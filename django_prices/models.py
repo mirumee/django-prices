@@ -23,7 +23,8 @@ class PriceField(models.DecimalField):
         return super(PriceField, self).get_db_prep_save(value, connection)
 
     def formfield(self, **kwargs):
-        defaults = {'form_class': forms.PriceField}
+        defaults = {'currency': self.currency,
+                    'form_class': forms.PriceField}
         defaults.update(kwargs)
         return super(PriceField, self).formfield(**defaults)
 
