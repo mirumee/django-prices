@@ -6,6 +6,7 @@ from . import forms
 
 class PriceField(models.DecimalField):
 
+    __metaclass__ = models.SubfieldBase
     description = "A field which stores a price."
 
     def __init__(self, verbose_name, currency, **kwargs):
@@ -15,19 +16,18 @@ class PriceField(models.DecimalField):
     def to_python(self, value):
         if isinstance(value, Price):
             return value
+        value = super(PriceField, self).to_python(value)
+        if value is None:
+            return value
         return Price(value, currency=self.currency)
 
-    def get_db_prep_save(self, value, connection):
-        if isinstance(value, Price):
+    def get_prep_value(self, value):
+        if value:
             value = value.net
-        return super(PriceField, self).get_db_prep_save(value, connection)
+        return super(PriceField, self).get_prep_value(value)
 
     def formfield(self, **kwargs):
         defaults = {'currency': self.currency,
                     'form_class': forms.PriceField}
         defaults.update(kwargs)
         return super(PriceField, self).formfield(**defaults)
-
-    def value_to_string(self, obj):
-        val = self._get_val_from_obj(obj)
-        return val.net

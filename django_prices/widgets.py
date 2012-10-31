@@ -1,4 +1,7 @@
 from django import forms
+from django.utils.html import escape
+from django.utils.safestring import mark_safe
+
 from prices import Price
 
 __all__ = ('PriceInput',)
@@ -10,10 +13,12 @@ class PriceInput(forms.TextInput):
         self.currency = currency
         super(PriceInput, self).__init__(*args, **kwargs)
 
-    def render(self, name, value, attrs=None):
-        amount = ''
+    def _format_value(self, value):
         if isinstance(value, Price):
             value = value.net
-        result = super(PriceInput, self).render(name, amount)
-        result += u' %s' % (self.currency,)
-        return result
+        return value
+
+    def render(self, name, value, attrs=None):
+        result = super(PriceInput, self).render(name, value)
+        result += u' %s' % (escape(self.currency),)
+        return mark_safe(result)

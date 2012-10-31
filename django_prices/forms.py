@@ -16,9 +16,14 @@ class PriceField(forms.DecimalField):
 
     def to_python(self, value):
         value = super(PriceField, self).to_python(value)
+        if value is None:
+            return value
         return Price(value, currency=self.currency)
 
     def validate(self, value):
-        if not isinstance(value, Price):
-            raise Exception('%r is not a valid price' % (value,))
-        super(PriceField, self).validate(value.net)
+        if value is None:
+            super(PriceField, self).validate(value)
+        else:
+            if not isinstance(value, Price):
+                raise Exception('%r is not a valid price' % (value,))
+            super(PriceField, self).validate(value.net)
