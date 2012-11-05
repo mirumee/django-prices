@@ -28,4 +28,5 @@ setup(name='django-prices',
       packages=['django_prices', 'django_prices.templatetags'],
       classifiers=CLASSIFIERS,
       install_requires=['django', 'prices == 2012.10.1'],
-      platforms=['any'])
+      platforms=['any'],
+      zip_safe=False)
