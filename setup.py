@@ -26,7 +26,6 @@ setup(name='django-prices',
       version=django_prices.__version__,
       url='http://satchless.com/',
       packages=['django_prices', 'django_prices.templatetags'],
-      include_package_data=True,
       classifiers=CLASSIFIERS,
       install_requires=['django', 'prices == 2012.10.1'],
       platforms=['any'])
