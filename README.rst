@@ -20,3 +20,9 @@ And forms::
     class ProductForm(forms.Form):
         name = forms.CharField(label='Name')
         price = PriceField(label='Price', currency='BTC')
+
+And templates::
+
+    {% load prices %}
+
+    <p>Price: {% gross foo.price %} ({% net foo.price %} + {% tax foo.price %} tax)</p>
