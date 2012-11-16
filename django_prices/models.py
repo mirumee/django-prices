@@ -3,6 +3,12 @@ from prices import Price
 
 from . import forms
 
+try:
+    from south.modelsinspector import add_introspection_rules
+    add_introspection_rules([], ["^django_prices\.models\.PriceField"])
+except ImportError:
+    pass
+
 
 class PriceField(models.DecimalField):
 
