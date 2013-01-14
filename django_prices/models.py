@@ -31,6 +31,12 @@ class PriceField(models.DecimalField):
             value = value.net
         return super(PriceField, self).get_prep_value(value)
 
+    def value_to_string(self, obj):
+        value = self._get_val_from_obj(obj)
+        if value:
+            return value.net
+        return super(PriceField, self).value_to_string(value)
+
     def formfield(self, **kwargs):
         defaults = {'currency': self.currency,
                     'form_class': forms.PriceField}
