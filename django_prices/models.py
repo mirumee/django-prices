@@ -9,7 +9,7 @@ class PriceField(models.DecimalField):
     __metaclass__ = models.SubfieldBase
     description = "A field which stores a price."
 
-    def __init__(self, verbose_name, currency, **kwargs):
+    def __init__(self, verbose_name=None, currency=None, **kwargs):
         self.currency = currency
         super(PriceField, self).__init__(verbose_name, **kwargs)
 
@@ -42,3 +42,15 @@ class PriceField(models.DecimalField):
                     'form_class': forms.PriceField}
         defaults.update(kwargs)
         return super(PriceField, self).formfield(**defaults)
+
+try:
+    from south.modelsinspector import add_introspection_rules
+except ImportError:
+    pass
+else:
+    rules = [
+        ((PriceField,), [], {
+            'currency': ('currency', {})
+        }),
+    ]
+    add_introspection_rules(rules, ["^django_prices\.models"])
