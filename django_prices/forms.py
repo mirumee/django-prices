@@ -27,7 +27,3 @@ class PriceField(forms.DecimalField):
             if not isinstance(value, Price):
                 raise Exception('%r is not a valid price' % (value,))
             super(PriceField, self).validate(value.net)
-            
-    def get_default(self):
-        default = super(PriceField, self).get_default()
-        return self.to_python(default)
