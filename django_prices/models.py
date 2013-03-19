@@ -43,6 +43,10 @@ class PriceField(models.DecimalField):
         defaults.update(kwargs)
         return super(PriceField, self).formfield(**defaults)
 
+    def get_default(self):
+        default = super(PriceField, self).get_default()
+        return self.to_python(default)
+
 try:
     from south.modelsinspector import add_introspection_rules
 except ImportError:
