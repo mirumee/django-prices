@@ -33,4 +33,16 @@ And templates:
 <p>Price: {% gross foo.price %} ({% net foo.price %} + {% tax foo.price %} tax)</p>
 ```
 
-Batteries included: comes with South migration support.
+Or install the wonderful [`babel`](http://babel.edgewall.org/) library and get proper currency symbols with `prices_i18n`:
+
+```
+$ pip install babel
+```
+
+```
+{% load prices_i18n %}
+
+<p>Price: {% gross foo.price %} ({% net foo.price %} + {% tax foo.price %} tax)</p>
+```
+
+Batteries included: django-prices comes with South migration support.

@@ -1,6 +1,4 @@
 #! /usr/bin/env python
-import django_prices
-
 from setuptools import setup
 
 CLASSIFIERS = [
@@ -23,7 +21,7 @@ setup(name='django-prices',
       author_email='hello@mirumee.com',
       description='Django fields for the prices module',
       license='BSD',
-      version='0.2',
+      version='0.2.1',
       url='http://satchless.com/',
       packages=['django_prices', 'django_prices.templatetags'],
       include_package_data=True,
