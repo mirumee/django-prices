@@ -27,7 +27,7 @@ class ProductForm(forms.Form):
 
 And templates:
 
-```
+```django
 {% load prices %}
 
 <p>Price: {% gross foo.price %} ({% net foo.price %} + {% tax foo.price %} tax)</p>
@@ -41,7 +41,7 @@ You can also install the wonderful [`babel`](http://babel.edgewall.org/) library
 $ pip install babel
 ```
 
-```
+```django
 {% load prices_i18n %}
 
 <p>Price: {% gross foo.price %} ({% net foo.price %} + {% tax foo.price %} tax)</p>
