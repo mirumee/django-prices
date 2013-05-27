@@ -33,7 +33,9 @@ And templates:
 <p>Price: {% gross foo.price %} ({% net foo.price %} + {% tax foo.price %} tax)</p>
 ```
 
-Or install the wonderful [`babel`](http://babel.edgewall.org/) library and get proper currency symbols with `prices_i18n`:
+**Note:** for template tags to work, you need to add `django_prices` to your `INSTALLED_APPS`.
+
+You can also install the wonderful [`babel`](http://babel.edgewall.org/) library and get proper currency symbols with `prices_i18n`:
 
 ```
 $ pip install babel
