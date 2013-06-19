@@ -22,7 +22,10 @@ class PriceField(models.DecimalField):
         return Price(value, currency=self.currency)
 
     def get_db_prep_save(self, value, connection):
-        return connection.ops.value_to_db_decimal(value.net,
+        value = self.to_python(value)
+        if value is not None:
+            value = value.net
+        return connection.ops.value_to_db_decimal(value,
                                                   self.max_digits,
                                                   self.decimal_places)
 
