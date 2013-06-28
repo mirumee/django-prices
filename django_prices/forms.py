@@ -26,4 +26,8 @@ class PriceField(forms.DecimalField):
         else:
             if not isinstance(value, Price):
                 raise Exception('%r is not a valid price' % (value,))
+            if value.currency != self.currency:
+                raise forms.ValidationError(
+                    'Invalid currency: %r (expected %r)' % (
+                        value.currency, self.currency))
             super(PriceField, self).validate(value.net)

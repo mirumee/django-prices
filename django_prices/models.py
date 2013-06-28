@@ -15,11 +15,20 @@ class PriceField(models.DecimalField):
 
     def to_python(self, value):
         if isinstance(value, Price):
+            if value.currency != self.currency:
+                raise ValueError('Invalid currency: %r (expected %r)' % (
+                    value.currency, self.currency))
             return value
         value = super(PriceField, self).to_python(value)
         if value is None:
             return value
         return Price(value, currency=self.currency)
+
+    def get_prep_value(self, value):
+        value = self.to_python(value)
+        if value is not None:
+            value = value.net
+        return value
 
     def get_db_prep_save(self, value, connection):
         value = self.to_python(value)
@@ -29,14 +38,9 @@ class PriceField(models.DecimalField):
                                                   self.max_digits,
                                                   self.decimal_places)
 
-    def get_prep_value(self, value):
-        if value:
-            value = value.net
-        return super(PriceField, self).get_prep_value(value)
-
     def value_to_string(self, obj):
         value = self._get_val_from_obj(obj)
-        if value:
+        if value is not None:
             return value.net
         return super(PriceField, self).value_to_string(value)
 
