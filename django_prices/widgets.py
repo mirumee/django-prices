@@ -18,6 +18,11 @@ class PriceInput(forms.TextInput):
             value = value.net
         return value
 
+    def _has_changed(self, initial, data):
+        if isinstance(initial, Price):
+            initial = initial.net
+        return super(PriceInput, self)._has_changed(initial, data)
+
     def render(self, name, value, attrs=None):
         result = super(PriceInput, self).render(name, value)
         result += u' %s' % (escape(self.currency),)
