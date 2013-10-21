@@ -1,10 +1,12 @@
+from __future__ import unicode_literals
+
 from django import forms
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
 
 from prices import Price
 
-__all__ = ('PriceInput',)
+__all__ = ['PriceInput']
 
 
 class PriceInput(forms.TextInput):
@@ -25,5 +27,5 @@ class PriceInput(forms.TextInput):
 
     def render(self, name, value, attrs=None):
         result = super(PriceInput, self).render(name, value)
-        result += u' %s' % (escape(self.currency),)
+        result += ' %s' % (escape(self.currency),)
         return mark_safe(result)
