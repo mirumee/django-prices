@@ -2,7 +2,6 @@
 from setuptools import setup
 
 CLASSIFIERS = [
-    'Development Status :: 5 - Production/Stable',
     'Environment :: Web Environment',
     'Intended Audience :: Developers',
     'License :: OSI Approved :: BSD License',
@@ -21,11 +20,11 @@ setup(name='django-prices',
       author_email='hello@mirumee.com',
       description='Django fields for the prices module',
       license='BSD',
-      version='0.2.3',
+      version='0.2.4',
       url='http://satchless.com/',
       packages=['django_prices', 'django_prices.templatetags'],
       include_package_data=True,
       classifiers=CLASSIFIERS,
-      install_requires=['django', 'prices >= 0.4, < 0.5a0'],
+      install_requires=['django', 'prices>=0.4,<0.5a0'],
       platforms=['any'],
       zip_safe=False)

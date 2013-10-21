@@ -1,6 +1,7 @@
 from django import forms
-from widgets import PriceInput
 from prices import Price
+
+from .widgets import PriceInput
 
 __all__ = ('PriceField', 'PriceInput')
 
