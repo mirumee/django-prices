@@ -4,9 +4,11 @@ from prices import Price
 from . import forms
 
 
-class PriceField(models.DecimalField):
+BaseField = models.SubfieldBase('BaseField', (models.DecimalField,), {})
 
-    __metaclass__ = models.SubfieldBase
+
+class PriceField(BaseField):
+
     description = "A field which stores a price."
 
     def __init__(self, verbose_name=None, currency=None, **kwargs):
@@ -62,6 +64,6 @@ else:
     rules = [
         ((PriceField,), [], {
             'currency': ('currency', {})
-        }),
+        })
     ]
     add_introspection_rules(rules, ["^django_prices\.models"])
