@@ -33,9 +33,7 @@ class PriceField(BaseField):
         return value
 
     def get_db_prep_save(self, value, connection):
-        value = self.to_python(value)
-        if value is not None:
-            value = value.net
+        value = self.get_prep_value(value)
         return connection.ops.value_to_db_decimal(value,
                                                   self.max_digits,
                                                   self.decimal_places)
