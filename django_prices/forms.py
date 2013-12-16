@@ -12,8 +12,7 @@ class PriceField(forms.DecimalField):
         self.currency = currency
         if isinstance(widget, type):
             widget = widget(currency=self.currency)
-        self.widget = widget
-        super(PriceField, self).__init__(*args, **kwargs)
+        super(PriceField, self).__init__(*args, widget=widget, **kwargs)
 
     def to_python(self, value):
         value = super(PriceField, self).to_python(value)
