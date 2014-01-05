@@ -13,9 +13,9 @@ def gross(price):
 
 @register.simple_tag
 def net(price):
-    return format_currency(price.gross, price.currency, locale=locale)
+    return format_currency(price.net, price.currency, locale=locale)
 
 
 @register.simple_tag
 def tax(price):
-    return format_currency(price.gross, price.currency, locale=locale)
+    return format_currency(price.tax, price.currency, locale=locale)
