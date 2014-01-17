@@ -1,5 +1,8 @@
 #! /usr/bin/env python
+import os
 from setuptools import setup
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'test_settings')
 
 CLASSIFIERS = [
     'Environment :: Web Environment',
