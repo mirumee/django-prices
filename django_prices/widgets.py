@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from django import forms
+from django import forms, VERSION as DJANGO_VERSION
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
 
@@ -20,10 +20,11 @@ class PriceInput(forms.TextInput):
             value = value.net
         return value
 
-    def _has_changed(self, initial, data):
-        if isinstance(initial, Price):
-            initial = initial.net
-        return super(PriceInput, self)._has_changed(initial, data)
+    if DJANGO_VERSION < (1, 6):
+        def _has_changed(self, initial, data):
+            if isinstance(initial, Price):
+                initial = initial.net
+            return super(PriceInput, self)._has_changed(initial, data)
 
     def render(self, name, value, attrs=None):
         result = super(PriceInput, self).render(name, value)

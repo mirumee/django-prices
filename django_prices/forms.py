@@ -31,3 +31,8 @@ class PriceField(forms.DecimalField):
                     'Invalid currency: %r (expected %r)' % (
                         value.currency, self.currency))
             super(PriceField, self).validate(value.net)
+
+    def _has_changed(self, initial, data):
+        if isinstance(initial, Price):
+            initial = initial.net
+        return super(PriceField, self)._has_changed(initial, data)
