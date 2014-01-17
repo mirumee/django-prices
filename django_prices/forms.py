@@ -36,4 +36,3 @@ class PriceField(forms.DecimalField):
         if isinstance(initial, Price):
             initial = initial.net
         return super(PriceField, self)._has_changed(initial, data)
-
