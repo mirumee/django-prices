@@ -35,11 +35,13 @@ And templates:
 
 **Note:** for template tags to work, you need to add `django_prices` to your `INSTALLED_APPS`.
 
-You can also install the wonderful [`babel`](http://babel.edgewall.org/) library and get proper currency symbols with `prices_i18n`:
+You can also install the wonderful [`babel`](http://babel.edgewall.org/) library and get proper currency symbols with `prices_i18n`. First install BabelDjango:
 
 ```
-$ pip install babel
+$ pip install BabelDjango
 ```
+
+Then follow the instruction to add it to your `INSTALLED_APPS` and `MIDDLEWARE_CLASSES`. Finally load the localized template tags:
 
 ```django
 {% load prices_i18n %}

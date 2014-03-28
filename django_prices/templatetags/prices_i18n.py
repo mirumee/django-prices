@@ -1,4 +1,4 @@
-from babel.numbers import format_currency
+from babeldjango.templatetags.babel import currencyfmt
 from django import template
 
 register = template.Library()
@@ -6,14 +6,14 @@ register = template.Library()
 
 @register.simple_tag
 def gross(price):
-    return format_currency(price.gross, price.currency)
+    return currencyfmt(price.gross, price.currency)
 
 
 @register.simple_tag
 def net(price):
-    return format_currency(price.net, price.currency)
+    return currencyfmt(price.net, price.currency)
 
 
 @register.simple_tag
 def tax(price):
-    return format_currency(price.tax, price.currency)
+    return currencyfmt(price.tax, price.currency)
