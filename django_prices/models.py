@@ -39,11 +39,6 @@ class PriceField(BaseField):
                                                   self.max_digits,
                                                   self.decimal_places)
 
-    def get_prep_value(self, value):
-        if value:
-            value = value.net
-        return super(PriceField, self).get_prep_value(value)
-
     def value_to_string(self, obj):
         value = self._get_val_from_obj(obj)
         if value is not None:
