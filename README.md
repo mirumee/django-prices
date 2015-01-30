@@ -27,7 +27,7 @@ class ProductForm(forms.Form):
 
 And templates:
 
-```django
+```html+django
 {% load prices %}
 
 <p>Price: {% gross foo.price %} ({% net foo.price %} + {% tax foo.price %} tax)</p>
@@ -43,7 +43,7 @@ $ pip install BabelDjango
 
 Then follow the instruction to add it to your `INSTALLED_APPS` and `MIDDLEWARE_CLASSES`. Finally load the localized template tags:
 
-```django
+```html+django
 {% load prices_i18n %}
 
 <p>Price: {% gross foo.price %} ({% net foo.price %} + {% tax foo.price %} tax)</p>
