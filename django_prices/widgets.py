@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 from django import forms, VERSION as DJANGO_VERSION
+from django.template.loader import render_to_string
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
 
@@ -10,6 +11,7 @@ __all__ = ['PriceInput']
 
 
 class PriceInput(forms.TextInput):
+    template = 'prices/widget.html'
 
     def __init__(self, currency, *args, **kwargs):
         self.currency = currency
@@ -27,6 +29,7 @@ class PriceInput(forms.TextInput):
             return super(PriceInput, self)._has_changed(initial, data)
 
     def render(self, name, value, attrs=None):
-        result = super(PriceInput, self).render(name, value)
-        result += ' %s' % (escape(self.currency),)
-        return mark_safe(result)
+        widget = super(PriceInput, self).render(name, value, attrs=attrs)
+        return render_to_string(self.template, {'widget': widget,
+                                                'value': value,
+                                                'currency': self.currency})

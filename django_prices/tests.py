@@ -1,4 +1,5 @@
 from decimal import Decimal
+from django.conf import settings
 from unittest import TestCase
 
 from django.db import models
@@ -50,3 +51,13 @@ class PriceFieldTest(TestCase):
         self.assertTrue(isinstance(form_field, forms.PriceField))
         self.assertEqual(form_field.currency, 'BTC')
         self.assertTrue(isinstance(form_field.widget, widgets.PriceInput))
+
+
+class PriceInputTest(TestCase):
+
+    def test_render(self):
+        widget = widgets.PriceInput('BTC', attrs={'type': 'number'})
+        result = widget.render('price', 5, attrs={'foo': 'bar'})
+        self.assertEqual(
+            result,
+            '<input foo="bar" name="price" type="number" value="5" /> BTC')
