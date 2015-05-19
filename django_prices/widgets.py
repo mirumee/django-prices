@@ -2,8 +2,6 @@ from __future__ import unicode_literals
 
 from django import forms, VERSION as DJANGO_VERSION
 from django.template.loader import render_to_string
-from django.utils.html import escape
-from django.utils.safestring import mark_safe
 
 from prices import Price
 
