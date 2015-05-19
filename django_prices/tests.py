@@ -1,7 +1,7 @@
 from decimal import Decimal
-from django.conf import settings
 from unittest import TestCase
 
+import django
 from django.db import models
 from prices import Price
 
@@ -54,6 +54,9 @@ class PriceFieldTest(TestCase):
 
 
 class PriceInputTest(TestCase):
+
+    def setUp(self):
+        django.setup()
 
     def test_render(self):
         widget = widgets.PriceInput('BTC', attrs={'type': 'number'})
