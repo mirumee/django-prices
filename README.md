@@ -10,7 +10,7 @@ from django_prices.models import PriceField
 
 class Product(models.Model):
     name = models.CharField('Name')
-    price = PriceField('Price', currency='BTC')
+    price = PriceField('Price', currency='BTC', max_digits=12, decimal_places=2)
 ```
 
 And forms:
