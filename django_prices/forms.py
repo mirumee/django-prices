@@ -11,7 +11,8 @@ class PriceField(forms.DecimalField):
     def __init__(self, currency, widget=PriceInput, *args, **kwargs):
         self.currency = currency
         if isinstance(widget, type):
-            widget = widget(currency=self.currency, attrs={'type': 'number'})
+            widget = widget(currency=self.currency, attrs={
+                'type': 'number', 'step': 'any'})
         super(PriceField, self).__init__(*args, widget=widget, **kwargs)
 
     def to_python(self, value):
