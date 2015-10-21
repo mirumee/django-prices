@@ -18,4 +18,9 @@ matrix:
     - env: TOXENV=py35-django_master
 after_success:
   - codecov
-
+addons:
+  apt:
+    sources:
+      - deadsnakes
+    packages:
+      - python3.5
