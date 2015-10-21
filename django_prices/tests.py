@@ -2,25 +2,19 @@ from decimal import Decimal
 from unittest import TestCase
 
 import django
-from django.db import models
 from prices import Price
 
 from . import forms
-from .models import PriceField
 from . import widgets
-
-
-class Foo(models.Model):
-
-    price = PriceField('price', currency='BTC', default='5', max_digits=9,
-                       decimal_places=2)
+from .models import PriceField
 
 
 class PriceFieldTest(TestCase):
 
     def test_init(self):
-        foo = Foo()
-        self.assertEquals(foo.price, Price(5, currency='BTC'))
+        field = PriceField(
+            currency='BTC', default='5', max_digits=9, decimal_places=2)
+        self.assertEquals(field.get_default(), Price(5, currency='BTC'))
 
     def test_get_prep_value(self):
         field = PriceField('price', currency='BTC', default='5', max_digits=9,
@@ -28,21 +22,23 @@ class PriceFieldTest(TestCase):
         self.assertEquals(field.get_prep_value(Price(5, currency='BTC')),
                           Decimal(5))
 
-    def test_to_python(self):
+    def test_from_db_value(self):
         field = PriceField('price', currency='BTC', default='5', max_digits=9,
                            decimal_places=2)
-        self.assertEqual(field.to_python(7), Price(7, currency='BTC'))
+        self.assertEqual(
+            field.from_db_value(7, None, None, None), Price(7, currency='BTC'))
 
-    def test_to_python_handles_none(self):
+    def test_from_db_value_handles_none(self):
         field = PriceField('price', currency='BTC', default='5', max_digits=9,
                            decimal_places=2)
-        self.assertEqual(field.to_python(None), None)
+        self.assertEqual(field.from_db_value(None, None, None, None), None)
 
-    def test_to_python_checks_currency(self):
+    def test_from_db_value_checks_currency(self):
         field = PriceField('price', currency='BTC', default='5', max_digits=9,
                            decimal_places=2)
         invalid = Price(1, currency='USD')
-        self.assertRaises(ValueError, lambda: field.to_python(invalid))
+        self.assertRaises(
+            ValueError, lambda: field.from_db_value(invalid, None, None, None))
 
     def test_formfield(self):
         field = PriceField('price', currency='BTC', default='5', max_digits=9,

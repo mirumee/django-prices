@@ -1,11 +1,14 @@
+import django
 from django.db import models
 from django.conf import settings
 from prices import Price
 
 from . import forms
 
-
-BaseField = models.SubfieldBase('BaseField', (models.DecimalField,), {})
+if django.VERSION < (1, 8):
+    BaseField = models.SubfieldBase('BaseField', (models.DecimalField,), {})
+else:
+    BaseField = models.DecimalField
 
 
 class PriceField(BaseField):
@@ -15,6 +18,9 @@ class PriceField(BaseField):
     def __init__(self, verbose_name=None, currency=None, **kwargs):
         self.currency = currency
         super(PriceField, self).__init__(verbose_name, **kwargs)
+
+    def from_db_value(self, value, expression, connection, context):
+        return self.to_python(value)
 
     def to_python(self, value):
         if isinstance(value, Price):

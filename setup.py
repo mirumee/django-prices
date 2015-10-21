@@ -29,7 +29,7 @@ setup(name='django-prices',
       packages=['django_prices', 'django_prices.templatetags'],
       include_package_data=True,
       classifiers=CLASSIFIERS,
-      install_requires=['django', 'prices>=0.5,<0.6a0'],
+      install_requires=['BabelDjango', 'django', 'prices>=0.5,<0.6a0'],
       platforms=['any'],
       test_suite='django_prices.tests',
       zip_safe=False)
