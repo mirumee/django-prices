@@ -2,25 +2,19 @@ from decimal import Decimal
 from unittest import TestCase
 
 import django
-from django.db import models
 from prices import Price
 
 from . import forms
-from .models import PriceField
 from . import widgets
-
-
-class Foo(models.Model):
-
-    price = PriceField('price', currency='BTC', default='5', max_digits=9,
-                       decimal_places=2)
+from .models import PriceField
 
 
 class PriceFieldTest(TestCase):
 
     def test_init(self):
-        foo = Foo()
-        self.assertEquals(foo.price, Price(5, currency='BTC'))
+        field = PriceField(
+            currency='BTC', default='5', max_digits=9, decimal_places=2)
+        self.assertEquals(field.get_default(), Price(5, currency='BTC'))
 
     def test_get_prep_value(self):
         field = PriceField('price', currency='BTC', default='5', max_digits=9,
