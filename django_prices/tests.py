@@ -48,6 +48,12 @@ class PriceFieldTest(TestCase):
         self.assertEqual(form_field.currency, 'BTC')
         self.assertTrue(isinstance(form_field.widget, widgets.PriceInput))
 
+    def test_field_passes_all_validations(self):
+        field = PriceField(name='price', currency='BTC', default='5',
+                           max_digits=9, decimal_places=2)
+        errors = field.check()
+        self.assertFalse(errors)
+
 
 class PriceInputTest(TestCase):
 
