@@ -1,5 +1,6 @@
 from decimal import Decimal
 from unittest import TestCase
+from unittest.mock import MagicMock
 
 import django
 from prices import Price
@@ -47,6 +48,13 @@ class PriceFieldTest(TestCase):
         self.assertTrue(isinstance(form_field, forms.PriceField))
         self.assertEqual(form_field.currency, 'BTC')
         self.assertTrue(isinstance(form_field.widget, widgets.PriceInput))
+
+    def test_field_passes_all_validations(self):
+        field = PriceField(name='price', currency='BTC', default='5',
+                           max_digits=9, decimal_places=2)
+        field.model = MagicMock()
+        errors = field.check()
+        self.assertFalse(errors)
 
 
 class PriceInputTest(TestCase):
