@@ -54,10 +54,6 @@ class PriceFieldTest(TestCase):
         self.assertEqual(form_field.currency, 'BTC')
         self.assertTrue(isinstance(form_field.widget, widgets.PriceInput))
 
-    def test_instance_values(self):
-        instance = TestModel(price=25)
-        self.assertEqual(instance.price.net, 25)
-
 
 class PriceInputTest(TestCase):
 
@@ -70,3 +66,13 @@ class PriceInputTest(TestCase):
         self.assertEqual(
             result,
             '<input foo="bar" name="price" type="number" value="5" /> BTC')
+
+
+class PriceModelFieldTest(TestCase):
+
+    def setUp(self):
+        django.setup()
+
+    def test_instance_values(self):
+        instance = TestModel(price=25)
+        self.assertEqual(instance.price.net, 25)
