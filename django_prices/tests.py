@@ -10,11 +10,6 @@ from . import widgets
 from .models import PriceField
 
 
-class TestModel(models.Model):
-    price = PriceField(currency='BTC', default='5', max_digits=9,
-                       decimal_places=2)
-
-
 class PriceFieldTest(TestCase):
 
     def test_init(self):
@@ -74,5 +69,8 @@ class PriceModelFieldTest(TestCase):
         django.setup()
 
     def test_instance_values(self):
+        class TestModel(models.Model):
+            price = PriceField(currency='BTC', default='5', max_digits=9,
+                               decimal_places=2)
         instance = TestModel(price=25)
         self.assertEqual(instance.price.net, 25)
