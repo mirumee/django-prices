@@ -1,5 +1,4 @@
 from decimal import Decimal
-from unittest import TestCase
 
 import django
 from django import forms as django_forms
