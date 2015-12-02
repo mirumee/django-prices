@@ -11,9 +11,13 @@ from . import widgets
 from .models import PriceField
 
 
-@pytest.fixture()
-def get_test_model():
+@pytest.fixture(scope='module')
+def django_setup():
     django.setup()
+
+
+@pytest.fixture(scope='module')
+def test_model(django_setup):
 
     class TestModel(models.Model):
         price = PriceField(currency='BTC', default='5', max_digits=9,
@@ -61,22 +65,13 @@ class PriceFieldTest(TestCase):
         self.assertTrue(isinstance(form_field.widget, widgets.PriceInput))
 
 
-class PriceInputTest(TestCase):
-
-    def setUp(self):
-        django.setup()
-
-    def test_render(self):
-        widget = widgets.PriceInput('BTC', attrs={'type': 'number'})
-        result = widget.render('price', 5, attrs={'foo': 'bar'})
-        self.assertEqual(
-            result,
+def test_render(django_setup):
+    widget = widgets.PriceInput('BTC', attrs={'type': 'number'})
+    result = widget.render('price', 5, attrs={'foo': 'bar'})
+    assert (result ==
             '<input foo="bar" name="price" type="number" value="5" /> BTC')
 
 
-class PriceModelFieldTest(TestCase):
-
-    def test_instance_values(self):
-        TestModel = get_test_model()
-        instance = TestModel(price=25)
-        self.assertEqual(instance.price.net, 25)
+def test_instance_values(test_model):
+    instance = test_model(price=25)
+    assert instance.price.net == 25
