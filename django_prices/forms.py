@@ -39,7 +39,7 @@ class PriceField(forms.DecimalField):
         return super(PriceField, self).has_changed(initial, data)
 
     def _has_changed(self, initial, data):
-        """Django <= 1.7 requires this method"""
+        # Django <= 1.7 requires this method
         if not isinstance(initial, Price):
             initial = self.to_python(initial)
         return super(PriceField, self)._has_changed(initial, data)
