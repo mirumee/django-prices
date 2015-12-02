@@ -1,10 +1,10 @@
 from decimal import Decimal
 from unittest import TestCase
 
-from prices import Price
-
 import django
+from django import forms as django_forms
 from django.db import models
+from prices import Price
 import pytest
 from . import forms
 from . import widgets
@@ -23,6 +23,13 @@ def test_model(django_setup):
         price = PriceField(currency='BTC', default='5', max_digits=9,
                            decimal_places=2)
     return TestModel
+
+
+@pytest.fixture(scope='module')
+def price_form(django_setup):
+    class PriceForm(django_forms.Form):
+        price = forms.PriceField(currency='BTC')
+    return PriceForm
 
 
 class PriceFieldTest(TestCase):
@@ -63,6 +70,23 @@ class PriceFieldTest(TestCase):
         self.assertTrue(isinstance(form_field, forms.PriceField))
         self.assertEqual(form_field.currency, 'BTC')
         self.assertTrue(isinstance(form_field.widget, widgets.PriceInput))
+
+
+def test_form_changed_data(price_form):
+    test_cases = [
+        ('5', Price(5, currency='BTC'), False),
+        ('5', Price(10, currency='BTC'), True),
+        ('5', '5', False),
+        ('5', '10', True),
+        ('5', None, True),
+        (None, Price(5, currency='BTC'), True),
+        (None, '5', True),
+        (None, None, False)]
+
+    for test_case in test_cases:
+        data, initial, expected_result = test_case
+        form = price_form(data={'price': data}, initial={'price': initial})
+        assert bool(form.changed_data) == expected_result
 
 
 def test_render(django_setup):
