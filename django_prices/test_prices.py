@@ -71,21 +71,19 @@ class PriceFieldTest(TestCase):
         self.assertTrue(isinstance(form_field.widget, widgets.PriceInput))
 
 
-def test_form_changed_data(test_form):
-    test_cases = [
-        ('5', Price(5, currency='BTC'), False),
-        ('5', Price(10, currency='BTC'), True),
-        ('5', '5', False),
-        ('5', '10', True),
-        ('5', None, True),
-        (None, Price(5, currency='BTC'), True),
-        (None, '5', True),
-        (None, None, False)]
-
-    for test_case in test_cases:
-        data, initial, expected_result = test_case
-        form = test_form(data={'price': data}, initial={'price': initial})
-        assert bool(form.changed_data) == expected_result
+@pytest.mark.parametrize("data,initial,expected_result", [
+    ('5', Price(5, currency='BTC'), False),
+    ('5', Price(10, currency='BTC'), True),
+    ('5', '5', False),
+    ('5', '10', True),
+    ('5', None, True),
+    (None, Price(5, currency='BTC'), True),
+    (None, '5', True),
+    (None, None, False)
+])
+def test_form_changed_data(test_form, data, initial, expected_result):
+    form = test_form(data={'price': data}, initial={'price': initial})
+    assert bool(form.changed_data) == expected_result
 
 
 def test_render(django_setup):
