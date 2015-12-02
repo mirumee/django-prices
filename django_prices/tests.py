@@ -1,20 +1,24 @@
 from decimal import Decimal
 from unittest import TestCase
 
-import django
-from django.db import models
 from prices import Price
 
+import django
+from django.db import models
+import pytest
 from . import forms
 from . import widgets
 from .models import PriceField
 
-django.setup()
 
+@pytest.fixture()
+def get_test_model():
+    django.setup()
 
-class TestModel(models.Model):
-    price = PriceField(currency='BTC', default='5', max_digits=9,
-                       decimal_places=2)
+    class TestModel(models.Model):
+        price = PriceField(currency='BTC', default='5', max_digits=9,
+                           decimal_places=2)
+    return TestModel
 
 
 class PriceFieldTest(TestCase):
@@ -59,6 +63,9 @@ class PriceFieldTest(TestCase):
 
 class PriceInputTest(TestCase):
 
+    def setUp(self):
+        django.setup()
+
     def test_render(self):
         widget = widgets.PriceInput('BTC', attrs={'type': 'number'})
         result = widget.render('price', 5, attrs={'foo': 'bar'})
@@ -70,5 +77,6 @@ class PriceInputTest(TestCase):
 class PriceModelFieldTest(TestCase):
 
     def test_instance_values(self):
+        TestModel = get_test_model()
         instance = TestModel(price=25)
         self.assertEqual(instance.price.net, 25)
