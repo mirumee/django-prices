@@ -18,7 +18,6 @@ def django_setup():
 
 @pytest.fixture(scope='module')
 def test_model(django_setup):
-
     class TestModel(models.Model):
         price = PriceField(currency='BTC', default='5', max_digits=9,
                            decimal_places=2)
@@ -26,7 +25,7 @@ def test_model(django_setup):
 
 
 @pytest.fixture(scope='module')
-def price_form(django_setup):
+def test_form(django_setup):
     class PriceForm(django_forms.Form):
         price = forms.PriceField(currency='BTC')
     return PriceForm
@@ -72,7 +71,7 @@ class PriceFieldTest(TestCase):
         self.assertTrue(isinstance(form_field.widget, widgets.PriceInput))
 
 
-def test_form_changed_data(price_form):
+def test_form_changed_data(test_form):
     test_cases = [
         ('5', Price(5, currency='BTC'), False),
         ('5', Price(10, currency='BTC'), True),
@@ -85,7 +84,7 @@ def test_form_changed_data(price_form):
 
     for test_case in test_cases:
         data, initial, expected_result = test_case
-        form = price_form(data={'price': data}, initial={'price': initial})
+        form = test_form(data={'price': data}, initial={'price': initial})
         assert bool(form.changed_data) == expected_result
 
 
