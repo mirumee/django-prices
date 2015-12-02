@@ -1,6 +1,8 @@
 #! /usr/bin/env python
 import os
 from setuptools import setup
+from setuptools.command.test import test as TestCommand
+import sys
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'test_settings')
 
@@ -18,17 +20,42 @@ CLASSIFIERS = [
     'Topic :: Software Development :: Libraries :: Application Frameworks',
     'Topic :: Software Development :: Libraries :: Python Modules']
 
-setup(name='django-prices',
-      author='Mirumee Software',
-      author_email='hello@mirumee.com',
-      description='Django fields for the prices module',
-      license='BSD',
-      version='0.4.2',
-      url='https://github.com/mirumee/django-prices',
-      packages=['django_prices', 'django_prices.templatetags'],
-      include_package_data=True,
-      classifiers=CLASSIFIERS,
-      install_requires=['BabelDjango', 'django', 'prices>=0.5,<0.6a0'],
-      platforms=['any'],
-      test_suite='django_prices.tests',
-      zip_safe=False)
+
+class PyTest(TestCommand):
+    user_options = [('pytest-args=', 'a', "Arguments to pass to py.test")]
+    test_args = []
+
+    def initialize_options(self):
+        TestCommand.initialize_options(self)
+        self.pytest_args = []
+
+    def finalize_options(self):
+        TestCommand.finalize_options(self)
+        self.test_args = []
+        self.test_suite = True
+
+    def run_tests(self):
+        #import here, cause outside the eggs aren't loaded
+        import pytest
+        errno = pytest.main(self.pytest_args)
+        sys.exit(errno)
+
+setup(
+    name='django-prices',
+    author='Mirumee Software',
+    author_email='hello@mirumee.com',
+    description='Django fields for the prices module',
+    license='BSD',
+    version='0.4.2',
+    url='https://github.com/mirumee/django-prices',
+    packages=['django_prices', 'django_prices.templatetags'],
+    modules=['test_settings'],
+    include_package_data=True,
+    classifiers=CLASSIFIERS,
+    install_requires=['BabelDjango', 'django', 'prices>=0.5,<0.6a0'],
+    tests_require=['pytest'],
+    platforms=['any'],
+    test_suite='django_prices.tests',
+    cmdclass={
+        'test': PyTest},
+    zip_safe=False)
