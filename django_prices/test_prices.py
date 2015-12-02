@@ -5,6 +5,7 @@ from django import forms as django_forms
 from django.db import models
 from prices import Price
 import pytest
+
 from . import forms
 from . import widgets
 from .models import PriceField
