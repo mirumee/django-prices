@@ -31,44 +31,45 @@ def test_form(django_setup):
     return PriceForm
 
 
-class PriceFieldTest(TestCase):
+def test_init():
+    field = PriceField(
+        currency='BTC', default='5', max_digits=9, decimal_places=2)
+    assert field.get_default() == Price(5, currency='BTC')
 
-    def test_init(self):
-        field = PriceField(
-            currency='BTC', default='5', max_digits=9, decimal_places=2)
-        self.assertEquals(field.get_default(), Price(5, currency='BTC'))
 
-    def test_get_prep_value(self):
-        field = PriceField('price', currency='BTC', default='5', max_digits=9,
-                           decimal_places=2)
-        self.assertEquals(field.get_prep_value(Price(5, currency='BTC')),
-                          Decimal(5))
+def test_get_prep_value():
+    field = PriceField('price', currency='BTC', default='5', max_digits=9,
+                       decimal_places=2)
+    assert field.get_prep_value(Price(5, currency='BTC')) == Decimal(5)
 
-    def test_from_db_value(self):
-        field = PriceField('price', currency='BTC', default='5', max_digits=9,
-                           decimal_places=2)
-        self.assertEqual(
-            field.from_db_value(7, None, None, None), Price(7, currency='BTC'))
 
-    def test_from_db_value_handles_none(self):
-        field = PriceField('price', currency='BTC', default='5', max_digits=9,
-                           decimal_places=2)
-        self.assertEqual(field.from_db_value(None, None, None, None), None)
+def test_from_db_value():
+    field = PriceField('price', currency='BTC', default='5', max_digits=9,
+                       decimal_places=2)
+    assert field.from_db_value(7, None, None, None) == Price(7, currency='BTC')
 
-    def test_from_db_value_checks_currency(self):
-        field = PriceField('price', currency='BTC', default='5', max_digits=9,
-                           decimal_places=2)
-        invalid = Price(1, currency='USD')
-        self.assertRaises(
-            ValueError, lambda: field.from_db_value(invalid, None, None, None))
 
-    def test_formfield(self):
-        field = PriceField('price', currency='BTC', default='5', max_digits=9,
-                           decimal_places=2)
-        form_field = field.formfield()
-        self.assertTrue(isinstance(form_field, forms.PriceField))
-        self.assertEqual(form_field.currency, 'BTC')
-        self.assertTrue(isinstance(form_field.widget, widgets.PriceInput))
+def test_from_db_value_handles_none():
+    field = PriceField('price', currency='BTC', default='5', max_digits=9,
+                       decimal_places=2)
+    assert field.from_db_value(None, None, None, None) == None
+
+
+def test_from_db_value_checks_currency():
+    field = PriceField('price', currency='BTC', default='5', max_digits=9,
+                       decimal_places=2)
+    invalid = Price(1, currency='USD')
+    with pytest.raises(ValueError):
+        field.from_db_value(invalid, None, None, None)
+
+
+def test_formfield():
+    field = PriceField('price', currency='BTC', default='5', max_digits=9,
+                       decimal_places=2)
+    form_field = field.formfield()
+    assert isinstance(form_field, forms.PriceField)
+    assert form_field.currency == 'BTC'
+    assert isinstance(form_field.widget, widgets.PriceInput)
 
 
 @pytest.mark.parametrize("data,initial,expected_result", [
