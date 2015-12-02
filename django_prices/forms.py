@@ -33,7 +33,13 @@ class PriceField(forms.DecimalField):
                         value.currency, self.currency))
             super(PriceField, self).validate(value.net)
 
+    def has_changed(self, initial, data):
+        if not isinstance(initial, Price):
+            initial = self.to_python(initial)
+        return super(PriceField, self).has_changed(initial, data)
+
     def _has_changed(self, initial, data):
-        if isinstance(initial, Price):
-            initial = initial.net
+        # Django <= 1.7 requires this method
+        if not isinstance(initial, Price):
+            initial = self.to_python(initial)
         return super(PriceField, self)._has_changed(initial, data)

@@ -4,3 +4,4 @@
 !.travis.yml
 *.py[co]
 *~
+*\.egg*
