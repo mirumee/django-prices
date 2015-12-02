@@ -2,11 +2,18 @@ from decimal import Decimal
 from unittest import TestCase
 
 import django
+django.setup()
+
+from django import forms as django_forms
 from prices import Price
 
 from . import forms
 from . import widgets
 from .models import PriceField
+
+
+class PriceForm(django_forms.Form):
+    price = forms.PriceField(currency='BTC')
 
 
 class PriceFieldTest(TestCase):
@@ -48,11 +55,24 @@ class PriceFieldTest(TestCase):
         self.assertEqual(form_field.currency, 'BTC')
         self.assertTrue(isinstance(form_field.widget, widgets.PriceInput))
 
+    def test_form_changed_data(self):
+        test_cases = [
+            ('5', Price(5, currency='BTC'), False),
+            ('5', Price(10, currency='BTC'), True),
+            ('5', '5', False),
+            ('5', '10', True),
+            ('5', None, True),
+            (None, Price(5, currency='BTC'), True),
+            (None, '5', True),
+            (None, None, False)]
+
+        for test_case in test_cases:
+            data, initial, expected_result = test_case
+            form = PriceForm(data={'price': data}, initial={'price': initial})
+            self.assertEqual(bool(form.changed_data), expected_result)
+
 
 class PriceInputTest(TestCase):
-
-    def setUp(self):
-        django.setup()
 
     def test_render(self):
         widget = widgets.PriceInput('BTC', attrs={'type': 'number'})
