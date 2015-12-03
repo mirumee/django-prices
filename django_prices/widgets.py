@@ -10,6 +10,7 @@ __all__ = ['PriceInput']
 
 class PriceInput(forms.TextInput):
     template = 'prices/widget.html'
+    input_type = 'number'
 
     def __init__(self, currency, *args, **kwargs):
         self.currency = currency

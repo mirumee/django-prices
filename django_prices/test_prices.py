@@ -2,7 +2,7 @@ from decimal import Decimal
 
 import django
 from django import forms as django_forms
-from django.db import models
+from django.db import connection, models
 from prices import Price
 import pytest
 
@@ -13,7 +13,8 @@ from .models import PriceField
 
 @pytest.fixture(scope='module')
 def django_setup():
-    django.setup()
+    if django.VERSION >= (1, 7, 0):
+        django.setup()
 
 
 @pytest.fixture(scope='module')
@@ -41,6 +42,19 @@ def test_get_prep_value():
     field = PriceField('price', currency='BTC', default='5', max_digits=9,
                        decimal_places=2)
     assert field.get_prep_value(Price(5, currency='BTC')) == Decimal(5)
+
+
+def test_get_db_prep_save():
+    field = PriceField('price', currency='BTC', default='5', max_digits=9,
+                       decimal_places=2)
+    value = field.get_db_prep_save(Price(5, currency='BTC'), connection)
+    assert value == '5.00'
+
+
+def test_value_to_string(test_model):
+    instance = test_model(price=30)
+    field = instance._meta.get_field('price')
+    assert field.value_to_string(instance) == Decimal('30')
 
 
 def test_from_db_value():
@@ -90,8 +104,10 @@ def test_form_changed_data(test_form, data, initial, expected_result):
 def test_render(django_setup):
     widget = widgets.PriceInput('BTC', attrs={'type': 'number'})
     result = widget.render('price', 5, attrs={'foo': 'bar'})
-    assert (result ==
-            '<input foo="bar" name="price" type="number" value="5" /> BTC')
+    attrs = [
+        'foo="bar"', 'name="price"', 'type="number"', 'value="5"', 'BTC']
+    for attr in attrs:
+        assert attr in result
 
 
 def test_instance_values(test_model):

@@ -61,12 +61,14 @@ class PriceField(BaseField):
 
     def get_db_prep_save(self, value, connection):
         value = self.get_prep_value(value)
-        return connection.ops.value_to_db_decimal(value,
-                                                  self.max_digits,
-                                                  self.decimal_places)
+        if django.VERSION < (1, 9):
+            db_value = connection.ops.value_to_db_decimal
+        else:
+            db_value = connection.ops.adapt_decimalfield_value
+        return db_value(value, self.max_digits, self.decimal_places)
 
     def value_to_string(self, obj):
-        value = self._get_val_from_obj(obj)
+        value = self.value_from_object(obj)
         if value is not None:
             return value.net
         return super(PriceField, self).value_to_string(value)

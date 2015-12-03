@@ -1,4 +1,4 @@
-from django import forms
+from django import forms, VERSION as DJANGO_VERSION
 from prices import Price
 
 from .widgets import PriceInput
@@ -38,8 +38,8 @@ class PriceField(forms.DecimalField):
             initial = self.to_python(initial)
         return super(PriceField, self).has_changed(initial, data)
 
-    def _has_changed(self, initial, data):
-        # Django <= 1.7 requires this method
-        if not isinstance(initial, Price):
-            initial = self.to_python(initial)
-        return super(PriceField, self)._has_changed(initial, data)
+    if DJANGO_VERSION < (1, 8):
+        def _has_changed(self, initial, data):
+            if not isinstance(initial, Price):
+                initial = self.to_python(initial)
+            return super(PriceField, self)._has_changed(initial, data)
