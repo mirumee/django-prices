@@ -5,6 +5,7 @@ install:
 script:
   - tox
 env:
+  - TOXENV=py27-django14
   - TOXENV=py27-django17
   - TOXENV=py27-django18
   - TOXENV=py27-django19
