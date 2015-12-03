@@ -113,3 +113,9 @@ def test_render(django_setup):
 def test_instance_values(test_model):
     instance = test_model(price=25)
     assert instance.price.net == 25
+
+
+def test_field_passes_all_validations(test_form):
+    form = test_form(data={'price': '20'})
+    form.full_clean()
+    assert form.errors == {}
