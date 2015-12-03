@@ -66,7 +66,7 @@ class PriceField(BaseField):
                                                   self.decimal_places)
 
     def value_to_string(self, obj):
-        value = self._get_val_from_obj(obj)
+        value = self.value_from_object(obj)
         if value is not None:
             return value.net
         return super(PriceField, self).value_to_string(value)
