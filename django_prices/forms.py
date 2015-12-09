@@ -34,7 +34,9 @@ class PriceField(forms.DecimalField):
             super(PriceField, self).validate(value.net)
 
     def run_validators(self, value):
-        return super(PriceField, self).run_validators(value.net)
+	if isinstance(value, Price):
+	    value = value.net
+        return super(PriceField, self).run_validators(value)
 
     def has_changed(self, initial, data):
         if not isinstance(initial, Price):
