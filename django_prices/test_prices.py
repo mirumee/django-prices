@@ -31,6 +31,12 @@ def test_form(django_setup):
         price = forms.PriceField(currency='BTC')
     return PriceForm
 
+@pytest.fixture(scope='module')
+def test_form_price_not_required(django_setup):
+    class PriceForm(django_forms.Form):
+        price = forms.PriceField(currency='BTC', required=False)
+    return PriceForm
+
 
 def test_init():
     field = PriceField(
@@ -119,3 +125,9 @@ def test_field_passes_all_validations(test_form):
     form = test_form(data={'price': '20'})
     form.full_clean()
     assert form.errors == {}
+
+
+def test_field_passes_none_validation(test_form_price_not_required):
+   form = test_form_price_not_required(data={'price': None})
+   form.full_clean()
+   assert form.errors == {}
