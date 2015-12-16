@@ -9,6 +9,7 @@ import pytest
 from . import forms
 from . import widgets
 from .models import PriceField
+from .templatetags import prices_i18n
 
 
 @pytest.fixture(scope='module')
@@ -24,6 +25,9 @@ def test_model(django_setup):
                            decimal_places=2)
     return TestModel
 
+@pytest.fixture(scope='module')
+def price_fixture():
+    return Price(net='10', gross='15', currency='USD')
 
 @pytest.fixture(scope='module')
 def test_form(django_setup):
@@ -128,6 +132,36 @@ def test_field_passes_all_validations(test_form):
 
 
 def test_field_passes_none_validation(test_form_price_not_required):
-   form = test_form_price_not_required(data={'price': None})
-   form.full_clean()
-   assert form.errors == {}
+    form = test_form_price_not_required(data={'price': None})
+    form.full_clean()
+    assert form.errors == {}
+
+
+def test_templatetag_gross(django_setup, price_fixture):
+        gross = prices_i18n.gross(price_fixture)
+        assert gross == '$15.00'
+
+
+def test_templatetag_gross_html(django_setup, price_fixture):
+    gross = prices_i18n.gross(price_fixture, html=True)
+    assert gross == '<span class="currency">$</span>15.00'
+
+
+def test_templatetag_net(django_setup, price_fixture):
+    net = prices_i18n.net(price_fixture)
+    assert net == '$10.00'
+
+
+def test_templatetag_net_html(django_setup, price_fixture):
+    net = prices_i18n.net(price_fixture, html=True)
+    assert net == '<span class="currency">$</span>10.00'
+
+
+def test_templatetag_tax(django_setup, price_fixture):
+    tax = prices_i18n.tax(price_fixture)
+    assert tax == '$5.00'
+
+
+def test_templatetag_tax_html(django_setup, price_fixture):
+    tax = prices_i18n.tax(price_fixture, html=True)
+    assert tax == '<span class="currency">$</span>5.00'
