@@ -60,7 +60,7 @@ You can also use HTML output from `prices_i18n` template tags, they will wrap cu
 It will be rendered as a following structure (for example with English locale):
 
 ```html
-<span class="currency">$</span> 15.00
+<span class="currency">$</span>15.00
 ```
 
 
