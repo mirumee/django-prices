@@ -49,4 +49,19 @@ Then follow the instruction to add it to your `INSTALLED_APPS` and `MIDDLEWARE_C
 <p>Price: {% gross foo.price %} ({% net foo.price %} + {% tax foo.price %} tax)</p>
 ```
 
+You can also use HTML output from `prices_i18n` template tags, they will wrap currency symbol in a `<span>` element:
+
+```html+django
+{% load prices_i18n %}
+
+<p>Price: {% gross foo.price html=True %} ({% net foo.price html=True %} + {% tax foo.price html=True %} tax)</p>
+```
+
+It will be rendered as a following structure (for example with English locale):
+
+```html
+<span class="currency">$</span> 15.00
+```
+
+
 Batteries included: django-prices comes with South migration support.
