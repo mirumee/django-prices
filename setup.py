@@ -4,7 +4,7 @@ from setuptools import setup
 from setuptools.command.test import test as TestCommand
 import sys
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'test_settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_prices.test_settings')
 
 CLASSIFIERS = [
     'Environment :: Web Environment',
@@ -46,10 +46,9 @@ setup(
     author_email='hello@mirumee.com',
     description='Django fields for the prices module',
     license='BSD',
-    version='0.4.7',
+    version='0.4.8',
     url='https://github.com/mirumee/django-prices',
     packages=['django_prices', 'django_prices.templatetags'],
-    modules=['test_settings'],
     include_package_data=True,
     classifiers=CLASSIFIERS,
     install_requires=['BabelDjango', 'django', 'prices>=0.5,<0.6a0'],
