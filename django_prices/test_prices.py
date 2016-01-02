@@ -25,15 +25,27 @@ def test_model(django_setup):
                            decimal_places=2)
     return TestModel
 
+
 @pytest.fixture(scope='module')
 def price_fixture():
     return Price(net='10', gross='15', currency='USD')
+
 
 @pytest.fixture(scope='module')
 def test_form(django_setup):
     class PriceForm(django_forms.Form):
         price = forms.PriceField(currency='BTC')
     return PriceForm
+
+
+@pytest.fixture(scope='module')
+def test_model_form(test_model):
+    class PriceForm(django_forms.ModelForm):
+        class Meta:
+            model = test_model
+            fields = ['price']
+    return PriceForm
+
 
 @pytest.fixture(scope='module')
 def test_form_price_not_required(django_setup):
@@ -127,6 +139,12 @@ def test_instance_values(test_model):
 
 def test_field_passes_all_validations(test_form):
     form = test_form(data={'price': '20'})
+    form.full_clean()
+    assert form.errors == {}
+
+
+def test_model_field_passes_all_validations(test_model_form):
+    form = test_model_form(data={'price': '20'})
     form.full_clean()
     assert form.errors == {}
 
