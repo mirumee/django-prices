@@ -53,6 +53,11 @@ class PriceField(BaseField):
             return value
         return Price(value, currency=self.currency)
 
+    def run_validators(self, value):
+        if isinstance(value, Price):
+            value = value.net
+        return super(PriceField, self).run_validators(value)
+
     def get_prep_value(self, value):
         value = self.to_python(value)
         if value is not None:
