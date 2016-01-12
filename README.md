@@ -1,6 +1,8 @@
 django-prices: Django fields for the `prices` module
 ====================================================
 
+[![Build Status](https://secure.travis-ci.org/mirumee/django-prices.png)](https://travis-ci.org/mirumee/django-prices) [![codecov.io](https://img.shields.io/codecov/c/github/mirumee/django-prices/master.svg)](http://codecov.io/github/mirumee/django-prices?branch=master)
+
 Provides support for models:
 
 ```python
