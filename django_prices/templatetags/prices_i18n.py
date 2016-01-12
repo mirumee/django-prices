@@ -29,7 +29,7 @@ def format_price(value, currency):
     if not localedata.exists(locale_code):
         localedata.load(locale_code)
     locale = Locale(locale_code)
-    currency_format = locale.currency_formats.get(None)
+    currency_format = locale.currency_formats.get('standard')
     pattern = currency_format.pattern
     pattern = re.sub(
         '(\xa4+)', '<span class="currency">\\1</span>', pattern)
