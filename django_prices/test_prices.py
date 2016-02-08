@@ -3,13 +3,13 @@ from decimal import Decimal
 import django
 from django import forms as django_forms
 from django.db import connection, models
-from prices import Price
+from prices import percentage_discount, Price
 import pytest
 
 from . import forms
 from . import widgets
 from .models import PriceField
-from .templatetags import prices_i18n
+from .templatetags import prices as tags, prices_i18n
 
 
 @pytest.fixture(scope='module')
@@ -88,7 +88,7 @@ def test_from_db_value():
 def test_from_db_value_handles_none():
     field = PriceField('price', currency='BTC', default='5', max_digits=9,
                        decimal_places=2)
-    assert field.from_db_value(None, None, None, None) == None
+    assert field.from_db_value(None, None, None, None) is None
 
 
 def test_from_db_value_checks_currency():
@@ -183,3 +183,10 @@ def test_templatetag_tax(django_setup, price_fixture):
 def test_templatetag_tax_html(django_setup, price_fixture):
     tax = prices_i18n.tax(price_fixture, html=True)
     assert tax == '<span class="currency">$</span>5.00'
+
+
+def test_templatetag_discount_amount_for(django_setup):
+    price = Price(30, currency='BTC')
+    discount = percentage_discount(50)
+    discount_amount = tags.as_amount_for(discount, price)
+    assert discount_amount == Price(-15, currency='BTC')

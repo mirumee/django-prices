@@ -16,3 +16,8 @@ def net(price):
 @register.inclusion_tag('prices/price.html')
 def tax(price):
     return {'amount': price.tax, 'currency': price.currency}
+
+
+@register.filter
+def discount_amount_for(discount, price):
+    return (price | discount) - price
