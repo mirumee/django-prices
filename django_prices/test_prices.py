@@ -188,5 +188,5 @@ def test_templatetag_tax_html(django_setup, price_fixture):
 def test_templatetag_discount_amount_for(django_setup):
     price = Price(30, currency='BTC')
     discount = percentage_discount(50)
-    discount_amount = tags.as_amount_for(discount, price)
+    discount_amount = tags.discount_amount_for(discount, price)
     assert discount_amount == Price(-15, currency='BTC')
