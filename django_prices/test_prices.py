@@ -197,10 +197,10 @@ def test_non_existing_locale(price_fixture):
     #     https://github.com/python-babel/babel/issues/30
     translation.activate('oO_Oo')
     tax = prices_i18n.tax(price_fixture, html=True)
-    assert tax == '<span class="currency">$</span>5.00'
+    assert tax  # No exception, success!
 
 
-def test_non_cannonical_locale_zh_CN(price_fixture):
+def test_non_cannonical_locale_zh_CN(price_fixture, settings):
     # Test detecting an error that occur for language 'zh_CN' for which
     # the canonical code is 'zh_Hans_CN', see:
     #     Babel 1.0+ doesn't support `zh_CN`
@@ -208,6 +208,15 @@ def test_non_cannonical_locale_zh_CN(price_fixture):
     # This should now work, as we are using:
     #     `Locale.parse('zh_CN')`
     # which does the conversion to the canonical name.
+
+    # Making sure the default "LANGUAGE_CODE" is "en_US"
+    settings.LANGUAGE_CODE = 'en_US'
+
+    # Checking format of the default locale
+    tax = prices_i18n.tax(price_fixture, html=True)
+    assert tax == '<span class="currency">$</span>5.00'
+
+    # Checking if 'zh_CN' has changed the format
     translation.activate('zh_CN')
     tax = prices_i18n.tax(price_fixture, html=True)
     assert tax == '<span class="currency">US$</span>5.00'  # 'US' before '$'
