@@ -27,7 +27,9 @@ def format_price(value, currency):
         language = settings.LANGUAGE_CODE
     locale_code = to_locale(language)
     if not localedata.exists(locale_code):
-        localedata.load(locale_code)
+        # Fallback to the default language
+        language = settings.LANGUAGE_CODE
+        locale_code = to_locale(language)
     locale = Locale(locale_code)
     currency_format = locale.currency_formats.get('standard')
     pattern = currency_format.pattern
