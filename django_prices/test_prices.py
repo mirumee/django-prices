@@ -1,6 +1,5 @@
 from decimal import Decimal
 
-import django
 from django import forms as django_forms
 from django.db import connection, models
 from django.utils import translation
@@ -14,13 +13,7 @@ from .templatetags import prices as tags, prices_i18n
 
 
 @pytest.fixture(scope='module')
-def django_setup():
-    if django.VERSION >= (1, 7, 0):
-        django.setup()
-
-
-@pytest.fixture(scope='module')
-def test_model(django_setup):
+def test_model():
     class TestModel(models.Model):
         price = PriceField(currency='BTC', default='5', max_digits=9,
                            decimal_places=2)
@@ -33,7 +26,7 @@ def price_fixture():
 
 
 @pytest.fixture(scope='module')
-def test_form(django_setup):
+def test_form():
     class PriceForm(django_forms.Form):
         price = forms.PriceField(currency='BTC')
     return PriceForm
@@ -49,7 +42,7 @@ def test_model_form(test_model):
 
 
 @pytest.fixture(scope='module')
-def test_form_price_not_required(django_setup):
+def test_form_price_not_required():
     class PriceForm(django_forms.Form):
         price = forms.PriceField(currency='BTC', required=False)
     return PriceForm
@@ -124,7 +117,7 @@ def test_form_changed_data(test_form, data, initial, expected_result):
     assert bool(form.changed_data) == expected_result
 
 
-def test_render(django_setup):
+def test_render():
     widget = widgets.PriceInput('BTC', attrs={'type': 'number'})
     result = widget.render('price', 5, attrs={'foo': 'bar'})
     attrs = [
@@ -156,45 +149,45 @@ def test_field_passes_none_validation(test_form_price_not_required):
     assert form.errors == {}
 
 
-def test_templatetag_gross(django_setup, price_fixture):
+def test_templatetag_gross(price_fixture):
         gross = prices_i18n.gross(price_fixture)
         assert gross == '$15.00'
 
 
-def test_templatetag_gross_html(django_setup, price_fixture):
+def test_templatetag_gross_html(price_fixture):
     gross = prices_i18n.gross(price_fixture, html=True)
     assert gross == '<span class="currency">$</span>15.00'
 
 
-def test_templatetag_net(django_setup, price_fixture):
+def test_templatetag_net(price_fixture):
     net = prices_i18n.net(price_fixture)
     assert net == '$10.00'
 
 
-def test_templatetag_net_html(django_setup, price_fixture):
+def test_templatetag_net_html(price_fixture):
     net = prices_i18n.net(price_fixture, html=True)
     assert net == '<span class="currency">$</span>10.00'
 
 
-def test_templatetag_tax(django_setup, price_fixture):
+def test_templatetag_tax(price_fixture):
     tax = prices_i18n.tax(price_fixture)
     assert tax == '$5.00'
 
 
-def test_templatetag_tax_html(django_setup, price_fixture):
+def test_templatetag_tax_html(price_fixture):
     tax = prices_i18n.tax(price_fixture, html=True)
     assert tax == '<span class="currency">$</span>5.00'
 
 
-def test_templatetag_discount_amount_for(django_setup):
+def test_templatetag_discount_amount_for():
     price = Price(30, currency='BTC')
     discount = percentage_discount(50)
     discount_amount = tags.discount_amount_for(discount, price)
     assert discount_amount == Price(-15, currency='BTC')
 
 
-def test_non_existing_locale(django_setup, price_fixture):
-    # Test detecting an error that occured for language 'zh_CN' for which
+def test_non_existing_locale(price_fixture):
+    # Test detecting an error that occur for language 'zh_CN' for which
     # the canonical code is 'zh_Hans_CN', see:
     #     Babel 1.0+ doesn't support `zh_CN`
     #     https://github.com/python-babel/babel/issues/37
@@ -204,4 +197,26 @@ def test_non_existing_locale(django_setup, price_fixture):
     #     https://github.com/python-babel/babel/issues/30
     translation.activate('oO_Oo')
     tax = prices_i18n.tax(price_fixture, html=True)
+    assert tax  # No exception, success!
+
+
+def test_non_cannonical_locale_zh_CN(price_fixture, settings):
+    # Test detecting an error that occur for language 'zh_CN' for which
+    # the canonical code is 'zh_Hans_CN', see:
+    #     Babel 1.0+ doesn't support `zh_CN`
+    #     https://github.com/python-babel/babel/issues/37
+    # This should now work, as we are using:
+    #     `Locale.parse('zh_CN')`
+    # which does the conversion to the canonical name.
+
+    # Making sure the default "LANGUAGE_CODE" is "en_US"
+    settings.LANGUAGE_CODE = 'en_US'
+
+    # Checking format of the default locale
+    tax = prices_i18n.tax(price_fixture, html=True)
     assert tax == '<span class="currency">$</span>5.00'
+
+    # Checking if 'zh_CN' has changed the format
+    translation.activate('zh_CN')
+    tax = prices_i18n.tax(price_fixture, html=True)
+    assert tax == '<span class="currency">US$</span>5.00'  # 'US' before '$'

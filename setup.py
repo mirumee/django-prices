@@ -53,7 +53,7 @@ setup(
     classifiers=CLASSIFIERS,
     install_requires=[
         'Babel>=2.2', 'BabelDjango', 'django', 'prices>=0.5.7,<0.6a0'],
-    tests_require=['pytest'],
+    tests_require=['pytest', 'pytest-django'],
     platforms=['any'],
     test_suite='django_prices.tests',
     cmdclass={
