@@ -3,6 +3,7 @@ from decimal import Decimal
 import django
 from django import forms as django_forms
 from django.db import connection, models
+from django.utils import translation
 from prices import percentage_discount, Price
 import pytest
 
@@ -190,3 +191,17 @@ def test_templatetag_discount_amount_for(django_setup):
     discount = percentage_discount(50)
     discount_amount = tags.discount_amount_for(discount, price)
     assert discount_amount == Price(-15, currency='BTC')
+
+
+def test_non_existing_locale(django_setup, price_fixture):
+    # Test detecting an error that occured for language 'zh_CN' for which
+    # the canonical code is 'zh_Hans_CN', see:
+    #     Babel 1.0+ doesn't support `zh_CN`
+    #     https://github.com/python-babel/babel/issues/37
+    # Though to make this test more reliable we mock the language with totally
+    # made up code 'oO_Oo' as the 'zh_CN' "alias" might work in the future, see:
+    #     Babel needs to support Fuzzy Locales
+    #     https://github.com/python-babel/babel/issues/30
+    translation.activate('oO_Oo')
+    tax = prices_i18n.tax(price_fixture, html=True)
+    assert tax == '<span class="currency">$</span>5.00'
