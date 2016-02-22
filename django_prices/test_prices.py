@@ -194,7 +194,7 @@ def test_templatetag_discount_amount_for(django_setup):
 
 
 def test_non_existing_locale(django_setup, price_fixture):
-    # Test detecting an error that occured for language 'zh_CN' for which
+    # Test detecting an error that occur for language 'zh_CN' for which
     # the canonical code is 'zh_Hans_CN', see:
     #     Babel 1.0+ doesn't support `zh_CN`
     #     https://github.com/python-babel/babel/issues/37
@@ -205,3 +205,16 @@ def test_non_existing_locale(django_setup, price_fixture):
     translation.activate('oO_Oo')
     tax = prices_i18n.tax(price_fixture, html=True)
     assert tax == '<span class="currency">$</span>5.00'
+
+
+def test_non_cannonical_locale_zh_CN(django_setup, price_fixture):
+    # Test detecting an error that occur for language 'zh_CN' for which
+    # the canonical code is 'zh_Hans_CN', see:
+    #     Babel 1.0+ doesn't support `zh_CN`
+    #     https://github.com/python-babel/babel/issues/37
+    # This should now work, as we are using:
+    #     `Locale.parse('zh_CN')`
+    # which does the conversion to the canonical name.
+    translation.activate('zh_CN')
+    tax = prices_i18n.tax(price_fixture, html=True)
+    assert tax == '<span class="currency">US$</span>5.00'  # 'US' before '$'

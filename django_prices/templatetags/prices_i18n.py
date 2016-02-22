@@ -1,8 +1,7 @@
 from decimal import Decimal, InvalidOperation
 import re
 
-from babel.core import Locale
-from babel import localedata
+from babel.core import Locale, UnknownLocaleError
 from babel.numbers import format_currency
 from babeldjango.templatetags.babel import currencyfmt
 from django import template
@@ -26,11 +25,15 @@ def format_price(value, currency):
     if not language:
         language = settings.LANGUAGE_CODE
     locale_code = to_locale(language)
-    if not localedata.exists(locale_code):
+    locale = None
+    try:
+        locale = Locale.parse(locale_code)
+    except (ValueError, UnknownLocaleError):
+        # Invalid format or unknown locale
         # Fallback to the default language
         language = settings.LANGUAGE_CODE
         locale_code = to_locale(language)
-    locale = Locale(locale_code)
+        locale = Locale.parse(locale_code)
     currency_format = locale.currency_formats.get('standard')
     pattern = currency_format.pattern
     pattern = re.sub(
