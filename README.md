@@ -37,7 +37,7 @@ And templates:
 
 **Note:** for template tags to work, you need to add `django_prices` to your `INSTALLED_APPS`.
 
-You can also install the wonderful [`babel`](http://babel.edgewall.org/) library and get proper currency symbols with `prices_i18n`. First install BabelDjango:
+You can also install the wonderful [`babel`](http://babel.pocoo.org/) library and get proper currency symbols with `prices_i18n`. First install BabelDjango:
 
 ```
 $ pip install BabelDjango
