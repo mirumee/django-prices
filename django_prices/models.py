@@ -24,7 +24,10 @@ class Creator(object):
         return obj.__dict__[self.field.name]
 
     def __set__(self, obj, value):
-        obj.__dict__[self.field.name] = self.field.to_python(value)
+        if (isinstance(value, models.Expression)):
+            obj.__dict__[self.field.name] = value
+        else:
+            obj.__dict__[self.field.name] = self.field.to_python(value)
 
 
 class PriceField(BaseField):
