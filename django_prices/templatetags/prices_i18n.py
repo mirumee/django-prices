@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from decimal import Decimal, InvalidOperation
 import re
 
@@ -8,7 +10,6 @@ from django import template
 from django.conf import settings
 from django.utils.safestring import mark_safe
 from django.utils.translation import get_language, to_locale
-
 
 register = template.Library()
 

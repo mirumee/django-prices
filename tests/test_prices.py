@@ -1,51 +1,23 @@
+from __future__ import unicode_literals
+
 from decimal import Decimal
 
-from django import forms as django_forms
-from django.db import connection, models
-from django.utils import translation
-from prices import percentage_discount, Price
 import pytest
+from django.db import connection
+from django.utils import translation
+from django_prices import forms, widgets
+from django_prices.models import PriceField
+from django_prices.templatetags import prices as tags
+from django_prices.templatetags import prices_i18n
+from prices import Price, percentage_discount
 
-from . import forms
-from . import widgets
-from .models import PriceField
-from .templatetags import prices as tags, prices_i18n
-
-
-@pytest.fixture(scope='module')
-def test_model():
-    class TestModel(models.Model):
-        price = PriceField(currency='BTC', default='5', max_digits=9,
-                           decimal_places=2)
-    return TestModel
+from .forms import ModelForm, OptionalPriceForm, RequiredPriceForm
+from .models import Model
 
 
 @pytest.fixture(scope='module')
 def price_fixture():
     return Price(net='10', gross='15', currency='USD')
-
-
-@pytest.fixture(scope='module')
-def test_form():
-    class PriceForm(django_forms.Form):
-        price = forms.PriceField(currency='BTC')
-    return PriceForm
-
-
-@pytest.fixture(scope='module')
-def test_model_form(test_model):
-    class PriceForm(django_forms.ModelForm):
-        class Meta:
-            model = test_model
-            fields = ['price']
-    return PriceForm
-
-
-@pytest.fixture(scope='module')
-def test_form_price_not_required():
-    class PriceForm(django_forms.Form):
-        price = forms.PriceField(currency='BTC', required=False)
-    return PriceForm
 
 
 def test_init():
@@ -67,8 +39,8 @@ def test_get_db_prep_save():
     assert value == '5.00'
 
 
-def test_value_to_string(test_model):
-    instance = test_model(price=30)
+def test_value_to_string():
+    instance = Model(price=30)
     field = instance._meta.get_field('price')
     assert field.value_to_string(instance) == Decimal('30')
 
@@ -110,10 +82,10 @@ def test_formfield():
     ('5', None, True),
     (None, Price(5, currency='BTC'), True),
     (None, '5', True),
-    (None, None, False)
-])
-def test_form_changed_data(test_form, data, initial, expected_result):
-    form = test_form(data={'price': data}, initial={'price': initial})
+    (None, None, False)])
+def test_form_changed_data(data, initial, expected_result):
+    form = RequiredPriceForm(
+        data={'price': data}, initial={'price': initial})
     assert bool(form.changed_data) == expected_result
 
 
@@ -126,32 +98,32 @@ def test_render():
         assert attr in result
 
 
-def test_instance_values(test_model):
-    instance = test_model(price=25)
+def test_instance_values():
+    instance = Model(price=25)
     assert instance.price.net == 25
 
 
-def test_field_passes_all_validations(test_form):
-    form = test_form(data={'price': '20'})
+def test_field_passes_all_validations():
+    form = RequiredPriceForm(data={'price': '20'})
     form.full_clean()
     assert form.errors == {}
 
 
-def test_model_field_passes_all_validations(test_model_form):
-    form = test_model_form(data={'price': '20'})
+def test_model_field_passes_all_validations():
+    form = ModelForm(data={'price': '20'})
     form.full_clean()
     assert form.errors == {}
 
 
-def test_field_passes_none_validation(test_form_price_not_required):
-    form = test_form_price_not_required(data={'price': None})
+def test_field_passes_none_validation():
+    form = OptionalPriceForm(data={'price': None})
     form.full_clean()
     assert form.errors == {}
 
 
 def test_templatetag_gross(price_fixture):
-        gross = prices_i18n.gross(price_fixture)
-        assert gross == '$15.00'
+    gross = prices_i18n.gross(price_fixture)
+    assert gross == '$15.00'
 
 
 def test_templatetag_gross_html(price_fixture):

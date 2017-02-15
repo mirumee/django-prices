@@ -1,14 +1,10 @@
+from __future__ import unicode_literals
+
 import django
 from django.db import models
-from django.conf import settings
 from prices import Price
 
 from . import forms
-
-if django.VERSION < (1, 8):
-    BaseField = models.SubfieldBase('BaseField', (models.DecimalField,), {})
-else:
-    BaseField = models.DecimalField
 
 
 class Creator(object):
@@ -24,15 +20,15 @@ class Creator(object):
         return obj.__dict__[self.field.name]
 
     def __set__(self, obj, value):
-        if (isinstance(value, models.Expression)):
+        if isinstance(value, models.Expression):
             obj.__dict__[self.field.name] = value
         else:
             obj.__dict__[self.field.name] = self.field.to_python(value)
 
 
-class PriceField(BaseField):
+class PriceField(models.DecimalField):
 
-    description = 'A field which stores a price.'
+    description = 'A field that stores a price.'
 
     def __init__(self, verbose_name=None, currency=None, **kwargs):
         self.currency = currency
@@ -95,12 +91,3 @@ class PriceField(BaseField):
         name, path, args, kwargs = super(PriceField, self).deconstruct()
         kwargs['currency'] = self.currency
         return name, path, args, kwargs
-
-if 'south' in settings.INSTALLED_APPS:
-    from south.modelsinspector import add_introspection_rules
-    rules = [
-        ((PriceField,), [], {
-            'currency': ('currency', {})
-        })
-    ]
-    add_introspection_rules(rules, ['^django_prices\.models'])

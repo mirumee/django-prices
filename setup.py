@@ -1,10 +1,5 @@
 #! /usr/bin/env python
-import os
 from setuptools import setup
-from setuptools.command.test import test as TestCommand
-import sys
-
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_prices.test_settings')
 
 CLASSIFIERS = [
     'Environment :: Web Environment',
@@ -21,25 +16,6 @@ CLASSIFIERS = [
     'Topic :: Software Development :: Libraries :: Python Modules']
 
 
-class PyTest(TestCommand):
-    user_options = [('pytest-args=', 'a', "Arguments to pass to py.test")]
-    test_args = []
-
-    def initialize_options(self):
-        TestCommand.initialize_options(self)
-        self.pytest_args = []
-
-    def finalize_options(self):
-        TestCommand.finalize_options(self)
-        self.test_args = []
-        self.test_suite = True
-
-    def run_tests(self):
-        #import here, cause outside the eggs aren't loaded
-        import pytest
-        errno = pytest.main(self.pytest_args)
-        sys.exit(errno)
-
 setup(
     name='django-prices',
     author='Mirumee Software',
@@ -53,9 +29,5 @@ setup(
     classifiers=CLASSIFIERS,
     install_requires=[
         'Babel>=2.2', 'BabelDjango', 'django', 'prices>=0.5.7,<0.6a0'],
-    tests_require=['pytest', 'pytest-django'],
     platforms=['any'],
-    test_suite='django_prices.tests',
-    cmdclass={
-        'test': PyTest},
     zip_safe=False)
