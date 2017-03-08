@@ -14,7 +14,7 @@ from django.utils.translation import get_language, to_locale
 register = template.Library()
 
 
-def format_price(value, currency):
+def format_price(value, currency, html=False, normalize=False):
     """
     Format decimal value as currency
     """
@@ -37,28 +37,33 @@ def format_price(value, currency):
         locale = Locale.parse(locale_code)
     currency_format = locale.currency_formats.get('standard')
     pattern = currency_format.pattern
-    pattern = re.sub(
-        '(\xa4+)', '<span class="currency">\\1</span>', pattern)
-    result = format_currency(value, currency, pattern, locale=locale_code)
+    if normalize:
+        pattern = pattern.replace('.00', '.##')
+
+    if html:
+        pattern = re.sub(
+            '(\xa4+)', '<span class="currency">\\1</span>', pattern)
+    result = format_currency(
+        value, currency, pattern, locale=locale_code, currency_digits=False)
     return mark_safe(result)
 
 
 @register.simple_tag
-def gross(price, html=False):
-    if html:
-        return format_price(price.gross, price.currency)
+def gross(price, html=False, normalize=False):
+    if html or normalize:
+        return format_price(price.gross, price.currency, html, normalize)
     return currencyfmt(price.gross, price.currency)
 
 
 @register.simple_tag
-def net(price, html=False):
-    if html:
-        return format_price(price.net, price.currency)
+def net(price, html=False, normalize=False):
+    if html or normalize:
+        return format_price(price.net, price.currency, html, normalize)
     return currencyfmt(price.net, price.currency)
 
 
 @register.simple_tag
-def tax(price, html=False):
-    if html:
-        return format_price(price.tax, price.currency)
+def tax(price, html=False, normalize=False):
+    if html or normalize:
+        return format_price(price.tax, price.currency, html, normalize)
     return currencyfmt(price.tax, price.currency)
