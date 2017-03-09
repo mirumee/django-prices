@@ -243,7 +243,7 @@ def test_normalize_price(value, normalize, expected):
                           (Decimal('12.20'), '12.2'),
                           (Decimal('1222'), '1,222'),
                           (Decimal('12.23'), '12.23')])
-def test_normalize_price(value, expected):
+def test_format_normalize_price(value, expected):
     formatted_price = prices_i18n.format_price(value, 'USD', normalize=True)
     assert formatted_price == '$%s' % expected
 
