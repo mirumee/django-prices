@@ -23,6 +23,12 @@ def get_currency_fraction(currency):
     return fraction[0]
 
 
+def change_pattern(pattern, currency, normalize):
+    fractions = get_currency_fraction(currency)
+    replacement = '#' if normalize else '0'
+    return pattern.replace('.00', '.' + replacement * fractions)
+
+
 def format_price(value, currency, html=False, normalize=False):
     """
     Format decimal value as currency
@@ -46,12 +52,7 @@ def format_price(value, currency, html=False, normalize=False):
         locale = Locale.parse(locale_code)
     currency_format = locale.currency_formats.get('standard')
     pattern = currency_format.pattern
-    if normalize:
-        pattern = pattern.replace('.00', '.##')
-        currency_fractions = get_currency_fraction(currency)
-        # Format don't handle values with three decimal digits
-        if currency_fractions == 3:
-            normalize = False
+    pattern = change_pattern(pattern, currency, normalize)
 
     if html:
         pattern = re.sub(

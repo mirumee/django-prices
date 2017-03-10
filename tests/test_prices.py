@@ -254,10 +254,11 @@ def test_format_normalize_price_no_digits():
     assert formatted_price == '¥123'
 
 
-def test_format_normalize_price_three_digits():
-    value = 123.002
+@pytest.mark.parametrize(
+    'value,expected', [(123.002, 'BHD123.002'), (123.000, 'BHD123')])
+def test_format_normalize_price_three_digits(value, expected):
     normalized_price = prices_i18n.format_price(value, 'BHD', normalize=True)
-    assert normalized_price == 'BHD123.002'
+    assert normalized_price == expected
 
 
 @pytest.mark.parametrize('value', [Decimal('12.22'), Decimal('1222.22')])
