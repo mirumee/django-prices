@@ -1,3 +1,4 @@
+# coding: utf-8
 from __future__ import unicode_literals
 
 from decimal import Decimal
@@ -246,6 +247,17 @@ def test_normalize_price(value, normalize, expected):
 def test_format_normalize_price(value, expected):
     formatted_price = prices_i18n.format_price(value, 'USD', normalize=True)
     assert formatted_price == '$%s' % expected
+
+
+def test_format_normalize_price_no_digits():
+    formatted_price = prices_i18n.format_price(123, 'JPY', normalize=True)
+    assert formatted_price == '¥123'
+
+
+def test_format_normalize_price_three_digits():
+    value = 123.002
+    normalized_price = prices_i18n.format_price(value, 'BHD', normalize=True)
+    assert normalized_price == 'BHD123.002'
 
 
 @pytest.mark.parametrize('value', [Decimal('12.22'), Decimal('1222.22')])

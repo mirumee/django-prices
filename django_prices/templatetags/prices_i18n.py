@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from decimal import Decimal, InvalidOperation
 import re
 
-from babel.core import Locale, UnknownLocaleError
+from babel.core import Locale, UnknownLocaleError, get_global
 from babel.numbers import format_currency
 from babeldjango.templatetags.babel import currencyfmt
 from django import template
@@ -12,6 +12,15 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import get_language, to_locale
 
 register = template.Library()
+
+
+def get_currency_fraction(currency):
+    fractions = get_global('currency_fractions')
+    try:
+        fraction = fractions[currency]
+    except KeyError:
+        fraction = fractions['DEFAULT']
+    return fraction[0]
 
 
 def format_price(value, currency, html=False, normalize=False):
@@ -39,12 +48,17 @@ def format_price(value, currency, html=False, normalize=False):
     pattern = currency_format.pattern
     if normalize:
         pattern = pattern.replace('.00', '.##')
+        currency_fractions = get_currency_fraction(currency)
+        # Format don't handle values with three decimal digits
+        if currency_fractions == 3:
+            normalize = False
 
     if html:
         pattern = re.sub(
             '(\xa4+)', '<span class="currency">\\1</span>', pattern)
     result = format_currency(
-        value, currency, pattern, locale=locale_code, currency_digits=False)
+        value, currency, pattern, locale=locale_code,
+        currency_digits=(not normalize))
     return mark_safe(result)
 
 
