@@ -1,3 +1,4 @@
+# coding: utf-8
 from __future__ import unicode_literals
 
 from decimal import Decimal
@@ -131,6 +132,16 @@ def test_templatetag_gross_html(price_fixture):
     assert gross == '<span class="currency">$</span>15.00'
 
 
+def test_templatetag_gross_normalize(price_fixture):
+    gross = prices_i18n.gross(price_fixture, normalize=True)
+    assert gross == '$15'
+
+
+def test_templatetag_gross_html_normalize(price_fixture):
+    gross = prices_i18n.gross(price_fixture, html=True, normalize=True)
+    assert gross == '<span class="currency">$</span>15'
+
+
 def test_templatetag_net(price_fixture):
     net = prices_i18n.net(price_fixture)
     assert net == '$10.00'
@@ -141,6 +152,22 @@ def test_templatetag_net_html(price_fixture):
     assert net == '<span class="currency">$</span>10.00'
 
 
+def test_templatetag_net_html_normalize(price_fixture):
+    net = prices_i18n.net(price_fixture, html=True, normalize=True)
+    assert net == '<span class="currency">$</span>10'
+
+
+def test_templatetag_net_normalize(price_fixture):
+    net = prices_i18n.net(price_fixture, normalize=True)
+    assert net == '$10'
+
+
+def test_templatetag_net_normalize_with_decimals():
+    price = Price(net='12.23', currency='USD')
+    net = prices_i18n.net(price, normalize=True)
+    assert net == '$12.23'
+
+
 def test_templatetag_tax(price_fixture):
     tax = prices_i18n.tax(price_fixture)
     assert tax == '$5.00'
@@ -149,6 +176,16 @@ def test_templatetag_tax(price_fixture):
 def test_templatetag_tax_html(price_fixture):
     tax = prices_i18n.tax(price_fixture, html=True)
     assert tax == '<span class="currency">$</span>5.00'
+
+
+def test_templatetag_tax_normalize(price_fixture):
+    tax = prices_i18n.tax(price_fixture, normalize=True)
+    assert tax == '$5'
+
+
+def test_templatetag_tax_html_normalize(price_fixture):
+    tax = prices_i18n.tax(price_fixture, html=True, normalize=True)
+    assert tax == '<span class="currency">$</span>5'
 
 
 def test_templatetag_discount_amount_for():
@@ -192,3 +229,46 @@ def test_non_cannonical_locale_zh_CN(price_fixture, settings):
     translation.activate('zh_CN')
     tax = prices_i18n.tax(price_fixture, html=True)
     assert tax == '<span class="currency">US$</span>5.00'  # 'US' before '$'
+
+
+@pytest.mark.parametrize('value, normalize, expected',
+                         [(Decimal('12.00'), True, Decimal('12')),
+                          (Decimal('12.00'), False, Decimal('12.00')),
+                          (Decimal('12.23'), True, Decimal('12.23'))])
+def test_normalize_price(value, normalize, expected):
+    assert tags.normalize_price(value, normalize) == expected
+
+
+@pytest.mark.parametrize('value, expected',
+                         [(Decimal('12'), '12'),
+                          (Decimal('12.20'), '12.2'),
+                          (Decimal('1222'), '1,222'),
+                          (Decimal('12.23'), '12.23')])
+def test_format_normalize_price(value, expected):
+    formatted_price = prices_i18n.format_price(value, 'USD', normalize=True)
+    assert formatted_price == '$%s' % expected
+
+
+def test_format_normalize_price_no_digits():
+    formatted_price = prices_i18n.format_price(123, 'JPY', normalize=True)
+    assert formatted_price == '¥123'
+
+
+@pytest.mark.parametrize(
+    'value,expected', [(123.002, 'BHD123.002'), (123.000, 'BHD123')])
+def test_format_normalize_price_three_digits(value, expected):
+    normalized_price = prices_i18n.format_price(value, 'BHD', normalize=True)
+    assert normalized_price == expected
+
+
+@pytest.mark.parametrize('value', [Decimal('12.22'), Decimal('1222.22')])
+def test_normalize_same_as_formatted(value):
+    formatted_price = prices_i18n.format_price(value, 'USD', normalize=True)
+    assert formatted_price == prices_i18n.net(Price(net=value, currency='USD'))
+
+
+@pytest.mark.parametrize('value', [Decimal('12'), Decimal('1222')])
+def test_normalize_same_as_formatted(value):
+    formatted_price = prices_i18n.format_price(value, 'USD', normalize=True)
+    net = prices_i18n.net(Price(net=value, currency='USD'))
+    assert not formatted_price == net

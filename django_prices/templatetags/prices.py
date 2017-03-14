@@ -5,19 +5,28 @@ from django import template
 register = template.Library()
 
 
-@register.inclusion_tag('prices/price.html')
-def gross(price):
-    return {'amount': price.gross, 'currency': price.currency}
+def normalize_price(price, normalize):
+    if normalize:
+        return price.normalize()
+    return price
 
 
 @register.inclusion_tag('prices/price.html')
-def net(price):
-    return {'amount': price.net, 'currency': price.currency}
+def gross(price, normalize=False):
+    return {'amount': normalize_price(price, normalize),
+            'currency': price.currency}
 
 
 @register.inclusion_tag('prices/price.html')
-def tax(price):
-    return {'amount': price.tax, 'currency': price.currency}
+def net(price, normalize=False):
+    return {'amount': normalize_price(price, normalize),
+            'currency': price.currency}
+
+
+@register.inclusion_tag('prices/price.html')
+def tax(price, normalize=False):
+    return {'amount': normalize_price(price, normalize),
+            'currency': price.currency}
 
 
 @register.filter
