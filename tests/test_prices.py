@@ -246,7 +246,7 @@ def test_normalize_price(value, normalize, expected):
 
 @pytest.mark.parametrize('value, expected',
                          [(Decimal('12'), '12'),
-                          (Decimal('12.20'), '12.2'),
+                          (Decimal('12.20'), '12.20'),
                           (Decimal('1222'), '1,222'),
                           (Decimal('12.23'), '12.23')])
 def test_format_normalize_price(value, expected):
