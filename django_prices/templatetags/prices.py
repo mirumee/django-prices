@@ -6,7 +6,8 @@ register = template.Library()
 
 
 def normalize_price(price, normalize):
-    if normalize:
+    _, value = divmod(price, 1)
+    if normalize and not value:
         return price.normalize()
     return price
 
