@@ -52,8 +52,9 @@ def format_price(value, currency, html=False, normalize=False):
         locale = Locale.parse(locale_code)
     currency_format = locale.currency_formats.get('standard')
     pattern = currency_format.pattern
-    _, decimals = divmod(value, 1)
-    pattern = change_pattern(pattern, currency, normalize and not decimals)
+    if value.normalize().as_tuple().exponent < 0:
+        normalize = False
+    pattern = change_pattern(pattern, currency, normalize)
 
     if html:
         pattern = re.sub(
