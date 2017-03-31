@@ -21,6 +21,11 @@ def price_fixture():
     return Price(net='10', gross='15', currency='USD')
 
 
+@pytest.fixture(scope='module')
+def price_with_decimals():
+    return Price(net='10.20', gross='15', currency='USD')
+
+
 def test_init():
     field = PriceField(
         currency='BTC', default='5', max_digits=9, decimal_places=2)
@@ -241,7 +246,7 @@ def test_normalize_price(value, normalize, expected):
 
 @pytest.mark.parametrize('value, expected',
                          [(Decimal('12'), '12'),
-                          (Decimal('12.20'), '12.2'),
+                          (Decimal('12.20'), '12.20'),
                           (Decimal('1222'), '1,222'),
                           (Decimal('12.23'), '12.23')])
 def test_format_normalize_price(value, expected):
@@ -290,3 +295,13 @@ def test_templatetag_tax(price_fixture):
     tax = tags.tax(price_fixture)
     assert tax['amount'] == Decimal('5')
     assert tax['currency'] == price_fixture.currency
+
+
+def test_templatetag_net_normalize_one_point(price_with_decimals):
+    net = tags.net(price_with_decimals, normalize=True)
+    assert str(net['amount']) == '10.20'
+
+
+def test_templatetag_i18n_tax_normalize_one_digit(price_with_decimals):
+    tax = prices_i18n.tax(price_with_decimals, normalize=True)
+    assert tax == '$4.80'

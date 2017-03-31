@@ -7,7 +7,9 @@ register = template.Library()
 
 def normalize_price(price, normalize):
     if normalize:
-        return price.normalize()
+        normalized = price.normalize()
+        if normalized.as_tuple().exponent >= 0:
+            return normalized
     return price
 
 
