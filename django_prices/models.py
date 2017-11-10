@@ -65,10 +65,7 @@ class PriceField(models.DecimalField):
 
     def get_db_prep_save(self, value, connection):
         value = self.get_prep_value(value)
-        if django.VERSION < (1, 9):
-            db_value = connection.ops.value_to_db_decimal
-        else:
-            db_value = connection.ops.adapt_decimalfield_value
+        db_value = connection.ops.adapt_decimalfield_value
         return db_value(value, self.max_digits, self.decimal_places)
 
     def value_to_string(self, obj):
