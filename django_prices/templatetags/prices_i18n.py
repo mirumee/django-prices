@@ -1,15 +1,16 @@
 from __future__ import unicode_literals
 
-from decimal import Decimal, InvalidOperation
 import re
+from decimal import Decimal, InvalidOperation
 
 from babel.core import Locale, UnknownLocaleError, get_global
 from babel.numbers import format_currency
-from babeldjango.templatetags.babel import currencyfmt
 from django import template
 from django.conf import settings
 from django.utils.safestring import mark_safe
 from django.utils.translation import get_language, to_locale
+
+from django_babel.templatetags.babel import currencyfmt
 
 register = template.Library()
 
