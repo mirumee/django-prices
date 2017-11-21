@@ -17,7 +17,7 @@ class PriceInput(forms.TextInput):
 
     def format_value(self, value):
         if isinstance(value, Price):
-            value = value.net
+            value = value.net.value
         return value
 
     def render(self, name, value, attrs=None):

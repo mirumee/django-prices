@@ -10,7 +10,7 @@ from django_prices import forms, widgets
 from django_prices.models import PriceField
 from django_prices.templatetags import prices as tags
 from django_prices.templatetags import prices_i18n
-from prices import Price, percentage_discount
+from prices import Amount, Price, percentage_discount
 
 from .forms import ModelForm, OptionalPriceForm, RequiredPriceForm
 from .models import Model
@@ -18,30 +18,32 @@ from .models import Model
 
 @pytest.fixture(scope='module')
 def price_fixture():
-    return Price(net='10', gross='15', currency='USD')
+    return Price(net=Amount('10', 'USD'), gross=Amount('15', 'USD'))
 
 
 @pytest.fixture(scope='module')
 def price_with_decimals():
-    return Price(net='10.20', gross='15', currency='USD')
+    return Price(net=Amount('10.20', 'USD'), gross=Amount('15', 'USD'))
 
 
 def test_init():
     field = PriceField(
         currency='BTC', default='5', max_digits=9, decimal_places=2)
-    assert field.get_default() == Price(5, currency='BTC')
+    assert field.get_default() == Price(Amount(5, 'BTC'), Amount(5, 'BTC'))
 
 
 def test_get_prep_value():
     field = PriceField('price', currency='BTC', default='5', max_digits=9,
                        decimal_places=2)
-    assert field.get_prep_value(Price(5, currency='BTC')) == Decimal(5)
+    assert field.get_prep_value(
+        Price(Amount(5, 'BTC'), Amount(5, 'BTC'))) == Decimal(5)
 
 
 def test_get_db_prep_save():
     field = PriceField('price', currency='BTC', default='5', max_digits=9,
                        decimal_places=2)
-    value = field.get_db_prep_save(Price(5, currency='BTC'), connection)
+    value = field.get_db_prep_save(
+        Price(Amount(5, 'BTC'), Amount(5, 'BTC')), connection)
     assert value == '5.00'
 
 
@@ -54,7 +56,7 @@ def test_value_to_string():
 def test_from_db_value():
     field = PriceField('price', currency='BTC', default='5', max_digits=9,
                        decimal_places=2)
-    assert field.from_db_value(7, None, None, None) == Price(7, currency='BTC')
+    assert field.from_db_value(7, None, None, None) == Price(Amount(7, 'BTC'), Amount(7, 'BTC'))
 
 
 def test_from_db_value_handles_none():
@@ -66,7 +68,7 @@ def test_from_db_value_handles_none():
 def test_from_db_value_checks_currency():
     field = PriceField('price', currency='BTC', default='5', max_digits=9,
                        decimal_places=2)
-    invalid = Price(1, currency='USD')
+    invalid = Price(Amount(1, 'USD'), Amount(1, 'USD'))
     with pytest.raises(ValueError):
         field.from_db_value(invalid, None, None, None)
 
@@ -81,12 +83,12 @@ def test_formfield():
 
 
 @pytest.mark.parametrize("data,initial,expected_result", [
-    ('5', Price(5, currency='BTC'), False),
-    ('5', Price(10, currency='BTC'), True),
+    ('5', Price(Amount(5, 'BTC'), Amount(5, 'BTC')), False),
+    ('5', Price(Amount(10, 'BTC'), Amount(10, 'BTC')), True),
     ('5', '5', False),
     ('5', '10', True),
     ('5', None, True),
-    (None, Price(5, currency='BTC'), True),
+    (None, Price(Amount(5, 'BTC'), Amount(5, 'BTC')), True),
     (None, '5', True),
     (None, None, False)])
 def test_form_changed_data(data, initial, expected_result):
@@ -106,7 +108,7 @@ def test_render():
 
 def test_instance_values():
     instance = Model(price=25)
-    assert instance.price.net == 25
+    assert instance.price.net.value == 25
 
 
 def test_field_passes_all_validations():
@@ -168,7 +170,7 @@ def test_templatetag_i18n_net_normalize(price_fixture):
 
 
 def test_templatetag_i18n_net_normalize_with_decimals():
-    price = Price(net='12.23', currency='USD')
+    price = Price(Amount('12.23', 'USD'), Amount('12.23', 'USD'))
     net = prices_i18n.net(price, normalize=True)
     assert net == '$12.23'
 
@@ -194,10 +196,10 @@ def test_templatetag_i18n_tax_html_normalize(price_fixture):
 
 
 def test_templatetag_discount_amount_for():
-    price = Price(30, currency='BTC')
+    price = Price(Amount(30, 'BTC'), Amount(30, 'BTC'))
     discount = percentage_discount(50)
     discount_amount = tags.discount_amount_for(discount, price)
-    assert discount_amount == Price(-15, currency='BTC')
+    assert discount_amount == Price(Amount(-15, 'BTC'), Amount(-15, 'BTC'))
 
 
 def test_non_existing_locale(price_fixture):
@@ -269,13 +271,14 @@ def test_format_normalize_price_three_digits(value, expected):
 @pytest.mark.parametrize('value', [Decimal('12.22'), Decimal('1222.22')])
 def test_normalize_same_as_formatted(value):
     formatted_price = prices_i18n.format_price(value, 'USD', normalize=True)
-    assert formatted_price == prices_i18n.net(Price(net=value, currency='USD'))
+    assert formatted_price == prices_i18n.net(
+        Price(Amount(value, 'USD'), Amount(value, 'USD')))
 
 
 @pytest.mark.parametrize('value', [Decimal('12'), Decimal('1222')])
 def test_normalize_same_as_formatted(value):
     formatted_price = prices_i18n.format_price(value, 'USD', normalize=True)
-    net = prices_i18n.net(Price(net=value, currency='USD'))
+    net = prices_i18n.net(Price(Amount(value, 'USD'), Amount(value, 'USD')))
     assert not formatted_price == net
 
 

@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 from django import forms
-from prices import Price
+from prices import Amount, Price
 
 from .widgets import PriceInput
 
@@ -21,7 +21,8 @@ class PriceField(forms.DecimalField):
         value = super(PriceField, self).to_python(value)
         if value is None:
             return value
-        return Price(value, currency=self.currency)
+        return Price(
+            Amount(value, self.currency), Amount(value, self.currency))
 
     def validate(self, value):
         if value is None:
@@ -37,7 +38,7 @@ class PriceField(forms.DecimalField):
 
     def run_validators(self, value):
         if isinstance(value, Price):
-            value = value.net
+            value = value.net.value
         return super(PriceField, self).run_validators(value)
 
     def has_changed(self, initial, data):

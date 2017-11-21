@@ -15,22 +15,22 @@ def normalize_price(price, normalize):
 
 @register.inclusion_tag('prices/price.html')
 def gross(price, normalize=False):
-    return {'amount': normalize_price(price.gross, normalize),
+    return {'amount': normalize_price(price.gross.value, normalize),
             'currency': price.currency}
 
 
 @register.inclusion_tag('prices/price.html')
 def net(price, normalize=False):
-    return {'amount': normalize_price(price.net, normalize),
+    return {'amount': normalize_price(price.net.value, normalize),
             'currency': price.currency}
 
 
 @register.inclusion_tag('prices/price.html')
 def tax(price, normalize=False):
-    return {'amount': normalize_price(price.tax, normalize),
+    return {'amount': normalize_price(price.tax.value, normalize),
             'currency': price.currency}
 
 
 @register.filter
 def discount_amount_for(discount, price):
-    return (price | discount) - price
+    return discount.apply(price) - price

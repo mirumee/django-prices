@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 from django.db import models
-from prices import Price
+from prices import Amount, Price
 
 from . import forms
 
@@ -49,17 +49,18 @@ class PriceField(models.DecimalField):
         value = super(PriceField, self).to_python(value)
         if value is None:
             return value
-        return Price(value, currency=self.currency)
+        return Price(
+            Amount(value, self.currency), Amount(value, self.currency))
 
     def run_validators(self, value):
         if isinstance(value, Price):
-            value = value.net
+            value = value.net.value
         return super(PriceField, self).run_validators(value)
 
     def get_prep_value(self, value):
         value = self.to_python(value)
         if value is not None:
-            value = value.net
+            value = value.net.value
         return value
 
     def get_db_prep_save(self, value, connection):
@@ -70,7 +71,7 @@ class PriceField(models.DecimalField):
     def value_to_string(self, obj):
         value = self.value_from_object(obj)
         if value is not None:
-            return value.net
+            return value.net.value
         return super(PriceField, self).value_to_string(value)
 
     def formfield(self, **kwargs):
