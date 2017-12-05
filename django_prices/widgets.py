@@ -2,7 +2,6 @@ from __future__ import unicode_literals
 
 from django import forms
 from django.template.loader import render_to_string
-
 from prices import Price
 
 __all__ = ['PriceInput']
@@ -16,7 +15,7 @@ class PriceInput(forms.TextInput):
         self.currency = currency
         super(PriceInput, self).__init__(*args, **kwargs)
 
-    def _format_value(self, value):
+    def format_value(self, value):
         if isinstance(value, Price):
             value = value.net
         return value
