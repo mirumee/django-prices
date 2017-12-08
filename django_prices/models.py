@@ -77,7 +77,7 @@ class AmountField(models.DecimalField):
 
     def formfield(self, **kwargs):
         defaults = {'currency': self.currency,
-                    'form_class': forms.PriceField}
+                    'form_class': forms.AmountField}
         defaults.update(kwargs)
         return super(AmountField, self).formfield(**defaults)
 
@@ -127,7 +127,3 @@ class PriceField(object):
 
         setattr(instance, self.net_field, net)
         setattr(instance, self.gross_field, gross)
-
-    def formfield(self, **kwargs):
-        defaults = {'form_class': forms.PriceField}
-        defaults.update(kwargs)

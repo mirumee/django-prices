@@ -75,7 +75,7 @@ def test_amount_field_formfield():
     field = AmountField(
         'price', currency='BTC', default='5', max_digits=9, decimal_places=2)
     form_field = field.formfield()
-    assert isinstance(form_field, forms.PriceField)
+    assert isinstance(form_field, forms.AmountField)
     assert form_field.currency == 'BTC'
     assert isinstance(form_field.widget, widgets.PriceInput)
 
@@ -87,17 +87,17 @@ def test_price_field_init():
 
 
 @pytest.mark.parametrize("data,initial,expected_result", [
-    ('5', Price(Amount(5, 'BTC'), Amount(5, 'BTC')), False),
-    ('5', Price(Amount(10, 'BTC'), Amount(10, 'BTC')), True),
+    ('5', Amount(5, 'BTC'), False),
+    ('5', Amount(10, 'BTC'), True),
     ('5', '5', False),
     ('5', '10', True),
     ('5', None, True),
-    (None, Price(Amount(5, 'BTC'), Amount(5, 'BTC')), True),
+    (None, Amount(5, 'BTC'), True),
     (None, '5', True),
     (None, None, False)])
 def test_form_changed_data(data, initial, expected_result):
     form = RequiredPriceForm(
-        data={'price': data}, initial={'price': initial})
+        data={'price_net': data}, initial={'price_net': initial})
     assert bool(form.changed_data) == expected_result
 
 
@@ -134,21 +134,21 @@ def test_set_instance_values():
 
 
 def test_field_passes_all_validations():
-    form = RequiredPriceForm(data={'price': '20'})
+    form = RequiredPriceForm(data={'price_net': '20'})
     form.full_clean()
     assert form.errors == {}
 
 
-# def test_model_field_passes_all_validations():
-#     form = ModelForm(data={'price_net': '20', 'price_gross': '25'})
-#     form.full_clean()
-#     assert form.errors == {}
+def test_model_field_passes_all_validations():
+    form = ModelForm(data={'price_net': '20', 'price_gross': '25'})
+    form.full_clean()
+    assert form.errors == {}
 
 
-# def test_field_passes_none_validation():
-#     form = OptionalPriceForm(data={'price': None})
-#     form.full_clean()
-#     assert form.errors == {}
+def test_field_passes_none_validation():
+    form = OptionalPriceForm(data={'price': None})
+    form.full_clean()
+    assert form.errors == {}
 
 
 def test_templatetag_i18n_gross(price_fixture):
