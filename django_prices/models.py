@@ -100,11 +100,6 @@ class PriceField(object):
         self.net_field = net_field
         self.gross_field = gross_field
 
-    def contribute_to_class(self, cls, name, **kwargs):
-        self.name = name
-        self.model = cls
-        setattr(cls, name, self)
-
     def __str__(self):
         return ('PriceField(net_field=%s, gross_field=%s)' %
                 (self.net_field, self.gross_field))
