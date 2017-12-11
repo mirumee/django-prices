@@ -1,7 +1,5 @@
 from __future__ import unicode_literals
 
-from django.core import checks
-from django.core.exceptions import FieldDoesNotExist
 from django.db import models
 from prices import Amount, Price
 
@@ -107,10 +105,8 @@ class PriceField(object):
     def __get__(self, instance, cls=None):
         if instance is None:
             return self
-
         net_val = getattr(instance, self.net_field)
         gross_val = getattr(instance, self.gross_field)
-
         return Price(net_val, gross_val)
 
     def __set__(self, instance, value):
@@ -119,6 +115,5 @@ class PriceField(object):
         if value is not None:
             net = value.net
             gross = value.gross
-
         setattr(instance, self.net_field, net)
         setattr(instance, self.gross_field, gross)
