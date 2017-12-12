@@ -14,6 +14,12 @@ def normalize_price(price, normalize):
 
 
 @register.inclusion_tag('prices/price.html')
+def amount(amount, normalize=False):
+    return {'amount': normalize_price(amount.value, normalize),
+            'currency': amount.currency}
+
+
+@register.inclusion_tag('prices/price.html')
 def gross(price, normalize=False):
     return {'amount': normalize_price(price.gross.value, normalize),
             'currency': price.currency}
