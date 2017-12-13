@@ -309,7 +309,7 @@ def test_normalize_same_as_formatted(value):
     assert not formatted_price == net
 
 
-def test_templatetag_amount_html(amount_fixture):
+def test_templatetag_amount(amount_fixture):
     amount = tags.amount(amount_fixture)
     assert amount == '10 <span class="currency">USD</span>'
 
@@ -335,6 +335,21 @@ def test_templatetag_tax(price_fixture):
 def test_templatetag_net_normalize_one_point(price_with_decimals):
     net = tags.net(price_with_decimals, normalize=True)
     assert str(net['amount']) == '10.20'
+
+
+def test_templatetag_i18n_amount(amount_fixture):
+    amount = prices_i18n.amount(amount_fixture, normalize=True)
+    assert amount == '$10'
+
+
+def test_templatetag_i18n_gross_normalize_one_digit(price_with_decimals):
+    gross = prices_i18n.gross(price_with_decimals, normalize=True)
+    assert gross == '$15'
+
+
+def test_templatetag_i18n_net_normalize_one_digit(price_with_decimals):
+    net = prices_i18n.net(price_with_decimals, normalize=True)
+    assert net == '$10.20'
 
 
 def test_templatetag_i18n_tax_normalize_one_digit(price_with_decimals):
