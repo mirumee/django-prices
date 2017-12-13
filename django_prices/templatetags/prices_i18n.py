@@ -67,7 +67,14 @@ def format_price(value, currency, html=False, normalize=False):
 
 
 @register.filter
-def amount(obj, html=False, normalize=False):
-    if html or normalize:
-        return format_price(obj.value, obj.currency, html, normalize)
+def amount(obj, normalize=False):
+    if normalize:
+        format_price(
+            obj.value, obj.currency, html=False, normalize=normalize)
     return currencyfmt(obj.value, obj.currency)
+
+
+@register.filter
+def amount_html(obj, normalize=False):
+    return format_price(
+        obj.value, obj.currency, html=True, normalize=normalize)

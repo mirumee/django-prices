@@ -178,7 +178,7 @@ def test_non_existing_locale(amount_fixture):
     #     Babel needs to support Fuzzy Locales
     #     https://github.com/python-babel/babel/issues/30
     translation.activate('oO_Oo')
-    amount = prices_i18n.amount(amount_fixture, html=True)
+    amount = prices_i18n.amount_html(amount_fixture)
     assert amount  # No exception, success!
 
 
@@ -195,12 +195,12 @@ def test_non_cannonical_locale_zh_CN(amount_fixture, settings):
     settings.LANGUAGE_CODE = 'en_US'
 
     # Checking format of the default locale
-    amount = prices_i18n.amount(amount_fixture, html=True)
+    amount = prices_i18n.amount_html(amount_fixture)
     assert amount == '<span class="currency">$</span>10.00'
 
     # Checking if 'zh_CN' has changed the format
     translation.activate('zh_CN')
-    amount = prices_i18n.amount(amount_fixture, html=True)
+    amount = prices_i18n.amount_html(amount_fixture)
     assert amount == '<span class="currency">US$</span>10.00'  # 'US' before '$'
 
 
@@ -251,4 +251,4 @@ def test_templatetag_i18n_amount(amount_fixture):
 
 def test_templatetag_i18n_amount_normalize(amount_fixture):
     amount = prices_i18n.amount(amount_fixture, normalize=True)
-    assert amount == '$10'
+    assert amount == '$10.00'
