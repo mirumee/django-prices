@@ -66,29 +66,8 @@ def format_price(value, currency, html=False, normalize=False):
     return mark_safe(result)
 
 
-@register.filter()
+@register.filter
 def amount(obj, html=False, normalize=False):
     if html or normalize:
         return format_price(obj.value, obj.currency, html, normalize)
     return currencyfmt(obj.value, obj.currency)
-
-
-@register.simple_tag
-def gross(price, html=False, normalize=False):
-    if html or normalize:
-        return format_price(price.gross.value, price.currency, html, normalize)
-    return currencyfmt(price.gross.value, price.currency)
-
-
-@register.simple_tag
-def net(price, html=False, normalize=False):
-    if html or normalize:
-        return format_price(price.net.value, price.currency, html, normalize)
-    return currencyfmt(price.net.value, price.currency)
-
-
-@register.simple_tag
-def tax(price, html=False, normalize=False):
-    if html or normalize:
-        return format_price(price.tax.value, price.currency, html, normalize)
-    return currencyfmt(price.tax.value, price.currency)

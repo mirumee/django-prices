@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 from django import template
+from django.utils.safestring import mark_safe
 
 register = template.Library()
 
@@ -13,28 +14,11 @@ def normalize_price(price, normalize):
     return price
 
 
-@register.filter()
+@register.filter
 def amount(obj, normalize=False):
-    return '%s <span class="currency">%s</span>' % (
+    result = '%s <span class="currency">%s</span>' % (
         normalize_price(obj.value, normalize), obj.currency)
-
-
-@register.inclusion_tag('prices/price.html')
-def gross(price, normalize=False):
-    return {'amount': normalize_price(price.gross.value, normalize),
-            'currency': price.currency}
-
-
-@register.inclusion_tag('prices/price.html')
-def net(price, normalize=False):
-    return {'amount': normalize_price(price.net.value, normalize),
-            'currency': price.currency}
-
-
-@register.inclusion_tag('prices/price.html')
-def tax(price, normalize=False):
-    return {'amount': normalize_price(price.tax.value, normalize),
-            'currency': price.currency}
+    return mark_safe(result)
 
 
 @register.filter

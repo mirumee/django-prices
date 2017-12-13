@@ -161,72 +161,6 @@ def test_field_passes_none_validation():
     assert form.errors == {}
 
 
-def test_templatetag_i18n_gross(price_fixture):
-    gross = prices_i18n.gross(price_fixture)
-    assert gross == '$15.00'
-
-
-def test_templatetag_i18n_gross_html(price_fixture):
-    gross = prices_i18n.gross(price_fixture, html=True)
-    assert gross == '<span class="currency">$</span>15.00'
-
-
-def test_templatetag_i18n_gross_normalize(price_fixture):
-    gross = prices_i18n.gross(price_fixture, normalize=True)
-    assert gross == '$15'
-
-
-def test_templatetag_i18n_gross_html_normalize(price_fixture):
-    gross = prices_i18n.gross(price_fixture, html=True, normalize=True)
-    assert gross == '<span class="currency">$</span>15'
-
-
-def test_templatetag_i18n_net(price_fixture):
-    net = prices_i18n.net(price_fixture)
-    assert net == '$10.00'
-
-
-def test_templatetag_i18n_net_html(price_fixture):
-    net = prices_i18n.net(price_fixture, html=True)
-    assert net == '<span class="currency">$</span>10.00'
-
-
-def test_templatetag_i18n_net_html_normalize(price_fixture):
-    net = prices_i18n.net(price_fixture, html=True, normalize=True)
-    assert net == '<span class="currency">$</span>10'
-
-
-def test_templatetag_i18n_net_normalize(price_fixture):
-    net = prices_i18n.net(price_fixture, normalize=True)
-    assert net == '$10'
-
-
-def test_templatetag_i18n_net_normalize_with_decimals():
-    price = Price(Amount('12.23', 'USD'), Amount('12.23', 'USD'))
-    net = prices_i18n.net(price, normalize=True)
-    assert net == '$12.23'
-
-
-def test_templatetag_i18n_tax(price_fixture):
-    tax = prices_i18n.tax(price_fixture)
-    assert tax == '$5.00'
-
-
-def test_templatetag_i18n_tax_html(price_fixture):
-    tax = prices_i18n.tax(price_fixture, html=True)
-    assert tax == '<span class="currency">$</span>5.00'
-
-
-def test_templatetag_i18n_tax_normalize(price_fixture):
-    tax = prices_i18n.tax(price_fixture, normalize=True)
-    assert tax == '$5'
-
-
-def test_templatetag_i18n_tax_html_normalize(price_fixture):
-    tax = prices_i18n.tax(price_fixture, html=True, normalize=True)
-    assert tax == '<span class="currency">$</span>5'
-
-
 def test_templatetag_discount_amount_for():
     price = Price(Amount(30, 'BTC'), Amount(30, 'BTC'))
     discount = percentage_discount(50)
@@ -234,7 +168,7 @@ def test_templatetag_discount_amount_for():
     assert discount_amount == Price(Amount(-15, 'BTC'), Amount(-15, 'BTC'))
 
 
-def test_non_existing_locale(price_fixture):
+def test_non_existing_locale(amount_fixture):
     # Test detecting an error that occur for language 'zh_CN' for which
     # the canonical code is 'zh_Hans_CN', see:
     #     Babel 1.0+ doesn't support `zh_CN`
@@ -244,11 +178,11 @@ def test_non_existing_locale(price_fixture):
     #     Babel needs to support Fuzzy Locales
     #     https://github.com/python-babel/babel/issues/30
     translation.activate('oO_Oo')
-    tax = prices_i18n.tax(price_fixture, html=True)
-    assert tax  # No exception, success!
+    amount = prices_i18n.amount(amount_fixture, html=True)
+    assert amount  # No exception, success!
 
 
-def test_non_cannonical_locale_zh_CN(price_fixture, settings):
+def test_non_cannonical_locale_zh_CN(amount_fixture, settings):
     # Test detecting an error that occur for language 'zh_CN' for which
     # the canonical code is 'zh_Hans_CN', see:
     #     Babel 1.0+ doesn't support `zh_CN`
@@ -261,13 +195,13 @@ def test_non_cannonical_locale_zh_CN(price_fixture, settings):
     settings.LANGUAGE_CODE = 'en_US'
 
     # Checking format of the default locale
-    tax = prices_i18n.tax(price_fixture, html=True)
-    assert tax == '<span class="currency">$</span>5.00'
+    amount = prices_i18n.amount(amount_fixture, html=True)
+    assert amount == '<span class="currency">$</span>10.00'
 
     # Checking if 'zh_CN' has changed the format
     translation.activate('zh_CN')
-    tax = prices_i18n.tax(price_fixture, html=True)
-    assert tax == '<span class="currency">US$</span>5.00'  # 'US' before '$'
+    amount = prices_i18n.amount(amount_fixture, html=True)
+    assert amount == '<span class="currency">US$</span>10.00'  # 'US' before '$'
 
 
 @pytest.mark.parametrize('value, normalize, expected',
@@ -300,20 +234,6 @@ def test_format_normalize_price_three_digits(value, expected):
     assert normalized_price == expected
 
 
-@pytest.mark.parametrize('value', [Decimal('12.22'), Decimal('1222.22')])
-def test_normalize_same_as_formatted(value):
-    formatted_price = prices_i18n.format_price(value, 'USD', normalize=True)
-    assert formatted_price == prices_i18n.net(
-        Price(Amount(value, 'USD'), Amount(value, 'USD')))
-
-
-@pytest.mark.parametrize('value', [Decimal('12'), Decimal('1222')])
-def test_normalize_same_as_formatted(value):
-    formatted_price = prices_i18n.format_price(value, 'USD', normalize=True)
-    net = prices_i18n.net(Price(Amount(value, 'USD'), Amount(value, 'USD')))
-    assert not formatted_price == net
-
-
 def test_templatetag_amount(amount_fixture):
     amount = tags.amount(amount_fixture)
     assert amount == '10 <span class="currency">USD</span>'
@@ -324,29 +244,6 @@ def test_templatetag_amount_normalize(amount_with_decimals):
     assert amount == '10.20 <span class="currency">USD</span>'
 
 
-def test_templatetag_gross(price_fixture):
-    gross = tags.gross(price_fixture)
-    assert gross['amount'] == Decimal('15')
-    assert gross['currency'] == price_fixture.currency
-
-
-def test_templatetag_net(price_fixture):
-    net = tags.net(price_fixture)
-    assert net['amount'] == Decimal('10')
-    assert net['currency'] == price_fixture.currency
-
-
-def test_templatetag_tax(price_fixture):
-    tax = tags.tax(price_fixture)
-    assert tax['amount'] == Decimal('5')
-    assert tax['currency'] == price_fixture.currency
-
-
-def test_templatetag_net_normalize_one_point(price_with_decimals):
-    net = tags.net(price_with_decimals, normalize=True)
-    assert str(net['amount']) == '10.20'
-
-
 def test_templatetag_i18n_amount(amount_fixture):
     amount = prices_i18n.amount(amount_fixture)
     assert amount == '$10.00'
@@ -355,18 +252,3 @@ def test_templatetag_i18n_amount(amount_fixture):
 def test_templatetag_i18n_amount_normalize(amount_fixture):
     amount = prices_i18n.amount(amount_fixture, normalize=True)
     assert amount == '$10'
-
-
-def test_templatetag_i18n_gross_normalize_one_digit(price_with_decimals):
-    gross = prices_i18n.gross(price_with_decimals, normalize=True)
-    assert gross == '$15'
-
-
-def test_templatetag_i18n_net_normalize_one_digit(price_with_decimals):
-    net = prices_i18n.net(price_with_decimals, normalize=True)
-    assert net == '$10.20'
-
-
-def test_templatetag_i18n_tax_normalize_one_digit(price_with_decimals):
-    tax = prices_i18n.tax(price_with_decimals, normalize=True)
-    assert tax == '$4.80'
