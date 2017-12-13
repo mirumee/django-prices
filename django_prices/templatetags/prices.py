@@ -13,10 +13,10 @@ def normalize_price(price, normalize):
     return price
 
 
-@register.inclusion_tag('prices/price.html')
-def amount(amount, normalize=False):
-    return {'amount': normalize_price(amount.value, normalize),
-            'currency': amount.currency}
+@register.filter()
+def amount(obj, normalize=False):
+    return '%s <span class="currency">%s</span>' % (
+        normalize_price(obj.value, normalize), obj.currency)
 
 
 @register.inclusion_tag('prices/price.html')

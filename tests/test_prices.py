@@ -17,6 +17,11 @@ from .models import Model
 
 
 @pytest.fixture(scope='module')
+def amount_fixture():
+    return Amount('10', 'USD')
+
+
+@pytest.fixture(scope='module')
 def price_fixture():
     return Price(net=Amount('10', 'USD'), gross=Amount('15', 'USD'))
 
@@ -302,6 +307,11 @@ def test_normalize_same_as_formatted(value):
     formatted_price = prices_i18n.format_price(value, 'USD', normalize=True)
     net = prices_i18n.net(Price(Amount(value, 'USD'), Amount(value, 'USD')))
     assert not formatted_price == net
+
+
+def test_templatetag_amount_html(amount_fixture):
+    amount = tags.amount(amount_fixture)
+    assert amount == '10 <span class="currency">USD</span>'
 
 
 def test_templatetag_gross(price_fixture):

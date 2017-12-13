@@ -66,11 +66,11 @@ def format_price(value, currency, html=False, normalize=False):
     return mark_safe(result)
 
 
-@register.simple_tag
-def amount(amount, html=False, normalize=False):
+@register.filter()
+def amount(obj, html=False, normalize=False):
     if html or normalize:
-        return format_price(amount.value, amount.currency, html, normalize)
-    return currencyfmt(amount.value, amount.currency)
+        return format_price(obj.value, obj.currency, html, normalize)
+    return currencyfmt(obj.value, obj.currency)
 
 
 @register.simple_tag
