@@ -22,6 +22,11 @@ def amount_fixture():
 
 
 @pytest.fixture(scope='module')
+def amount_with_decimals():
+    return Amount('10.20', 'USD')
+
+
+@pytest.fixture(scope='module')
 def price_fixture():
     return Price(net=Amount('10', 'USD'), gross=Amount('15', 'USD'))
 
@@ -314,6 +319,11 @@ def test_templatetag_amount(amount_fixture):
     assert amount == '10 <span class="currency">USD</span>'
 
 
+def test_templatetag_amount_normalize(amount_with_decimals):
+    amount = tags.amount(amount_with_decimals, normalize=True)
+    assert amount == '10.20 <span class="currency">USD</span>'
+
+
 def test_templatetag_gross(price_fixture):
     gross = tags.gross(price_fixture)
     assert gross['amount'] == Decimal('15')
@@ -338,6 +348,11 @@ def test_templatetag_net_normalize_one_point(price_with_decimals):
 
 
 def test_templatetag_i18n_amount(amount_fixture):
+    amount = prices_i18n.amount(amount_fixture)
+    assert amount == '$10.00'
+
+
+def test_templatetag_i18n_amount_normalize(amount_fixture):
     amount = prices_i18n.amount(amount_fixture, normalize=True)
     assert amount == '$10'
 
