@@ -8,7 +8,7 @@ from django.db import connection
 from django.utils import translation
 from django_prices import forms, widgets
 from django_prices.models import PriceField, AmountField
-from django_prices.templatetags import prices as tags
+from django_prices.templatetags import prices
 from django_prices.templatetags import prices_i18n
 from prices import Amount, Price, percentage_discount
 
@@ -166,7 +166,7 @@ def test_field_passes_none_validation():
 def test_templatetag_discount_amount_for():
     price = Price(Amount(30, 'BTC'), Amount(30, 'BTC'))
     discount = percentage_discount(50)
-    discount_amount = tags.discount_amount_for(discount, price)
+    discount_amount = prices.discount_amount_for(discount, price)
     assert discount_amount == Price(Amount(-15, 'BTC'), Amount(-15, 'BTC'))
 
 
@@ -180,7 +180,7 @@ def test_non_existing_locale(amount_fixture):
     #     Babel needs to support Fuzzy Locales
     #     https://github.com/python-babel/babel/issues/30
     translation.activate('oO_Oo')
-    amount = prices_i18n.amount_html(amount_fixture)
+    amount = prices_i18n.amount(amount_fixture, format='html')
     assert amount  # No exception, success!
 
 
@@ -197,53 +197,18 @@ def test_non_cannonical_locale_zh_CN(amount_fixture, settings):
     settings.LANGUAGE_CODE = 'en_US'
 
     # Checking format of the default locale
-    amount = prices_i18n.amount_html(amount_fixture)
+    amount = prices_i18n.amount(amount_fixture, format='html')
     assert amount == '<span class="currency">$</span>10.00'
 
     # Checking if 'zh_CN' has changed the format
     translation.activate('zh_CN')
-    amount = prices_i18n.amount_html(amount_fixture)
+    amount = prices_i18n.amount(amount_fixture, format='html')
     assert amount == '<span class="currency">US$</span>10.00'  # 'US' before '$'
 
 
-@pytest.mark.parametrize('value, normalize, expected',
-                         [(Decimal('12.00'), True, Decimal('12')),
-                          (Decimal('12.00'), False, Decimal('12.00')),
-                          (Decimal('12.23'), True, Decimal('12.23'))])
-def test_normalize_price(value, normalize, expected):
-    assert tags.normalize_price(value, normalize) == expected
-
-
-@pytest.mark.parametrize('value, expected',
-                         [(Decimal('12'), '12'),
-                          (Decimal('12.20'), '12.20'),
-                          (Decimal('1222'), '1,222'),
-                          (Decimal('12.23'), '12.23')])
-def test_format_normalize_price(value, expected):
-    formatted_price = prices_i18n.format_price(value, 'USD', normalize=True)
-    assert formatted_price == '$%s' % expected
-
-
-def test_format_normalize_price_no_digits():
-    formatted_price = prices_i18n.format_price(123, 'JPY', normalize=True)
-    assert formatted_price == '¥123'
-
-
-@pytest.mark.parametrize(
-    'value,expected', [(123.002, 'BHD123.002'), (123.000, 'BHD123')])
-def test_format_normalize_price_three_digits(value, expected):
-    normalized_price = prices_i18n.format_price(value, 'BHD', normalize=True)
-    assert normalized_price == expected
-
-
 def test_templatetag_amount(amount_fixture):
-    amount = tags.amount(amount_fixture)
+    amount = prices.amount(amount_fixture)
     assert amount == '10 <span class="currency">USD</span>'
-
-
-def test_templatetag_amount_normalize(amount_with_decimals):
-    amount = tags.amount(amount_with_decimals, normalize=True)
-    assert amount == '10.20 <span class="currency">USD</span>'
 
 
 def test_templatetag_i18n_amount(amount_fixture):
@@ -251,6 +216,6 @@ def test_templatetag_i18n_amount(amount_fixture):
     assert amount == '$10.00'
 
 
-def test_templatetag_i18n_amount_normalize(amount_fixture):
-    amount = prices_i18n.amount(amount_fixture, normalize=True)
-    assert amount == '$10.00'
+def test_templatetag_i18n_amount_html(amount_fixture):
+    amount = prices_i18n.amount(amount_fixture, format='html')
+    assert amount == '<span class="currency">$</span>10.00'

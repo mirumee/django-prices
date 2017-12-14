@@ -62,7 +62,7 @@ You can also use HTML output from `prices_i18n` template tags, they will wrap cu
 ```html+django
 {% load prices_i18n %}
 
-<p>Price: {{ foo.price.gross|amount_html }} ({{ foo.price.net|amount_html }} + {{ foo.price.tax|amount_html }} tax)</p>
+<p>Price: {{ foo.price.gross|amount:'html' }} ({{ foo.price.net|amount:'html' }} + {{ foo.price.tax|amount:'html' }} tax)</p>
 ```
 
 It will be rendered as a following structure (for example with English locale):
