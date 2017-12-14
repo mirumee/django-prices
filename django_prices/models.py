@@ -6,25 +6,6 @@ from prices import Amount, Price
 from . import forms
 
 
-class Creator(object):
-    """
-    A placeholder class that provides a way to set the attribute on the model.
-    """
-    def __init__(self, field):
-        self.field = field
-
-    def __get__(self, obj, objtype=None):
-        if obj is None:
-            return self
-        return obj.__dict__[self.field.name]
-
-    def __set__(self, obj, value):
-        if isinstance(value, models.Expression):
-            obj.__dict__[self.field.name] = value
-        else:
-            obj.__dict__[self.field.name] = self.field.to_python(value)
-
-
 class AmountField(models.DecimalField):
 
     description = 'A field that stores an amount'
@@ -32,10 +13,6 @@ class AmountField(models.DecimalField):
     def __init__(self, verbose_name=None, currency=None, **kwargs):
         self.currency = currency
         super(AmountField, self).__init__(verbose_name, **kwargs)
-
-    def contribute_to_class(self, cls, name, **kwargs):
-        super(AmountField, self).contribute_to_class(cls, name, **kwargs)
-        setattr(cls, self.name, Creator(self))
 
     def from_db_value(self, value, expression, connection, context):
         return self.to_python(value)
@@ -70,7 +47,7 @@ class AmountField(models.DecimalField):
     def value_to_string(self, obj):
         value = self.value_from_object(obj)
         if value is not None:
-            return value.value
+            return value
         return super(AmountField, self).value_to_string(value)
 
     def formfield(self, **kwargs):
