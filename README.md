@@ -8,11 +8,17 @@ Provides support for models:
 ```python
 from django.db import models
 
-from django_prices.models import PriceField
+from django_prices.models import AmountField, PriceField
 
 class Product(models.Model):
     name = models.CharField('Name')
-    price = PriceField('Price', currency='BTC', max_digits=12, decimal_places=2)
+    price_net = AmountField(
+        'net', currency='BTC', default='5', max_digits=9,
+        decimal_places=2)
+    price_gross = AmountField(
+        'gross', currency='BTC', default='5', max_digits=9,
+        decimal_places=2)
+    price = PriceField(net_field='price_net', gross_field='price_gross')
 ```
 
 And forms:
@@ -20,11 +26,11 @@ And forms:
 ```python
 from django import forms
 
-from django_prices.forms import PriceField
+from django_prices.forms import Amount, PriceField
 
 class ProductForm(forms.Form):
     name = forms.CharField(label='Name')
-    price = PriceField(label='Price', currency='BTC')
+    price_net = AmountField(label='net', currency='BTC')
 ```
 
 And templates:
@@ -32,7 +38,7 @@ And templates:
 ```html+django
 {% load prices %}
 
-<p>Price: {% gross foo.price %} ({% net foo.price %} + {% tax foo.price %} tax)</p>
+<p>Price: {{ foo.price.gross|amount }} ({{ foo.price.net|amount }} + {{ foo.price.tax|amount }} tax)</p>
 ```
 
 **Note:** for template tags to work, you need to add `django_prices` to your `INSTALLED_APPS`.
@@ -48,7 +54,7 @@ Then follow the instruction to add it to your `INSTALLED_APPS` and `MIDDLEWARE_C
 ```html+django
 {% load prices_i18n %}
 
-<p>Price: {% gross foo.price %} ({% net foo.price %} + {% tax foo.price %} tax)</p>
+<p>Price: {{ foo.price.gross|amount }} ({{ foo.price.net|amount }} + {{ foo.price.tax|amount }} tax)</p>
 ```
 
 You can also use HTML output from `prices_i18n` template tags, they will wrap currency symbol in a `<span>` element:
@@ -56,7 +62,7 @@ You can also use HTML output from `prices_i18n` template tags, they will wrap cu
 ```html+django
 {% load prices_i18n %}
 
-<p>Price: {% gross foo.price html=True %} ({% net foo.price html=True %} + {% tax foo.price html=True %} tax)</p>
+<p>Price: {{ foo.price.gross|amount:'html' }} ({{ foo.price.net|amount:'html' }} + {{ foo.price.tax|amount:'html' }} tax)</p>
 ```
 
 It will be rendered as a following structure (for example with English locale):
