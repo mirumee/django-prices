@@ -29,6 +29,6 @@ setup(
     include_package_data=True,
     classifiers=CLASSIFIERS,
     install_requires=[
-        'Babel>=2.2', 'Django>=1.11', 'django-babel', 'prices>=1.0.0-beta'],
+        'Babel>=2.2', 'Django>=1.11', 'django-babel', 'prices>=1.0.1-beta'],
     platforms=['any'],
     zip_safe=False)

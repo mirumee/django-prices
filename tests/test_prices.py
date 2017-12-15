@@ -121,7 +121,7 @@ def test_render():
 
 
 def test_instance_values():
-    instance = Model(price_net=Amount(25, 'USD'))
+    instance = Model(price_net=Amount(25, 'BTC'))
     assert instance.price.net.value == 25
 
 
@@ -130,6 +130,13 @@ def test_instance_values_both_amounts():
         price_net=Amount(25, 'BTC'), price_gross=Amount(30, 'BTC'))
     assert instance.price == Price(
         net=Amount(25, 'BTC'), gross=Amount(30, 'BTC'))
+
+
+def test_instance_values_different_currencies():
+    with pytest.raises(ValueError):
+        model = Model(
+            price_net=Amount(25, 'BTC'), price_gross=Amount(30, 'USD'))
+        assert model.price
 
 
 def test_instance_values_different_currency(db):
