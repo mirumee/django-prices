@@ -221,6 +221,11 @@ def test_templatetag_i18n_amount_html(amount_fixture):
     assert amount == '<span class="currency">$</span>10.00'
 
 
+def test_templatetag_i18n_amount_wrong_param(amount_fixture):
+    amount = prices_i18n.amount(amount_fixture, format='test')
+    assert amount == '$10.00'
+
+
 def test_get_currency_fraction_USD():
     result = prices_i18n.get_currency_fraction('USD')
     assert result == 2
@@ -229,3 +234,8 @@ def test_get_currency_fraction_USD():
 def test_get_currency_fraction_unknown_currency():
     result = prices_i18n.get_currency_fraction(('test'))
     assert result == 2
+
+
+def test_format_price_invalid_value():
+    result = prices_i18n.format_price('invalid', 'USD')
+    assert result == ''
