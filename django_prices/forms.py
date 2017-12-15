@@ -32,7 +32,7 @@ class AmountField(forms.DecimalField):
                 raise forms.ValidationError(
                     'Invalid currency: %r (expected %r)' % (
                         value.currency, self.currency))
-            super(AmountField, self).validate(value)
+            super(AmountField, self).validate(value.value)
 
     def run_validators(self, value):
         if isinstance(value, Amount):
