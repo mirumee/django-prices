@@ -23,12 +23,12 @@ setup(
     author_email='hello@mirumee.com',
     description='Django fields for the prices module',
     license='BSD',
-    version='1.0.0-beta',
+    version='1.0.0-beta2',
     url='https://github.com/mirumee/django-prices',
     packages=['django_prices', 'django_prices.templatetags'],
     include_package_data=True,
     classifiers=CLASSIFIERS,
     install_requires=[
-        'Babel>=2.2', 'Django>=1.11', 'django-babel', 'prices>=1.0.1-beta'],
+        'Babel>=2.2', 'Django>=1.11', 'django-babel', 'prices>=1.0.0-beta2'],
     platforms=['any'],
     zip_safe=False)
