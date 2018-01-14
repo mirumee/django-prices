@@ -18,7 +18,7 @@ class PriceInput(forms.TextInput):
     def format_value(self, value):
         if isinstance(value, Price):
             value = value.net.value
-        return value
+        return value.value
 
     def render(self, name, value, attrs=None):
         widget = super(PriceInput, self).render(name, value, attrs=attrs)
