@@ -16,8 +16,14 @@ class PriceInput(forms.TextInput):
         super(PriceInput, self).__init__(*args, **kwargs)
 
     def format_value(self, value):
+        if not value:
+            return value
         if isinstance(value, Price):
             value = value.net.value
+        if isinstance(value, Amount):
+            value = value.value
+        else:
+            value = value
         return value
 
     def render(self, name, value, attrs=None):
