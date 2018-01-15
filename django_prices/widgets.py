@@ -20,7 +20,11 @@ class PriceInput(forms.TextInput):
             return value
         if isinstance(value, Price):
             value = value.net.value
-        return value.value
+        if isinstance(value, Amount):
+            value = value.value
+        else:
+            value = value
+        return value
 
     def render(self, name, value, attrs=None):
         widget = super(PriceInput, self).render(name, value, attrs=attrs)
