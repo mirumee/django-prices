@@ -1,5 +1,5 @@
 from django import forms
-from django_prices.forms import AmountField
+from django_prices.forms import MoneyField
 
 from . import models
 
@@ -11,8 +11,8 @@ class ModelForm(forms.ModelForm):
 
 
 class RequiredPriceForm(forms.Form):
-    price_net = AmountField(currency='BTC')
+    price_net = MoneyField(currency='BTC')
 
 
 class OptionalPriceForm(forms.Form):
-    price_net = AmountField(currency='BTC', required=False)
+    price_net = MoneyField(currency='BTC', required=False)

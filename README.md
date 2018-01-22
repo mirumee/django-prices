@@ -8,17 +8,17 @@ Provides support for models:
 ```python
 from django.db import models
 
-from django_prices.models import AmountField, PriceField
+from django_prices.models import MoneyField, TaxedMoneyField
 
 class Product(models.Model):
     name = models.CharField('Name')
-    price_net = AmountField(
+    price_net = MoneyField(
         'net', currency='BTC', default='5', max_digits=9,
         decimal_places=2)
-    price_gross = AmountField(
+    price_gross = MoneyField(
         'gross', currency='BTC', default='5', max_digits=9,
         decimal_places=2)
-    price = PriceField(net_field='price_net', gross_field='price_gross')
+    price = TaxedMoneyField(net_field='price_net', gross_field='price_gross')
 ```
 
 And forms:
@@ -26,11 +26,11 @@ And forms:
 ```python
 from django import forms
 
-from django_prices.forms import Amount, PriceField
+from django_prices.forms import MoneyField
 
 class ProductForm(forms.Form):
     name = forms.CharField(label='Name')
-    price_net = AmountField(label='net', currency='BTC')
+    price_net = MoneyField(label='net', currency='BTC')
 ```
 
 And templates:
@@ -70,6 +70,3 @@ It will be rendered as a following structure (for example with English locale):
 ```html
 <span class="currency">$</span>15.00
 ```
-
-
-Batteries included: django-prices comes with South migration support.
