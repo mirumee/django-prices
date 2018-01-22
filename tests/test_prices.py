@@ -1,6 +1,7 @@
 # coding: utf-8
 from __future__ import unicode_literals
 
+import functools
 from decimal import Decimal
 
 import pytest
@@ -172,7 +173,8 @@ def test_field_passes_none_validation():
 
 def test_templatetag_discount_amount_for():
     price = TaxedMoney(Money(30, 'BTC'), Money(30, 'BTC'))
-    discount = percentage_discount(price, 50)
+    
+    discount = functools.partial(percentage_discount, percentage=50)
     discount_amount = prices.discount_amount_for(discount, price)
     assert discount_amount == TaxedMoney(Money(-15, 'BTC'), Money(-15, 'BTC'))
 

@@ -12,4 +12,4 @@ def amount(obj):
 
 @register.filter
 def discount_amount_for(discount, price):
-    return discount.apply(price) - price
+    return discount(price) - price
