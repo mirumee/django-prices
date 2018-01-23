@@ -5,10 +5,10 @@ from django.core.validators import (
 from .templatetags.prices_i18n import format_price
 
 
-class MoneyValidator(DecimalValidator):
+class MoneyPrecisionValidator(DecimalValidator):
     def __init__(self, currency, max_digits=None, **options):
         self.currency = currency
-        super(MoneyValidator, self).__init__(
+        super(MoneyPrecisionValidator, self).__init__(
             max_digits=max_digits,
             decimal_places=get_currency_precision(currency),
             **options)
@@ -18,7 +18,7 @@ class MoneyValidator(DecimalValidator):
             raise ValueError(
                 'Cannot validate amounts that are not in %r (value was %r)' % (
                     self.currency, other.currency ))
-        super(MoneyValidator, self).__call__(other.amount)
+        super(MoneyPrecisionValidator, self).__call__(other.amount)
 
 
 class MoneyValueValidator:

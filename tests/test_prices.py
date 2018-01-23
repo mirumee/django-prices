@@ -15,7 +15,7 @@ from django_prices.templatetags import prices_i18n
 from prices import Money, TaxedMoney, percentage_discount
 
 from django_prices.validators import (
-    MoneyValidator, MaxMoneyValidator, MinMoneyValidator)
+    MaxMoneyValidator, MinMoneyValidator, MoneyPrecisionValidator)
 
 from .forms import (
     ModelForm, OptionalPriceForm, RequiredPriceForm, ValidatedPriceForm)
@@ -204,8 +204,8 @@ def test_validate_min_money():
         validator(Money('5.01', 'BTC'))
 
 
-def test_validate_money():
-    validator = MoneyValidator('USD')
+def test_validate_money_precision():
+    validator = MoneyPrecisionValidator('USD')
     validator(Money('5.00', 'USD'))
     validator(Money('5.1', 'USD'))
     with pytest.raises(ValidationError):
