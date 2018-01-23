@@ -16,3 +16,7 @@ class RequiredPriceForm(forms.Form):
 
 class OptionalPriceForm(forms.Form):
     price_net = MoneyField(currency='BTC', required=False)
+
+
+class ValidatedPriceForm(forms.Form):
+    price_net = MoneyField(currency='USD')

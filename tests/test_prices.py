@@ -5,6 +5,7 @@ import functools
 from decimal import Decimal
 
 import pytest
+from django.core.exceptions import ValidationError
 from django.db import connection
 from django.utils import translation
 from django_prices import forms, widgets
@@ -13,7 +14,11 @@ from django_prices.templatetags import prices
 from django_prices.templatetags import prices_i18n
 from prices import Money, TaxedMoney, percentage_discount
 
-from .forms import ModelForm, OptionalPriceForm, RequiredPriceForm
+from django_prices.validators import (
+    MoneyValidator, MaxMoneyValidator, MinMoneyValidator)
+
+from .forms import (
+    ModelForm, OptionalPriceForm, RequiredPriceForm, ValidatedPriceForm)
 from .models import Model
 
 
@@ -75,6 +80,14 @@ def test_money_field_from_db_value_handles_none():
 
 
 def test_money_field_from_db_value_checks_currency():
+    field = MoneyField(
+        'price', currency='BTC', default='5', max_digits=9, decimal_places=2)
+    invalid = Money(1, 'USD')
+    with pytest.raises(ValueError):
+        field.from_db_value(invalid, None, None, None)
+
+
+def test_money_field_from_db_value_checks_min_value():
     field = MoneyField(
         'price', currency='BTC', default='5', max_digits=9, decimal_places=2)
     invalid = Money(1, 'USD')
@@ -146,6 +159,12 @@ def test_instance_values_different_currency(db):
         model.save()
 
 
+def test_instance_values_invalid_amount(db):
+    with pytest.raises(ValueError):
+        model = Model(price_gross=Money('10.999', 'USD'))
+        model.save()
+
+
 def test_set_instance_values():
     instance = Model()
     instance.price = TaxedMoney(Money(25, 'BTC'), Money(30, 'BTC'))
@@ -169,6 +188,30 @@ def test_field_passes_none_validation():
     form = OptionalPriceForm(data={'price': None})
     form.full_clean()
     assert form.errors == {}
+
+
+def test_validate_max_money():
+    validator = MaxMoneyValidator(Money(5, 'BTC'))
+    validator(Money('5.00', 'BTC'))
+    with pytest.raises(ValidationError):
+        validator(Money('5.01', 'BTC'))
+
+
+def test_validate_min_money():
+    validator = MaxMoneyValidator(Money(5, 'BTC'))
+    validator(Money('5.00', 'BTC'))
+    with pytest.raises(ValidationError):
+        validator(Money('5.01', 'BTC'))
+
+
+def test_validate_money():
+    validator = MoneyValidator('USD')
+    validator(Money('5.00', 'USD'))
+    validator(Money('5.1', 'USD'))
+    with pytest.raises(ValidationError):
+        validator(Money('5.001', 'USD'))
+    with pytest.raises(ValueError):
+        validator(Money('5.00', 'BTC'))
 
 
 def test_templatetag_discount_amount_for():
