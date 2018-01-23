@@ -28,6 +28,6 @@ setup(
     include_package_data=True,
     classifiers=CLASSIFIERS,
     install_requires=[
-        'Babel>=2.2', 'Django<2.0.0', 'django-babel', 'prices>=1.0.0-beta3'],
+        'Babel>=2.2', 'Django<2.1.0', 'django-babel', 'prices>=1.0.0-beta3'],
     platforms=['any'],
     zip_safe=False)
