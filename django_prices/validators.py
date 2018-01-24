@@ -1,4 +1,3 @@
-from babel.numbers import get_currency_precision
 from django.core.exceptions import ValidationError
 from django.core.validators import (
     DecimalValidator, MaxValueValidator, MinValueValidator, ValidationError)
@@ -7,14 +6,9 @@ from .templatetags.prices_i18n import format_price
 
 
 class MoneyPrecisionValidator(DecimalValidator):
-    def __init__(self, currency, max_digits=None, **options):
+    def __init__(self, currency, *args):
         self.currency = currency
-        if 'decimal_places' in options:
-            raise ValueError('decimal_places option is not supported')
-        super(MoneyPrecisionValidator, self).__init__(
-            max_digits=max_digits,
-            decimal_places=get_currency_precision(currency),
-            **options)
+        super(MoneyPrecisionValidator, self).__init__(*args)
 
     def __call__(self, other):
         if self.currency != other.currency:

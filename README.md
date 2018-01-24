@@ -40,15 +40,14 @@ from django import forms
 from prices.forms import Money
 
 from django_prices.forms import MoneyField
-from django_prices.Validators import MaxMoneyValidator, MinMoneyValidator, MoneyPrecisionValidator
+from django_prices.Validators import MaxMoneyValidator, MinMoneyValidator
 
 class DonateForm(forms.Form):
     donator_name = forms.CharField(label='Your name')
-    donation = MoneyField(label='net', currency='EUR', validators=[
-        MoneyPrecisionValidator('EUR'),
-        MinMoneyValidator(Money(5, 'EUR')),
-        MaxMoneyValidator(Money(500, 'EUR')),
-    ])
+    donation = MoneyField(
+        label='net', currency='EUR', max_digits=9, decimal_places=2,
+        validators=[MinMoneyValidator(Money(5, 'EUR')),
+                    MaxMoneyValidator(Money(500, 'EUR'))])
 ```
 
 And templates:

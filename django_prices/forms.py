@@ -1,7 +1,10 @@
+import itertools
+
 from django import forms
 from prices import Money
 
-from .validators import MoneyPrecisionValidator
+from .validators import (
+    MaxMoneyValidator, MinMoneyValidator, MoneyPrecisionValidator)
 from .widgets import MoneyInput
 
 __all__ = ('MoneyField', 'MoneyInput')
@@ -9,7 +12,8 @@ __all__ = ('MoneyField', 'MoneyInput')
 
 class MoneyField(forms.DecimalField):
     def __init__(
-            self, currency, widget=MoneyInput, max_digits=None, validators=(),
+            self, currency, widget=MoneyInput, max_value=None, min_value=None,
+            max_digits=None, decimal_places=None, validators=(),
             *args, **kwargs):
         self.currency = currency
         if isinstance(widget, type):
@@ -17,9 +21,14 @@ class MoneyField(forms.DecimalField):
                 'type': 'number', 'step': 'any'})
         super(MoneyField, self).__init__(*args, widget=widget, **kwargs)
 
-        self.validators = [*self.default_validators, *validators]
-        self.validators.append(
-            MoneyPrecisionValidator(currency=currency, max_digits=max_digits))
+        self.validators = list(itertools.chain(
+            self.default_validators, validators))
+        self.validators.append(MoneyPrecisionValidator(
+            currency, max_digits, decimal_places))
+        if max_value is not None:
+            self.validators.append(MaxMoneyValidator(max_value))
+        if min_value is not None:
+            self.validators.append(MinMoneyValidator(min_value))
 
     def to_python(self, value):
         value = super(MoneyField, self).to_python(value)

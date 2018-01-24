@@ -209,7 +209,7 @@ def test_validate_min_money():
 
 
 def test_validate_money_precision():
-    validator = MoneyPrecisionValidator('USD')
+    validator = MoneyPrecisionValidator('USD', 9, 2)
     validator(Money('5.00', 'USD'))
     validator(Money('5.1', 'USD'))
     with pytest.raises(ValidationError):

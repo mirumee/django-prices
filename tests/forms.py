@@ -2,8 +2,7 @@ from django import forms
 from prices import Money
 
 from django_prices.forms import MoneyField
-from django_prices.validators import (
-    MaxMoneyValidator, MinMoneyValidator, MoneyPrecisionValidator)
+from django_prices.validators import MaxMoneyValidator, MinMoneyValidator
 
 from . import models
 
@@ -23,7 +22,6 @@ class OptionalPriceForm(forms.Form):
 
 
 class ValidatedPriceForm(forms.Form):
-    price = MoneyField(currency='USD', validators=[
-        MoneyPrecisionValidator(currency='USD'),
+    price = MoneyField(currency='USD', max_digits=9, decimal_places=2, validators=[
         MinMoneyValidator(Money(5, currency='USD')),
         MaxMoneyValidator(Money(15, currency='USD'))])
