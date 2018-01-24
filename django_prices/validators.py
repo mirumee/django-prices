@@ -1,4 +1,3 @@
-from django.core.exceptions import ValidationError
 from django.core.validators import (
     DecimalValidator, MaxValueValidator, MinValueValidator, ValidationError)
 
@@ -14,7 +13,7 @@ class MoneyPrecisionValidator(DecimalValidator):
         if self.currency != other.currency:
             raise ValueError(
                 'Cannot validate amounts that are not in %r (value was %r)' % (
-                    self.currency, other.currency ))
+                    self.currency, other.currency))
         super(MoneyPrecisionValidator, self).__call__(other.amount)
 
 

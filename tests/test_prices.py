@@ -8,12 +8,12 @@ import pytest
 from django.core.exceptions import ValidationError
 from django.db import connection
 from django.utils import translation
+from prices import Money, TaxedMoney, percentage_discount
+
 from django_prices import forms, widgets
 from django_prices.models import MoneyField, TaxedMoneyField
 from django_prices.templatetags import prices
 from django_prices.templatetags import prices_i18n
-from prices import Money, TaxedMoney, percentage_discount
-
 from django_prices.validators import (
     MaxMoneyValidator, MinMoneyValidator, MoneyPrecisionValidator)
 
