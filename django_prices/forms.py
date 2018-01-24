@@ -1,18 +1,25 @@
 from django import forms
 from prices import Money
 
+from .validators import MoneyPrecisionValidator
 from .widgets import MoneyInput
 
 __all__ = ('MoneyField', 'MoneyInput')
 
 
 class MoneyField(forms.DecimalField):
-    def __init__(self, currency, widget=MoneyInput, *args, **kwargs):
+    def __init__(
+            self, currency, widget=MoneyInput, max_digits=None, validators=(),
+            *args, **kwargs):
         self.currency = currency
         if isinstance(widget, type):
             widget = widget(currency=self.currency, attrs={
                 'type': 'number', 'step': 'any'})
         super(MoneyField, self).__init__(*args, widget=widget, **kwargs)
+
+        self.validators = [*self.default_validators, *validators]
+        self.validators.append(
+            MoneyPrecisionValidator(currency=currency, max_digits=max_digits))
 
     def to_python(self, value):
         value = super(MoneyField, self).to_python(value)
@@ -33,8 +40,6 @@ class MoneyField(forms.DecimalField):
             super(MoneyField, self).validate(value.amount)
 
     def run_validators(self, value):
-        if isinstance(value, Money):
-            value = value.amount
         return super(MoneyField, self).run_validators(value)
 
     def has_changed(self, initial, data):

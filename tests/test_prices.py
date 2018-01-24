@@ -195,13 +195,17 @@ def test_validate_max_money():
     validator(Money('5.00', 'BTC'))
     with pytest.raises(ValidationError):
         validator(Money('5.01', 'BTC'))
+    with pytest.raises(ValueError):
+        validator(Money('5.00', 'USD'))
 
 
 def test_validate_min_money():
-    validator = MaxMoneyValidator(Money(5, 'BTC'))
+    validator = MinMoneyValidator(Money(5, 'BTC'))
     validator(Money('5.00', 'BTC'))
     with pytest.raises(ValidationError):
-        validator(Money('5.01', 'BTC'))
+        validator(Money('4.99', 'BTC'))
+    with pytest.raises(ValueError):
+        validator(Money('5.00', 'USD'))
 
 
 def test_validate_money_precision():
@@ -212,6 +216,13 @@ def test_validate_money_precision():
         validator(Money('5.001', 'USD'))
     with pytest.raises(ValueError):
         validator(Money('5.00', 'BTC'))
+
+
+def test_validators_work_with_formfields():
+    form = ValidatedPriceForm(data={'price': '25'})
+    form.full_clean()
+    assert form.errors == {
+        'price': ['Ensure this value is less than or equal to $15.00.']}
 
 
 def test_templatetag_discount_amount_for():
