@@ -218,6 +218,22 @@ def test_validate_money_precision():
         validator(Money('5.00', 'BTC'))
 
 
+def test_validate_money_precision_by_currency():
+    # Validator tests if precision is valid for given currency
+    validator = MoneyPrecisionValidator('USD', 9, 3)
+    validator(Money('5.00', 'USD'))
+    validator(Money('5.1', 'USD'))
+    with pytest.raises(ValidationError):
+        validator(Money('5.001', 'USD'))
+
+
+def test_validate_money_precision_fictional_currency():
+    validator = MoneyPrecisionValidator('BTC', 16, 10)
+    validator(Money('5.1234567890', 'BTC'))
+    with pytest.raises(ValidationError):
+        validator(Money('5.12345678901', 'BTC'))
+
+
 def test_validators_work_with_formfields():
     form = ValidatedPriceForm(data={'price': '25'})
     form.full_clean()

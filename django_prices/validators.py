@@ -1,3 +1,5 @@
+from babel.numbers import is_currency, get_currency_precision
+
 from django.core.validators import (
     DecimalValidator, MaxValueValidator, MinValueValidator, ValidationError)
 
@@ -14,7 +16,23 @@ class MoneyPrecisionValidator(DecimalValidator):
             raise ValueError(
                 'Cannot validate amounts that are not in %r (value was %r)' % (
                     self.currency, other.currency))
-        super(MoneyPrecisionValidator, self).__call__(other.amount)
+
+        value = other.amount
+        super(MoneyPrecisionValidator, self).__call__(value)
+
+        if is_currency(self.currency):
+            currency_precision = get_currency_precision(self.currency)
+            exponent = value.as_tuple()[-1]
+            if exponent >= 0:
+                decimals = 0
+            else:
+                decimals = abs(exponent)
+            if decimals > currency_precision:
+                raise ValidationError(
+                    self.messages['max_decimal_places'],
+                    code='max_decimal_places',
+                    params={'max': currency_precision},
+                )
 
 
 class MoneyValueValidator:
