@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import re
 from decimal import Decimal, InvalidOperation
 
@@ -67,8 +65,8 @@ def get_locale_data():
 def amount(obj, format='text'):
     if format == 'text':
         return format_price(
-            obj.value, obj.currency, html=False)
+            obj.amount, obj.currency, html=False)
     if format == 'html':
         return format_price(
-            obj.value, obj.currency, html=True)
-    return currencyfmt(obj.value, obj.currency)
+            obj.amount, obj.currency, html=True)
+    return currencyfmt(obj.amount, obj.currency)
