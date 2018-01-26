@@ -13,9 +13,8 @@ class MoneyPrecisionValidator(DecimalValidator):
 
     def __call__(self, other):
         if self.currency != other.currency:
-            raise ValueError(
-                'Cannot validate amounts that are not in %r (value was %r)' % (
-                    self.currency, other.currency))
+            raise ValueError('Invalid currency: %r (expected %r)' % (
+                other.currency, self.currency))
 
         value = other.amount
         super(MoneyPrecisionValidator, self).__call__(value)

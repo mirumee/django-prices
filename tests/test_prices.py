@@ -153,16 +153,22 @@ def test_instance_values_different_currencies():
         assert model.price
 
 
-def test_instance_values_different_currency(db):
+def test_instance_save_values_different_currency(db):
     with pytest.raises(ValueError):
         model = Model(price_gross=Money(10, 'USD'))
         model.save()
 
 
-def test_instance_values_invalid_amount(db):
+def test_instance_full_lean_values_different_currency(db):
     with pytest.raises(ValueError):
-        model = Model(price_gross=Money('10.999', 'USD'))
-        model.save()
+        model = Model(price_gross=Money(10, 'USD'))
+        model.full_clean()
+
+
+def test_instance_full_clean_values_invalid_amount(db):
+    with pytest.raises(ValidationError):
+        model = Model(price_gross=Money('10.999', 'BTC'))
+        model.full_clean()
 
 
 def test_set_instance_values():
