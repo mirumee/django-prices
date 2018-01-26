@@ -1,7 +1,11 @@
+import itertools
+
 from django.db import models
+from django.utils.functional import cached_property
 from prices import Money, TaxedMoney
 
 from . import forms
+from .validators import MoneyPrecisionValidator
 
 
 class MoneyField(models.DecimalField):
@@ -25,11 +29,6 @@ class MoneyField(models.DecimalField):
         if value is None:
             return value
         return Money(value, self.currency)
-
-    def run_validators(self, value):
-        if isinstance(value, Money):
-            value = value.amount
-        return super(MoneyField, self).run_validators(value)
 
     def get_prep_value(self, value):
         value = self.to_python(value)
@@ -57,6 +56,13 @@ class MoneyField(models.DecimalField):
     def get_default(self):
         default = super(MoneyField, self).get_default()
         return self.to_python(default)
+
+    @cached_property
+    def validators(self):
+        validators = list(
+            itertools.chain(self.default_validators, self._validators))
+        return validators + [MoneyPrecisionValidator(
+                self.currency, self.max_digits, self.decimal_places)]
 
     def deconstruct(self):
         name, path, args, kwargs = super(MoneyField, self).deconstruct()

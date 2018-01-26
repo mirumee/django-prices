@@ -48,9 +48,6 @@ class MoneyField(forms.DecimalField):
                         value.currency, self.currency))
             super(MoneyField, self).validate(value.amount)
 
-    def run_validators(self, value):
-        return super(MoneyField, self).run_validators(value)
-
     def has_changed(self, initial, data):
         if not isinstance(initial, Money):
             initial = self.to_python(initial)
