@@ -30,8 +30,7 @@ class MoneyPrecisionValidator(DecimalValidator):
                 raise ValidationError(
                     self.messages['max_decimal_places'],
                     code='max_decimal_places',
-                    params={'max': currency_precision},
-                )
+                    params={'max': currency_precision})
 
 
 class MoneyValueValidator:
