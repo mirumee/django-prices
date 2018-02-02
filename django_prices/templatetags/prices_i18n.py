@@ -36,8 +36,7 @@ def format_price(value, currency, html=False):
 
     if html:
         pattern = re.sub(
-            '(\xa4+)', '<span class="currency">\\1</span>',
-            pattern)
+            '(\xa4+)', '<span class="currency">\\1</span>', pattern)
 
     result = format_currency(
         value, currency, format=pattern, locale=locale_code)

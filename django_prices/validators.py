@@ -42,8 +42,7 @@ class MoneyValueValidator:
                 'limit_value': format_price(self.limit_value.amount, currency),
                 'show_value': format_price(cleaned.amount, currency),
                 'value': format_price(value.amount, currency)}
-            raise ValidationError(
-                self.message, code=self.code, params=params)
+            raise ValidationError(self.message, code=self.code, params=params)
 
 
 class MaxMoneyValidator(MoneyValueValidator, MaxValueValidator):
