@@ -178,6 +178,12 @@ def test_set_instance_values():
     assert instance.price_gross == Money(30, 'BTC')
 
 
+def test_init_taxedmoney_model_field():
+    instance = Model(price=TaxedMoney(Money(25, 'BTC'), Money(30, 'BTC')))
+    assert instance.price_net == Money(25, 'BTC')
+    assert instance.price_gross == Money(30, 'BTC')
+
+
 def test_field_passes_all_validations():
     form = RequiredPriceForm(data={'price_net': '20'})
     form.full_clean()
@@ -249,7 +255,7 @@ def test_validators_work_with_formfields():
 
 def test_templatetag_discount_amount_for():
     price = TaxedMoney(Money(30, 'BTC'), Money(30, 'BTC'))
-    
+
     discount = functools.partial(percentage_discount, percentage=50)
     discount_amount = prices.discount_amount_for(discount, price)
     assert discount_amount == TaxedMoney(Money(-15, 'BTC'), Money(-15, 'BTC'))

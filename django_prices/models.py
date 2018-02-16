@@ -71,6 +71,19 @@ class MoneyField(models.DecimalField):
 
 
 class TaxedMoneyField(object):
+    # Field flags
+    auto_created = False
+    concrete = False
+    editable = False
+    hidden = False
+
+    is_relation = True
+    many_to_many = False
+    many_to_one = True
+    one_to_many = False
+    one_to_one = False
+    related_model = None
+    remote_field = None
 
     description = 'A field that stores a price.'
 
@@ -78,6 +91,10 @@ class TaxedMoneyField(object):
                  verbose_name=None, **kwargs):
         self.net_field = net_field
         self.gross_field = gross_field
+
+        self.editable = False
+        self.rel = None
+        self.column = None
 
     def __str__(self):
         return ('TaxedMoneyField(net_field=%s, gross_field=%s)' %
@@ -98,3 +115,9 @@ class TaxedMoneyField(object):
             gross = value.gross
         setattr(instance, self.net_field, net)
         setattr(instance, self.gross_field, gross)
+
+    def contribute_to_class(self, cls, name, **kwargs):
+        self.name = name
+        self.model = cls
+        cls._meta.add_field(self, private=True)
+        setattr(cls, name, self)
