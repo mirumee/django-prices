@@ -87,8 +87,9 @@ class TaxedMoneyField(object):
 
     description = 'A field that stores a price.'
 
-    def __init__(self, net_field='price_net', gross_field='price_gross',
-                 verbose_name=None, **kwargs):
+    def __init__(
+            self, net_field='price_net', gross_field='price_gross',
+            verbose_name=None, **kwargs):
         self.net_field = net_field
         self.gross_field = gross_field
 
@@ -97,8 +98,9 @@ class TaxedMoneyField(object):
         self.column = None
 
     def __str__(self):
-        return ('TaxedMoneyField(net_field=%s, gross_field=%s)' %
-                (self.net_field, self.gross_field))
+        return (
+            'TaxedMoneyField(net_field=%s, gross_field=%s)' %
+            (self.net_field, self.gross_field))
 
     def __get__(self, instance, cls=None):
         if instance is None:

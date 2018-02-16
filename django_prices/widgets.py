@@ -20,6 +20,5 @@ class MoneyInput(forms.TextInput):
 
     def render(self, name, value, attrs=None):
         widget = super(MoneyInput, self).render(name, value, attrs=attrs)
-        return render_to_string(self.template, {'widget': widget,
-                                                'value': value,
-                                                'currency': self.currency})
+        return render_to_string(self.template, {
+            'widget': widget, 'value': value, 'currency': self.currency})
