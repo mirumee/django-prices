@@ -184,6 +184,19 @@ def test_init_taxedmoney_model_field():
     assert instance.price_gross == Money(30, 'BTC')
 
 
+def test_init_taxedmoney_model_field_validation():
+    with pytest.raises(ValueError):
+        instance = Model(price=TaxedMoney(Money(25, 'USD'), Money(30, 'USD')))
+        instance.full_clean()
+
+
+def test_combined_field_validation():
+    with pytest.raises(ValueError):
+        instance = Model()
+        instance.price = TaxedMoney(Money(25, 'USD'), Money(30, 'USD'))
+        instance.full_clean()
+
+
 def test_field_passes_all_validations():
     form = RequiredPriceForm(data={'price_net': '20'})
     form.full_clean()

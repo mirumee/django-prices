@@ -1,5 +1,6 @@
 import itertools
 
+from django.core import validators
 from django.db import models
 from django.utils.functional import cached_property
 from prices import Money, TaxedMoney
@@ -71,21 +72,17 @@ class MoneyField(models.DecimalField):
 
 
 class TaxedMoneyField(object):
+    
+    description = 'A field that stores a price.'
+    empty_values = list(validators.EMPTY_VALUES)
+
     # Field flags
-    auto_created = False
+    blank = True
     concrete = False
     editable = False
-    hidden = False
 
-    is_relation = True
-    many_to_many = False
-    many_to_one = True
-    one_to_many = False
-    one_to_one = False
-    related_model = None
+    is_relation = False
     remote_field = None
-
-    description = 'A field that stores a price.'
 
     def __init__(
             self, net_field='price_net', gross_field='price_gross',
@@ -93,9 +90,8 @@ class TaxedMoneyField(object):
         self.net_field = net_field
         self.gross_field = gross_field
 
-        self.editable = False
-        self.rel = None
         self.column = None
+        self.attname = None
 
     def __str__(self):
         return (
@@ -119,7 +115,13 @@ class TaxedMoneyField(object):
         setattr(instance, self.gross_field, gross)
 
     def contribute_to_class(self, cls, name, **kwargs):
-        self.name = name
+        self.attname = self.name = name
         self.model = cls
         cls._meta.add_field(self, private=True)
         setattr(cls, name, self)
+
+    def clean(self, value, model_instance):
+        # Shortcircut clean() because Django calls it on all fields with
+        # is_relation = False, but we rely on our net and gross fields for
+        # actual validation.
+        return value
