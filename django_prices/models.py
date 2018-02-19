@@ -49,8 +49,7 @@ class MoneyField(models.DecimalField):
         return super(MoneyField, self).value_to_string(value)
 
     def formfield(self, **kwargs):
-        defaults = {'currency': self.currency,
-                    'form_class': forms.MoneyField}
+        defaults = {'currency': self.currency, 'form_class': forms.MoneyField}
         defaults.update(kwargs)
         return super(MoneyField, self).formfield(**defaults)
 
@@ -63,7 +62,7 @@ class MoneyField(models.DecimalField):
         validators = list(
             itertools.chain(self.default_validators, self._validators))
         return validators + [MoneyPrecisionValidator(
-                self.currency, self.max_digits, self.decimal_places)]
+            self.currency, self.max_digits, self.decimal_places)]
 
     def deconstruct(self):
         name, path, args, kwargs = super(MoneyField, self).deconstruct()
@@ -78,6 +77,7 @@ class TaxedMoneyField(object):
     empty_values = list(validators.EMPTY_VALUES)
 
     # Field flags
+    auto_created = False
     blank = True
     concrete = False
     editable = False
@@ -92,7 +92,6 @@ class TaxedMoneyField(object):
         self.gross_field = gross_field
 
         self.column = None
-        self.attname = None
 
     def __str__(self):
         return (
