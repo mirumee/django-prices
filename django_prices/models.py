@@ -72,8 +72,9 @@ class MoneyField(models.DecimalField):
 
 
 class TaxedMoneyField(object):
-    
-    description = 'A field that stores a price.'
+
+    description = (
+        'A field that combines net and gross fields values into TaxedMoney.')
     empty_values = list(validators.EMPTY_VALUES)
 
     # Field flags
