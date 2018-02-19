@@ -151,6 +151,7 @@ def test_instance_values_different_currencies():
     with pytest.raises(ValueError):
         assert model.price
 
+
 def test_instance_save_values_different_currency(db):
     model = Model()
     model.price_gross = Money(10, 'USD')
