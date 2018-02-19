@@ -147,27 +147,26 @@ def test_instance_values_both_amounts():
 
 
 def test_instance_values_different_currencies():
+    model = Model(price_net=Money(25, 'BTC'), price_gross=Money(30, 'USD'))
     with pytest.raises(ValueError):
-        model = Model(
-            price_net=Money(25, 'BTC'), price_gross=Money(30, 'USD'))
         assert model.price
 
-
 def test_instance_save_values_different_currency(db):
+    model = Model()
+    model.price_gross = Money(10, 'USD')
     with pytest.raises(ValueError):
-        model = Model(price_gross=Money(10, 'USD'))
         model.save()
 
 
 def test_instance_full_lean_values_different_currency(db):
+    model = Model(price_gross=Money(10, 'USD'))
     with pytest.raises(ValueError):
-        model = Model(price_gross=Money(10, 'USD'))
         model.full_clean()
 
 
 def test_instance_full_clean_values_invalid_amount(db):
+    model = Model(price_gross=Money('10.999', 'BTC'))
     with pytest.raises(ValidationError):
-        model = Model(price_gross=Money('10.999', 'BTC'))
         model.full_clean()
 
 
@@ -185,15 +184,15 @@ def test_init_taxedmoney_model_field():
 
 
 def test_init_taxedmoney_model_field_validation():
+    instance = Model(price=TaxedMoney(Money(25, 'USD'), Money(30, 'USD')))
     with pytest.raises(ValueError):
-        instance = Model(price=TaxedMoney(Money(25, 'USD'), Money(30, 'USD')))
         instance.full_clean()
 
 
 def test_combined_field_validation():
+    instance = Model()
+    instance.price = TaxedMoney(Money(25, 'USD'), Money(30, 'USD'))
     with pytest.raises(ValueError):
-        instance = Model()
-        instance.price = TaxedMoney(Money(25, 'USD'), Money(30, 'USD'))
         instance.full_clean()
 
 
