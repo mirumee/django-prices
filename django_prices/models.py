@@ -92,6 +92,7 @@ class TaxedMoneyField(object):
         self.gross_field = gross_field
 
         self.column = None
+        self.primary_key = False
 
     def __str__(self):
         return (
