@@ -95,9 +95,8 @@ class TaxedMoneyField(object):
         self.primary_key = False
 
     def __str__(self):
-        return (
-            'TaxedMoneyField(net_field=%s, gross_field=%s)' %
-            (self.net_field, self.gross_field))
+        return ('TaxedMoneyField(net_field=%s, gross_field=%s)' % (
+            self.net_field, self.gross_field))
 
     def __get__(self, instance, cls=None):
         if instance is None:
