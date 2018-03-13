@@ -15,6 +15,11 @@ class MoneyField(models.DecimalField):
 
     def __init__(self, verbose_name=None, currency=None, **kwargs):
         self.currency = currency
+        if (isinstance(kwargs.get('default'), Money) and
+                kwargs['default'].currency != self.currency):
+            raise ValueError(
+                'Invalid currency for default value: %r (expected %r)' % (
+                    kwargs['default'].currency, self.currency))
         super(MoneyField, self).__init__(verbose_name, **kwargs)
 
     def from_db_value(self, value, expression, connection, context):
@@ -67,6 +72,8 @@ class MoneyField(models.DecimalField):
     def deconstruct(self):
         name, path, args, kwargs = super(MoneyField, self).deconstruct()
         kwargs['currency'] = self.currency
+        if isinstance(kwargs.get('default'), Money):
+            kwargs['default'] = str(kwargs['default'].amount)
         return name, path, args, kwargs
 
 

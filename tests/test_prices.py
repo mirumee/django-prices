@@ -6,7 +6,7 @@ from decimal import Decimal
 
 import pytest
 from django.core.exceptions import ValidationError
-from django.db import connection
+from django.db import connection, models
 from django.utils import translation
 from prices import Money, TaxedMoney, percentage_discount
 
@@ -19,7 +19,7 @@ from django_prices.validators import (
 
 from .forms import (
     ModelForm, OptionalPriceForm, RequiredPriceForm, ValidatedPriceForm)
-from .models import Model
+from .models import Model, ModelWithDefault
 
 
 @pytest.fixture(scope='module')
@@ -195,6 +195,27 @@ def test_combined_field_validation():
     instance.price = TaxedMoney(Money(25, 'USD'), Money(30, 'USD'))
     with pytest.raises(ValueError):
         instance.full_clean()
+
+
+def test_money_field_default_money():
+    instance = ModelWithDefault()
+    assert instance.price == Money(0, 'USD')
+
+
+def test_money_field_default_money_deconstruct():
+    instance = ModelWithDefault()
+    _, _, _, kwargs = instance._meta.get_field('price').deconstruct()
+    assert kwargs == {
+        'currency': 'USD', 'default': '0', 'max_digits': 9,
+        'decimal_places': 2}
+
+
+def test_money_field_default_money_invalid_currency():
+    with pytest.raises(ValueError):
+        class InvalidModel(models.Model):
+            price = MoneyField(
+                currency='USD', default=Money('0', 'BTC'), max_digits=9,
+                decimal_places=2)
 
 
 def test_field_passes_all_validations():
