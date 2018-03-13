@@ -73,7 +73,7 @@ class MoneyField(models.DecimalField):
         name, path, args, kwargs = super(MoneyField, self).deconstruct()
         kwargs['currency'] = self.currency
         if isinstance(kwargs.get('default'), Money):
-            kwargs['default'] = str(kwargs['default'].amount)
+            kwargs['default'] = kwargs['default'].amount
         return name, path, args, kwargs
 
 

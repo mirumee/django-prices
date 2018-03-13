@@ -206,7 +206,7 @@ def test_money_field_default_money_deconstruct():
     instance = ModelWithDefault()
     _, _, _, kwargs = instance._meta.get_field('price').deconstruct()
     assert kwargs == {
-        'currency': 'USD', 'default': '0', 'max_digits': 9,
+        'currency': 'USD', 'default': Decimal(0), 'max_digits': 9,
         'decimal_places': 2}
 
 
