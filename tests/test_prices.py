@@ -11,8 +11,8 @@ from django.utils import translation
 from django_prices import forms, widgets
 from django_prices.models import MoneyField, TaxedMoneyField
 from django_prices.templatetags import prices, prices_i18n
-from django_prices.validators import (MaxMoneyValidator, MinMoneyValidator,
-                                      MoneyPrecisionValidator)
+from django_prices.validators import (
+    MaxMoneyValidator, MinMoneyValidator, MoneyPrecisionValidator)
 from prices import Money, TaxedMoney, percentage_discount
 
 from .forms import (ModelForm, OptionalPriceForm,

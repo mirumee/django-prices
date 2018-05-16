@@ -119,12 +119,12 @@ class TaxedMoneyField(object):
         setattr(instance, self.gross_field, gross)
 
     def __eq__(self, other):
-        if isinstance(other, Field) or isinstance(other, TaxedMoneyField):
+        if isinstance(other, (Field, TaxedMoneyField)):
             return self.creation_counter == other.creation_counter
         return NotImplemented
 
     def __lt__(self, other):
-        if isinstance(other, Field) or isinstance(other, TaxedMoneyField):
+        if isinstance(other, (Field, TaxedMoneyField)):
             return self.creation_counter < other.creation_counter
         return NotImplemented
 
