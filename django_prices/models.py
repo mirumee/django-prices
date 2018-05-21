@@ -2,6 +2,7 @@ import itertools
 
 from django.core import validators
 from django.db import models
+from django.db.models import Field
 from django.utils.functional import cached_property
 from prices import Money, TaxedMoney
 
@@ -94,6 +95,9 @@ class TaxedMoneyField(object):
         self.column = None
         self.primary_key = False
 
+        self.creation_counter = Field.creation_counter
+        Field.creation_counter += 1
+
     def __str__(self):
         return ('TaxedMoneyField(net_field=%s, gross_field=%s)' % (
             self.net_field, self.gross_field))
@@ -113,6 +117,16 @@ class TaxedMoneyField(object):
             gross = value.gross
         setattr(instance, self.net_field, net)
         setattr(instance, self.gross_field, gross)
+
+    def __eq__(self, other):
+        if isinstance(other, (Field, TaxedMoneyField)):
+            return self.creation_counter == other.creation_counter
+        return NotImplemented
+
+    def __lt__(self, other):
+        if isinstance(other, (Field, TaxedMoneyField)):
+            return self.creation_counter < other.creation_counter
+        return NotImplemented
 
     def contribute_to_class(self, cls, name, **kwargs):
         self.attname = self.name = name

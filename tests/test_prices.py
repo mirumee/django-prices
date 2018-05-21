@@ -8,17 +8,15 @@ import pytest
 from django.core.exceptions import ValidationError
 from django.db import connection
 from django.utils import translation
-from prices import Money, TaxedMoney, percentage_discount
-
 from django_prices import forms, widgets
 from django_prices.models import MoneyField, TaxedMoneyField
-from django_prices.templatetags import prices
-from django_prices.templatetags import prices_i18n
+from django_prices.templatetags import prices, prices_i18n
 from django_prices.validators import (
     MaxMoneyValidator, MinMoneyValidator, MoneyPrecisionValidator)
+from prices import Money, TaxedMoney, percentage_discount
 
-from .forms import (
-    ModelForm, OptionalPriceForm, RequiredPriceForm, ValidatedPriceForm)
+from .forms import (ModelForm, OptionalPriceForm,
+                    RequiredPriceForm, ValidatedPriceForm)
 from .models import Model
 
 
@@ -108,6 +106,27 @@ def test_price_field_init():
     field = TaxedMoneyField(net_field='price_net', gross_field='price_gross')
     assert field.net_field == 'price_net'
     assert field.gross_field == 'price_gross'
+
+
+def test_compare_taxed_money_field_with_same_type_field():
+    field_1 = TaxedMoneyField(net_field='price_net', gross_field='price_gross')
+    field_2 = TaxedMoneyField(net_field='price_net', gross_field='price_gross')
+
+    # Comparision is based on creation_counter attribute
+    assert field_1 < field_2
+    field_2.creation_counter -= 1
+    assert field_1 == field_2
+
+
+def test_compare_taxed_money_field_with_django_field():
+    field_1 = TaxedMoneyField(net_field='price_net', gross_field='price_gross')
+    field_2 = MoneyField(
+        currency='BTC', default='5', max_digits=9, decimal_places=2)
+
+    # Comparision is based on creation_counter attribute
+    assert field_1 < field_2
+    field_2.creation_counter -= 1
+    assert field_1 == field_2
 
 
 @pytest.mark.parametrize("data,initial,expected_result", [
