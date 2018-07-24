@@ -109,6 +109,9 @@ class TaxedMoneyField(object):
         gross_val = getattr(instance, self.gross_field)
         return TaxedMoney(net_val, gross_val)
 
+    def __hash__(self):
+        return hash(self.creation_counter)
+
     def __set__(self, instance, value):
         net = None
         gross = None
