@@ -18,7 +18,7 @@ class MoneyField(models.DecimalField):
         self.currency = currency
         super(MoneyField, self).__init__(verbose_name, **kwargs)
 
-    def from_db_value(self, value, expression, connection, context):
+    def from_db_value(self, value, *args, **kwargs):
         return self.to_python(value)
 
     def to_python(self, value):
