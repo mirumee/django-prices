@@ -1,7 +1,11 @@
 from babel.numbers import get_currency_precision, is_currency
 
 from django.core.validators import (
-    DecimalValidator, MaxValueValidator, MinValueValidator, ValidationError)
+    DecimalValidator,
+    MaxValueValidator,
+    MinValueValidator,
+    ValidationError,
+)
 
 from .templatetags.prices_i18n import format_price
 
@@ -13,8 +17,9 @@ class MoneyPrecisionValidator(DecimalValidator):
 
     def __call__(self, other):
         if self.currency != other.currency:
-            raise ValueError('Invalid currency: %r (expected %r)' % (
-                other.currency, self.currency))
+            raise ValueError(
+                "Invalid currency: %r (expected %r)" % (other.currency, self.currency)
+            )
 
         value = other.amount
         super(MoneyPrecisionValidator, self).__call__(value)
@@ -28,9 +33,10 @@ class MoneyPrecisionValidator(DecimalValidator):
                 decimals = abs(exponent)
             if decimals > currency_precision:
                 raise ValidationError(
-                    self.messages['max_decimal_places'],
-                    code='max_decimal_places',
-                    params={'max': currency_precision})
+                    self.messages["max_decimal_places"],
+                    code="max_decimal_places",
+                    params={"max": currency_precision},
+                )
 
 
 class MoneyValueValidator:
@@ -39,9 +45,10 @@ class MoneyValueValidator:
         if self.compare(cleaned, self.limit_value):
             currency = self.limit_value.currency
             params = {
-                'limit_value': format_price(self.limit_value.amount, currency),
-                'show_value': format_price(cleaned.amount, currency),
-                'value': format_price(value.amount, currency)}
+                "limit_value": format_price(self.limit_value.amount, currency),
+                "show_value": format_price(cleaned.amount, currency),
+                "value": format_price(value.amount, currency),
+            }
             raise ValidationError(self.message, code=self.code, params=params)
 
 
