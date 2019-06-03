@@ -9,7 +9,7 @@ from django.core.exceptions import ValidationError
 from django.db import connection
 from django.utils import translation
 from django_prices import forms, widgets
-from django_prices.models import MoneyField, TaxedMoneyField
+from django_prices.models import MoneyCurrencyField, MoneyField, TaxedMoneyField
 from django_prices.templatetags import prices, prices_i18n
 from django_prices.validators import (
     MaxMoneyValidator,
@@ -19,7 +19,7 @@ from django_prices.validators import (
 from prices import Money, TaxedMoney, percentage_discount
 
 from .forms import ModelForm, OptionalPriceForm, RequiredPriceForm, ValidatedPriceForm
-from .models import Model
+from .models import CurrencyModel, Model
 
 
 @pytest.fixture(scope="module")
@@ -370,3 +370,79 @@ def test_get_currency_fraction_unknown_currency():
 def test_format_price_invalid_value():
     result = prices_i18n.format_price("invalid", "USD")
     assert result == ""
+
+
+def test_money_currency_field_init():
+    field = MoneyCurrencyField(
+        amount_field="money_net_amount", currency_field="currency"
+    )
+    assert field.amount_field == "money_net_amount"
+    assert field.currency_field == "currency"
+
+
+def test_compare_money_currency_field_with_same_type_field():
+    field_1 = MoneyCurrencyField(
+        amount_field="money_net_amount", currency_field="currency"
+    )
+    field_2 = MoneyCurrencyField(
+        amount_field="money_net_amount", currency_field="currency"
+    )
+
+    # Comparision is based on creation_counter attribute
+    assert field_1 < field_2
+    field_2.creation_counter -= 1
+    assert field_1 == field_2
+
+
+def test_compare_money_currency_field_with_django_field():
+    field_1 = MoneyCurrencyField(
+        amount_field="money_net_amount", currency_field="currency"
+    )
+    field_2 = MoneyField(currency="BTC", default="5", max_digits=9, decimal_places=2)
+
+    # Comparision is based on creation_counter attribute
+    assert field_1 < field_2
+    field_2.creation_counter -= 1
+    assert field_1 == field_2
+
+
+def test_money_currency_instance_values():
+    instance = CurrencyModel(money_net_amount=Decimal("10"), currency="USD")
+    assert instance.money_net.amount == Decimal("10")
+    assert instance.money_net.currency == "USD"
+    assert instance.money_net == Money("10", "USD")
+
+
+def test_money_currency_set_instance_values():
+    instance = CurrencyModel()
+    instance.money_net = Money(25, "USD")
+    assert instance.money_net_amount == 25
+    assert instance.currency == "USD"
+
+
+def test_taxed_money_currency_instance_values():
+    instance = CurrencyModel(
+        money_net_amount=Decimal("10"), currency="USD", money_gross_amount=Decimal("11")
+    )
+
+    assert instance.money_gross.amount == Decimal("11")
+    assert instance.money_gross.currency == "USD"
+    assert instance.taxed_money.net.amount == Decimal("10")
+    assert instance.taxed_money.net.currency == "USD"
+    assert instance.taxed_money.gross.amount == Decimal("11")
+    assert instance.taxed_money.gross.currency == "USD"
+
+
+def test_taxed_money_currency_set_instance_values():
+    instance = CurrencyModel()
+    instance.taxed_money = TaxedMoney(Money(25, "USD"), Money(30, "USD"))
+    assert instance.money_net_amount == 25
+    assert instance.currency == "USD"
+    assert instance.money_gross.amount == 30
+    assert instance.money_gross.currency == "USD"
+
+
+def test_taxed_money_currency_init_model_field():
+    instance = CurrencyModel(money_net=Money(10, "USD"))
+    assert instance.money_net_amount == 10
+    assert instance.currency == "USD"
