@@ -9,8 +9,8 @@ cache:
 install:
   - pip install tox-travis codecov black==19.3b0
 script:
-  - tox
   - black --check .
+  - tox
 env:
   matrix:
     - DJANGO="1.11"
