@@ -12,7 +12,7 @@ from .validators import MoneyPrecisionValidator
 
 class MoneyField(models.DecimalField):
 
-    description = 'A field that stores an amount of money'
+    description = "A field that stores an amount of money"
 
     def __init__(self, verbose_name=None, currency=None, **kwargs):
         self.currency = currency
@@ -24,8 +24,10 @@ class MoneyField(models.DecimalField):
     def to_python(self, value):
         if isinstance(value, Money):
             if value.currency != self.currency:
-                raise ValueError('Invalid currency: %r (expected %r)' % (
-                    value.currency, self.currency))
+                raise ValueError(
+                    "Invalid currency: %r (expected %r)"
+                    % (value.currency, self.currency)
+                )
             return value
         value = super(MoneyField, self).to_python(value)
         if value is None:
@@ -50,7 +52,7 @@ class MoneyField(models.DecimalField):
         return super(MoneyField, self).value_to_string(value)
 
     def formfield(self, **kwargs):
-        defaults = {'currency': self.currency, 'form_class': forms.MoneyField}
+        defaults = {"currency": self.currency, "form_class": forms.MoneyField}
         defaults.update(kwargs)
         return super(MoneyField, self).formfield(**defaults)
 
@@ -60,21 +62,20 @@ class MoneyField(models.DecimalField):
 
     @cached_property
     def validators(self):
-        validators = list(
-            itertools.chain(self.default_validators, self._validators))
-        return validators + [MoneyPrecisionValidator(
-            self.currency, self.max_digits, self.decimal_places)]
+        validators = list(itertools.chain(self.default_validators, self._validators))
+        return validators + [
+            MoneyPrecisionValidator(self.currency, self.max_digits, self.decimal_places)
+        ]
 
     def deconstruct(self):
         name, path, args, kwargs = super(MoneyField, self).deconstruct()
-        kwargs['currency'] = self.currency
+        kwargs["currency"] = self.currency
         return name, path, args, kwargs
 
 
 class TaxedMoneyField(object):
 
-    description = (
-        'A field that combines net and gross fields values into TaxedMoney.')
+    description = "A field that combines net and gross fields values into TaxedMoney."
     empty_values = list(validators.EMPTY_VALUES)
 
     # Field flags
@@ -87,8 +88,12 @@ class TaxedMoneyField(object):
     remote_field = None
 
     def __init__(
-            self, net_field='price_net', gross_field='price_gross',
-            verbose_name=None, **kwargs):
+        self,
+        net_field="price_net",
+        gross_field="price_gross",
+        verbose_name=None,
+        **kwargs
+    ):
         self.net_field = net_field
         self.gross_field = gross_field
 
@@ -99,8 +104,10 @@ class TaxedMoneyField(object):
         Field.creation_counter += 1
 
     def __str__(self):
-        return ('TaxedMoneyField(net_field=%s, gross_field=%s)' % (
-            self.net_field, self.gross_field))
+        return "TaxedMoneyField(net_field=%s, gross_field=%s)" % (
+            self.net_field,
+            self.gross_field,
+        )
 
     def __get__(self, instance, cls=None):
         if instance is None:
