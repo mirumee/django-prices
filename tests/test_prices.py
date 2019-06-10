@@ -136,6 +136,17 @@ def test_compare_taxed_money_field_with_django_field():
     assert field_1 == field_2
 
 
+def test_compare_taxed_money_field_with_money_currency_field():
+    field_1 = TaxedMoneyField(net_field="price_net", gross_field="price_gross")
+    field_2 = MoneyCurrencyField(
+        amount_field="money_net_amount", currency_field="currency"
+    )
+    # Comparision is based on creation_counter attribute
+    assert field_1 < field_2
+    field_2.creation_counter -= 1
+    assert field_1 == field_2
+
+
 @pytest.mark.parametrize(
     "data,initial,expected_result",
     [
@@ -399,6 +410,18 @@ def test_compare_money_currency_field_with_django_field():
         amount_field="money_net_amount", currency_field="currency"
     )
     field_2 = MoneyField(currency="BTC", default="5", max_digits=9, decimal_places=2)
+
+    # Comparision is based on creation_counter attribute
+    assert field_1 < field_2
+    field_2.creation_counter -= 1
+    assert field_1 == field_2
+
+
+def test_compare_money_currency_field_with_taxed_money_field():
+    field_1 = MoneyCurrencyField(
+        amount_field="money_net_amount", currency_field="currency"
+    )
+    field_2 = TaxedMoneyField(net_field="price_net", gross_field="price_gross")
 
     # Comparision is based on creation_counter attribute
     assert field_1 < field_2
