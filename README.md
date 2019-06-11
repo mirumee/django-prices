@@ -52,7 +52,7 @@ class DonateForm(forms.Form):
                     MaxMoneyValidator(Money(500, 'EUR'))])
 ```
 
-And for multi-currency:
+The above fields allow to store money in one currency in the table. To store money with different currencies in one table, use the following fields:
 
 ```python
 from django.db import models
@@ -74,7 +74,7 @@ class Product(models.Model):
     price = TaxedMoneyField(net_field="price_net", gross_field="price_gross")
 ```
 
-And templates:
+It also provides support for templates:
 
 ```html+django
 {% load prices %}
