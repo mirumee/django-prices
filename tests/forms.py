@@ -10,20 +10,23 @@ from . import models
 class ModelForm(forms.ModelForm):
     class Meta:
         model = models.Model
-        fields = ["price_net", "price_gross"]
+        fields = []
+
+    price_net = MoneyField(default_currency="BTC")
+    price_gross = MoneyField(default_currency="BTC")
 
 
 class RequiredPriceForm(forms.Form):
-    price_net = MoneyField(currency="BTC")
+    price_net = MoneyField(default_currency="BTC")
 
 
 class OptionalPriceForm(forms.Form):
-    price_net = MoneyField(currency="BTC", required=False)
+    price_net = MoneyField(default_currency="BTC", required=False)
 
 
 class ValidatedPriceForm(forms.Form):
     price = MoneyField(
-        currency="USD",
+        default_currency="USD",
         max_digits=9,
         decimal_places=2,
         validators=[

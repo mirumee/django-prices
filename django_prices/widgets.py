@@ -1,27 +1,20 @@
 from django import forms
-from django.template.loader import render_to_string
 from prices import Money
 
 __all__ = ["MoneyInput"]
 
 
-class MoneyInput(forms.TextInput):
-    template = "prices/widget.html"
-    input_type = "number"
+class MoneyInput(forms.MultiWidget):
+    def __init__(self, attrs=None):
+        widgets = [
+            forms.TextInput(attrs={"type": "number", "step": "any"}),
+            forms.TextInput(),
+        ]
+        super(MoneyInput, self).__init__(widgets, attrs)
 
-    def __init__(self, currency, *args, **kwargs):
-        self.currency = currency
-        super(MoneyInput, self).__init__(*args, **kwargs)
-
-    def format_value(self, value):
-        if isinstance(value, Money):
-            return value.amount
-        return value
-
-    def render(self, name, value, attrs=None, renderer=None):
-        widget = super(MoneyInput, self).render(
-            name, value, attrs=attrs, renderer=renderer
-        )
-        return render_to_string(
-            self.template, {"widget": widget, "value": value, "currency": self.currency}
-        )
+    def decompress(self, value):
+        if value and isinstance(value, Money):
+            return [value.amount, value.currency]
+        if value and isinstance(value, (list, tuple)) and len(value) == 2:
+            return value
+        return [None, None]

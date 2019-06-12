@@ -11,21 +11,16 @@ from .templatetags.prices_i18n import format_price
 
 
 class MoneyPrecisionValidator(DecimalValidator):
-    def __init__(self, currency, *args):
-        self.currency = currency
+    def __init__(self, *args):
         super(MoneyPrecisionValidator, self).__init__(*args)
 
     def __call__(self, other):
-        if self.currency != other.currency:
-            raise ValueError(
-                "Invalid currency: %r (expected %r)" % (other.currency, self.currency)
-            )
-
         value = other.amount
+        currency = other.currency
         super(MoneyPrecisionValidator, self).__call__(value)
 
-        if is_currency(self.currency):
-            currency_precision = get_currency_precision(self.currency)
+        if is_currency(currency):
+            currency_precision = get_currency_precision(currency)
             exponent = value.as_tuple()[-1]
             if exponent >= 0:
                 decimals = 0

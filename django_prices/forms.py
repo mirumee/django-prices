@@ -9,10 +9,10 @@ from .widgets import MoneyInput
 __all__ = ("MoneyField", "MoneyInput")
 
 
-class MoneyField(forms.DecimalField):
+class MoneyField(forms.MultiValueField):
     def __init__(
         self,
-        currency,
+        default_currency,
         widget=MoneyInput,
         max_value=None,
         min_value=None,
@@ -22,42 +22,18 @@ class MoneyField(forms.DecimalField):
         *args,
         **kwargs
     ):
-        self.currency = currency
-        if isinstance(widget, type):
-            widget = widget(
-                currency=self.currency, attrs={"type": "number", "step": "any"}
-            )
-        super(MoneyField, self).__init__(*args, widget=widget, **kwargs)
+        self.default_currency = default_currency or ""
+        fields = (forms.DecimalField(), forms.CharField())
+        super(MoneyField, self).__init__(fields, widget=widget, *args, **kwargs)
 
         self.validators = list(itertools.chain(self.default_validators, validators))
-        self.validators.append(
-            MoneyPrecisionValidator(currency, max_digits, decimal_places)
-        )
+        self.validators.append(MoneyPrecisionValidator(max_digits, decimal_places))
         if max_value is not None:
             self.validators.append(MaxMoneyValidator(max_value))
         if min_value is not None:
             self.validators.append(MinMoneyValidator(min_value))
 
-    def to_python(self, value):
-        value = super(MoneyField, self).to_python(value)
-        if value is None:
-            return value
-        return Money(value, self.currency)
-
-    def validate(self, value):
-        if value is None:
-            super(MoneyField, self).validate(value)
-        else:
-            if not isinstance(value, Money):
-                raise Exception("%r is not a valid price" % (value,))
-            if value.currency != self.currency:
-                raise forms.ValidationError(
-                    "Invalid currency: %r (expected %r)"
-                    % (value.currency, self.currency)
-                )
-            super(MoneyField, self).validate(value.amount)
-
-    def has_changed(self, initial, data):
-        if not isinstance(initial, Money):
-            initial = self.to_python(initial)
-        return super(MoneyField, self).has_changed(initial, data)
+    def compress(self, data_list):
+        if len(data_list) != 2:
+            return Money(0, self.default_currency)
+        return Money(data_list[0], data_list[1])
