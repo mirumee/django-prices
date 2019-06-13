@@ -6,27 +6,40 @@ from django_prices.validators import MaxMoneyValidator, MinMoneyValidator
 
 from . import models
 
+AVAILABLE_CURRENCIES = [("BTC", "bitcoins"), ("USD", "US dollar")]
+
 
 class ModelForm(forms.ModelForm):
     class Meta:
         model = models.Model
         fields = []
 
-    price_net = MoneyField(default_currency="BTC")
-    price_gross = MoneyField(default_currency="BTC")
+    price_net = MoneyField(
+        default_currency="BTC", available_currencies=AVAILABLE_CURRENCIES
+    )
+    price_gross = MoneyField(
+        default_currency="BTC", available_currencies=AVAILABLE_CURRENCIES
+    )
 
 
 class RequiredPriceForm(forms.Form):
-    price_net = MoneyField(default_currency="BTC")
+    price_net = MoneyField(
+        default_currency="BTC", available_currencies=AVAILABLE_CURRENCIES
+    )
 
 
 class OptionalPriceForm(forms.Form):
-    price_net = MoneyField(default_currency="BTC", required=False)
+    price_net = MoneyField(
+        default_currency="BTC",
+        available_currencies=AVAILABLE_CURRENCIES,
+        required=False,
+    )
 
 
 class ValidatedPriceForm(forms.Form):
     price = MoneyField(
         default_currency="USD",
+        available_currencies=AVAILABLE_CURRENCIES,
         max_digits=9,
         decimal_places=2,
         validators=[

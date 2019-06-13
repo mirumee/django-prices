@@ -133,7 +133,7 @@ to the
 
 7. Run `python manage.py makemigrations` and `python manage.py migrate`.
 
-8. If you use forms, change `currency` to `default_currency` (if you need) and remove `MoneyField` from `ModelForm`'s fields list; you should declare it explicitly:
+8. If you use forms, change `currency` to `default_currency`, add (if you need) list `available_currencies` and remove `MoneyField` from `ModelForm`'s fields list; you should declare it explicitly:
 ```python
 class ModelForm(forms.ModelForm):
     class Meta:

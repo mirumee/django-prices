@@ -1,5 +1,4 @@
 from babel.numbers import get_currency_precision, is_currency
-
 from django.core.validators import (
     DecimalValidator,
     MaxValueValidator,

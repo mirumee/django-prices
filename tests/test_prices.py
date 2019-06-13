@@ -19,7 +19,13 @@ from django_prices.validators import (
 )
 from prices import Money, TaxedMoney, percentage_discount
 
-from .forms import ModelForm, OptionalPriceForm, RequiredPriceForm, ValidatedPriceForm
+from .forms import (
+    ModelForm,
+    OptionalPriceForm,
+    RequiredPriceForm,
+    ValidatedPriceForm,
+    AVAILABLE_CURRENCIES,
+)
 from .models import Model
 
 
@@ -52,12 +58,16 @@ def test_money_field_init():
 
 def test_money_field_formfield():
     field = MoneyField(amount_field="amount", currency_field="currency")
-    # field = MoneyField("price", default=Money(5, "BTC"), max_digits=9, decimal_places=2)
     form_field = field.formfield()
     assert isinstance(form_field, forms.MoneyField)
-    # assert form_field.currency == ""
+    assert isinstance(form_field.widget, widgets.MoneyConstCurrencyInput)
+
+
+def test_money_field_formfield_select():
+    field = Model.price_net
+    form_field = field.formfield()
+    assert isinstance(form_field, forms.MoneyField)
     assert isinstance(form_field.widget, widgets.MoneyInput)
-    # assert
 
 
 def test_compare_money_field_with_same_type_field():
@@ -147,7 +157,6 @@ def test_compare_taxed_money_field_with_money_field():
         (["5", "BTC"], ["5", "BTC"], False),
         (["5", "BTC"], ["5", "USD"], True),
         (["5", "BTC"], None, True),
-        # (["5"], Money(10, "BTC"), True)
         ([None, None], Money(5, "BTC"), True),
         ([None, None], ["5", "BTC"], True),
         ([None, None], None, False),
@@ -172,18 +181,25 @@ def test_form_changed_one_data(field, value, expected_result):
     assert bool(form.changed_data) == expected_result
 
 
-def test_render():
-    # widget = widgets.MoneyInput("BTC", attrs={"type": "number"})
-    widget = widgets.MoneyInput(attrs={"key": "value"})
-    result = widget.render("price", Money(5, "BTC"), attrs={"foo": "bar"})
+def test_render_money_input():
+    widget = widgets.MoneyInput(choices=[("USD", "US dollar")], attrs={"key": "value"})
+    result = widget.render("price", Money(5, "USD"), attrs={"foo": "bar"})
     attrs = [
         'foo="bar"',
         'name="price_0"',
         'name="price_1"',
         'key="value"',
         'value="5"',
-        "BTC",
+        "USD",
     ]
+    for attr in attrs:
+        assert attr in result
+
+
+def test_render_money_const_currency_input():
+    widget = widgets.MoneyConstCurrencyInput(currency="BTC", attrs={"key": "value"})
+    result = widget.render("price", Money(5, "BTC"), attrs={"foo": "bar"})
+    attrs = ['foo="bar"', 'key="value"', 'value="5"', "price_0", "BTC"]
     for attr in attrs:
         assert attr in result
 
@@ -250,9 +266,23 @@ def test_model_field_passes_all_validations():
 
 
 def test_field_passes_none_validation():
-    form = OptionalPriceForm(data={"price": None})
+    form = OptionalPriceForm(data={"price_net_0": None, "price_net_1": None})
     form.full_clean()
     assert form.errors == {}
+
+
+def test_field_only_one_value_validation():
+    form = OptionalPriceForm(data={"price_net_0": None, "price_net_1": "USD"})
+    form.full_clean()
+    assert form.errors == {"price_net": ["Enter a valid amount of money"]}
+
+
+def test_validate_nonavailable_currency():
+    assert "EUR" not in AVAILABLE_CURRENCIES
+    form = RequiredPriceForm(data={"price_net_0": "20", "price_net_1": "EUR"})
+    assert form.errors == {
+        "price_net": ["Select a valid choice. EUR is not one of the available choices."]
+    }
 
 
 def test_validate_max_money():
