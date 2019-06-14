@@ -17,8 +17,7 @@ __all__ = ("MoneyField", "MoneyInput")
 class MoneyField(forms.MultiValueField):
     def __init__(
         self,
-        default_currency,
-        available_currencies=None,
+        available_currencies,
         widget=MoneyInput,
         max_value=None,
         min_value=None,
@@ -28,24 +27,20 @@ class MoneyField(forms.MultiValueField):
         *args,
         **kwargs
     ):
-        self.default_currency = default_currency
-
+        fields = (forms.DecimalField(), forms.ChoiceField(choices=available_currencies))
         if isinstance(widget, type):
             widget_instance = widget(available_currencies)
-            if isinstance(widget_instance, MoneyInput) and (
-                available_currencies is None or len(available_currencies) <= 1
+            if (
+                isinstance(widget_instance, MoneyInput)
+                and len(available_currencies) <= 1
             ):
                 widget_instance = MoneyConstCurrencyInput(
-                    currency=default_currency, attrs={"type": "number", "step": "any"}
+                    currency=available_currencies[0]
+                    if len(available_currencies) == 1
+                    else "",
+                    attrs={"type": "number", "step": "any"},
                 )
-
-        if available_currencies:
-            fields = (
-                forms.DecimalField(),
-                forms.ChoiceField(choices=available_currencies),
-            )
-        else:
-            fields = (forms.DecimalField(), forms.CharField())
+                fields = (forms.DecimalField(), forms.CharField())
 
         super(MoneyField, self).__init__(
             fields, widget=widget_instance, *args, **kwargs

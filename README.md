@@ -30,9 +30,12 @@ from django import forms
 
 from django_prices.forms import MoneyField
 
+AVAILABLE_CURRENCIES = [("BTC", "bitcoins"), ("USD", "US dollar")]
+
+
 class ProductForm(forms.Form):
-    name = forms.CharField(label='Name')
-    price_net = MoneyField(label='net', default_currency='BTC')
+    name = forms.CharField(label="Name")
+    price_net = MoneyField(label="net", available_currencies=AVAILABLE_CURRENCIES)
 ```
 
 And validators:
@@ -45,13 +48,20 @@ from django_prices.forms import MoneyField
 from django_prices.validators import (
     MaxMoneyValidator, MinMoneyValidator, MoneyPrecisionValidator)
 
+
 class DonateForm(forms.Form):
-    donator_name = forms.CharField(label='Your name')
+    donator_name = forms.CharField(label="Your name")
     donation = MoneyField(
-        label='net', default_currency='EUR', max_digits=9, decimal_places=2,
-        validators=[MoneyPrecisionValidator(),
-                    MinMoneyValidator(Money(5, 'EUR')),
-                    MaxMoneyValidator(Money(500, 'EUR'))])
+        label="net",
+        available_currencies=[("BTC", "bitcoins"), ("USD", "US dollar")],
+        max_digits=9,
+        decimal_places=2,
+        validators=[
+            MoneyPrecisionValidator(),
+            MinMoneyValidator(Money(5, "EUR")),
+            MaxMoneyValidator(Money(500, "EUR")),
+        ],
+    )
 ```
 
 It also provides support for templates:
@@ -133,12 +143,14 @@ to the
 
 7. Run `python manage.py makemigrations` and `python manage.py migrate`.
 
-8. If you use forms, change `currency` to `default_currency`, add (if you need) list `available_currencies` and remove `MoneyField` from `ModelForm`'s fields list; you should declare it explicitly:
+8. If you use forms, remove `currency` argument and add list of choices `available_currencies`. Moreover, remove `MoneyField` from `ModelForm`'s fields list; you should declare it explicitly:
 ```python
+AVAILABLE_CURRENCIES = [("BTC", "bitcoins"), ("USD", "US dollar")]
+
 class ModelForm(forms.ModelForm):
     class Meta:
         model = models.Model
         fields = []
 
-    price_net = MoneyField(default_currency="BTC")
+    price_net = MoneyField(available_currencies=AVAILABLE_CURRENCIES)
 ```
