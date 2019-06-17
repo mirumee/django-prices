@@ -9,7 +9,7 @@ from .validators import (
     MoneyPrecisionValidator,
     ValidationError,
 )
-from .widgets import MoneyConstCurrencyInput, MoneyInput
+from .widgets import FixedCurrencyMoneyInput, MoneyInput
 
 __all__ = ("MoneyField", "MoneyInput")
 
@@ -37,7 +37,7 @@ class MoneyField(forms.MultiValueField):
                 isinstance(widget_instance, MoneyInput)
                 and len(available_currencies) <= 1
             ):
-                widget_instance = MoneyConstCurrencyInput(
+                widget_instance = FixedCurrencyMoneyInput(
                     currency=available_currencies[0]
                     if len(available_currencies) == 1
                     else "",

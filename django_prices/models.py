@@ -106,14 +106,13 @@ class MoneyField(NonDatabaseFieldBase):
         return forms.MoneyField(available_currencies=available_currencies)
 
     def get_default(self):
-        default_currency = ""
+        default_currency = None
         default_amount = Decimal(0)
         if hasattr(self, "model"):
             default_currency = self.model._meta.get_field(
                 self.currency_field
             ).get_default()
-            d = self.model._meta.get_field(self.amount_field).get_default()
-            default_amount = self.model._meta.get_field(self.amount_field).to_python(d)
+            default_amount = self.model._meta.get_field(self.amount_field).get_default()
 
         return Money(default_amount, default_currency)
 

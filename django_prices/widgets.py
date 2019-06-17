@@ -2,7 +2,7 @@ from django import forms
 from django.template.loader import render_to_string
 from prices import Money
 
-__all__ = ["MoneyInput", "MoneyConstCurrencyInput"]
+__all__ = ["MoneyInput", "FixedCurrencyMoneyInput"]
 
 
 class MoneyInput(forms.MultiWidget):
@@ -21,23 +21,23 @@ class MoneyInput(forms.MultiWidget):
         return [None, None]
 
 
-class MoneyConstCurrencyInput(forms.MultiWidget):
+class FixedCurrencyMoneyInput(forms.MultiWidget):
     template = "prices/widget.html"
 
     def __init__(self, currency, attrs=None):
         self.currency = currency
         widgets = [forms.TextInput(attrs={"type": "number", "step": "any"})]
-        super(MoneyConstCurrencyInput, self).__init__(widgets, attrs)
+        super(FixedCurrencyMoneyInput, self).__init__(widgets, attrs)
 
     def decompress(self, value):
         if value and isinstance(value, Money):
             return [value.amount, self.currency]
         if value and isinstance(value, (list, tuple)) and len(value) == 2:
             return [value[0], self.currency]
-        return [None, self.currency]
+        return [None, None]
 
     def render(self, name, value, attrs=None, renderer=None):
-        widget = super(MoneyConstCurrencyInput, self).render(
+        widget = super(FixedCurrencyMoneyInput, self).render(
             name, value, attrs=attrs, renderer=renderer
         )
         return render_to_string(

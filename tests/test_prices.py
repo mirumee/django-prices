@@ -52,7 +52,7 @@ def price_with_decimals():
 
 def test_money_field_init():
     field = MoneyField(amount_field="amount", currency_field="currency")
-    assert field.get_default() == Money(0, "")
+    assert field.get_default() == Money(0, None)
     assert field.amount_field == "amount"
     assert field.currency_field == "currency"
 
@@ -61,7 +61,7 @@ def test_money_field_formfield():
     field = MoneyField(amount_field="amount", currency_field="currency")
     form_field = field.formfield()
     assert isinstance(form_field, forms.MoneyField)
-    assert isinstance(form_field.widget, widgets.MoneyConstCurrencyInput)
+    assert isinstance(form_field.widget, widgets.FixedCurrencyMoneyInput)
 
 
 def test_money_field_formfield_select():
@@ -193,8 +193,8 @@ def test_render_money_input():
     assert "USD" in result
 
 
-def test_render_money_const_currency_input():
-    widget = widgets.MoneyConstCurrencyInput(currency="BTC", attrs={"key": "value"})
+def test_render_fixed_currency_money_input():
+    widget = widgets.FixedCurrencyMoneyInput(currency="BTC", attrs={"key": "value"})
     result = widget.render("price", Money(5, "BTC"), attrs={"foo": "bar"})
     attrs = ['foo="bar"', 'key="value"', 'value="5"', "price_0", "BTC"]
     for attr in attrs:
