@@ -20,11 +20,12 @@ from django_prices.validators import (
 from prices import Money, TaxedMoney, percentage_discount
 
 from .forms import (
+    AVAILABLE_CURRENCIES,
+    MaxMinPriceForm,
     ModelForm,
     OptionalPriceForm,
     RequiredPriceForm,
     ValidatedPriceForm,
-    AVAILABLE_CURRENCIES,
 )
 from .models import Model
 
@@ -170,30 +171,26 @@ def test_form_changed_data(data, initial, expected_result):
     assert bool(form.changed_data) == expected_result
 
 
-@pytest.mark.parametrize(
-    "field,value,expected_result",
-    [("price_net_0", "5", True), ("price_net_1", "USD", True)],
-)
-def test_form_changed_one_data(field, value, expected_result):
+def test_form_changed_one_data():
     form = RequiredPriceForm(
-        data={field: value}, initial={"price_net": Money(10, "BTC")}
+        data={"price_net_0": "5"}, initial={"price_net": Money(10, "BTC")}
     )
-    assert bool(form.changed_data) == expected_result
+    assert bool(form.changed_data) == True
+    form = RequiredPriceForm(
+        data={"price_net_1": "USD"}, initial={"price_net": Money(10, "BTC")}
+    )
+    assert bool(form.changed_data) == True
 
 
 def test_render_money_input():
     widget = widgets.MoneyInput(choices=[("USD", "US dollar")], attrs={"key": "value"})
     result = widget.render("price", Money(5, "USD"), attrs={"foo": "bar"})
-    attrs = [
-        'foo="bar"',
-        'name="price_0"',
-        'name="price_1"',
-        'key="value"',
-        'value="5"',
-        "USD",
-    ]
-    for attr in attrs:
-        assert attr in result
+    assert 'foo="bar"' in result
+    assert 'name="price_0"' in result
+    assert 'name="price_1"' in result
+    assert 'key="value"' in result
+    assert 'value="5"' in result
+    assert "USD" in result
 
 
 def test_render_money_const_currency_input():
@@ -233,19 +230,6 @@ def test_init_taxedmoney_model_field():
     assert instance.price_gross == Money(30, "BTC")
 
 
-def test_init_taxedmoney_model_field_validation():
-    instance = Model(price=TaxedMoney(Money("25.566", "USD"), Money(30, "USD")))
-    with pytest.raises(ValidationError):
-        instance.full_clean()
-
-
-def test_combined_field_validation():
-    instance = Model()
-    instance.price = TaxedMoney(Money("25.7877", "USD"), Money(30, "USD"))
-    with pytest.raises(ValidationError):
-        instance.full_clean()
-
-
 def test_field_passes_all_validations():
     form = RequiredPriceForm(data={"price_net_0": "20", "price_net_1": "BTC"})
     form.full_clean()
@@ -277,6 +261,22 @@ def test_field_only_one_value_validation():
     assert form.errors == {"price_net": ["Enter a valid amount of money"]}
 
 
+def test_field_validate_max_digits():
+    form = ValidatedPriceForm(data={"price_0": 15000000000, "price_1": "USD"})
+    form.full_clean()
+    assert form.errors == {
+        "price": ["Ensure that there are no more than 9 digits in total."]
+    }
+
+
+def test_field_validate_decimal_places():
+    form = ValidatedPriceForm(data={"price_0": "5.005", "price_1": "USD"})
+    form.full_clean()
+    assert form.errors == {
+        "price": ["Ensure that there are no more than 2 decimal places."]
+    }
+
+
 def test_validate_nonavailable_currency():
     assert "EUR" not in AVAILABLE_CURRENCIES
     form = RequiredPriceForm(data={"price_net_0": "20", "price_net_1": "EUR"})
@@ -290,8 +290,6 @@ def test_validate_max_money():
     validator(Money("5.00", "BTC"))
     with pytest.raises(ValidationError):
         validator(Money("5.01", "BTC"))
-    with pytest.raises(ValueError):
-        validator(Money("5.00", "USD"))
 
 
 def test_validate_min_money():
@@ -299,8 +297,20 @@ def test_validate_min_money():
     validator(Money("5.00", "BTC"))
     with pytest.raises(ValidationError):
         validator(Money("4.99", "BTC"))
-    with pytest.raises(ValueError):
-        validator(Money("5.00", "USD"))
+
+
+def test_validate_max_money_different_currencies():
+    """It's incomparable, so it should be accepted."""
+    validator = MaxMoneyValidator(Money(5, "BTC"))
+    validator(Money("5.00", "USD"))
+    validator(Money("5.01", "USD"))
+
+
+def test_validate_min_money_different_currencies():
+    """It's incomparable, so it should be accepted."""
+    validator = MinMoneyValidator(Money(5, "BTC"))
+    validator(Money("5.00", "USD"))
+    validator(Money("4.99", "USD"))
 
 
 def test_validate_money_precision():
@@ -332,6 +342,32 @@ def test_validators_work_with_formfields():
     form.full_clean()
     assert form.errors == {
         "price": ["Ensure this value is less than or equal to $15.00."]
+    }
+
+
+def test_validate_max_money_many_min_limits():
+    form = MaxMinPriceForm(data={"price_0": "1", "price_1": "USD"})
+    form.full_clean()
+    assert form.errors == {
+        "price": ["Ensure this value is greater than or equal to $5.00."]
+    }
+    form = MaxMinPriceForm(data={"price_0": "1", "price_1": "BTC"})
+    form.full_clean()
+    assert form.errors == {
+        "price": ["Ensure this value is greater than or equal to BTC6.00."]
+    }
+
+
+def test_validate_max_money_many_max_limits():
+    form = MaxMinPriceForm(data={"price_0": "15.01", "price_1": "USD"})
+    form.full_clean()
+    assert form.errors == {
+        "price": ["Ensure this value is less than or equal to $15.00."]
+    }
+    form = MaxMinPriceForm(data={"price_0": "16.01", "price_1": "BTC"})
+    form.full_clean()
+    assert form.errors == {
+        "price": ["Ensure this value is less than or equal to BTC16.00."]
     }
 
 

@@ -36,6 +36,8 @@ class MoneyPrecisionValidator(DecimalValidator):
 class MoneyValueValidator:
     def __call__(self, value):
         cleaned = self.clean(value)
+        if cleaned.currency != self.limit_value.currency:
+            return
         if self.compare(cleaned, self.limit_value):
             currency = self.limit_value.currency
             params = {

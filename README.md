@@ -58,8 +58,8 @@ class DonateForm(forms.Form):
         decimal_places=2,
         validators=[
             MoneyPrecisionValidator(),
-            MinMoneyValidator(Money(5, "EUR")),
-            MaxMoneyValidator(Money(500, "EUR")),
+            MinMoneyValidator(Money(5, "USD")),
+            MaxMoneyValidator(Money(500, "USD")),
         ],
     )
 ```

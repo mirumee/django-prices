@@ -36,3 +36,11 @@ class ValidatedPriceForm(forms.Form):
             MaxMoneyValidator(Money(15, currency="USD")),
         ],
     )
+
+
+class MaxMinPriceForm(forms.Form):
+    price = MoneyField(
+        available_currencies=AVAILABLE_CURRENCIES,
+        min_values=[Money(5, currency="USD"), Money(6, currency="BTC")],
+        max_values=[Money(15, currency="USD"), Money(16, currency="BTC")],
+    )

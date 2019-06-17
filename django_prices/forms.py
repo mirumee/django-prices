@@ -19,15 +19,18 @@ class MoneyField(forms.MultiValueField):
         self,
         available_currencies,
         widget=MoneyInput,
-        max_value=None,
-        min_value=None,
+        max_values=None,
+        min_values=None,
         max_digits=None,
         decimal_places=None,
         validators=(),
         *args,
         **kwargs
     ):
-        fields = (forms.DecimalField(), forms.ChoiceField(choices=available_currencies))
+        decimal_field = forms.DecimalField(
+            max_digits=max_digits, decimal_places=decimal_places
+        )
+        fields = (decimal_field, forms.ChoiceField(choices=available_currencies))
         if isinstance(widget, type):
             widget_instance = widget(available_currencies)
             if (
@@ -40,7 +43,7 @@ class MoneyField(forms.MultiValueField):
                     else "",
                     attrs={"type": "number", "step": "any"},
                 )
-                fields = (forms.DecimalField(), forms.CharField())
+                fields = (decimal_field, forms.CharField())
 
         super(MoneyField, self).__init__(
             fields, widget=widget_instance, *args, **kwargs
@@ -48,10 +51,14 @@ class MoneyField(forms.MultiValueField):
 
         self.validators = list(itertools.chain(self.default_validators, validators))
         self.validators.append(MoneyPrecisionValidator(max_digits, decimal_places))
-        if max_value is not None:
-            self.validators.append(MaxMoneyValidator(max_value))
-        if min_value is not None:
-            self.validators.append(MinMoneyValidator(min_value))
+        if max_values is not None:
+            self.validators.extend(
+                [MaxMoneyValidator(limit_value) for limit_value in max_values]
+            )
+        if min_values is not None:
+            self.validators.extend(
+                [MinMoneyValidator(limit_value) for limit_value in min_values]
+            )
 
     def compress(self, data_list):
         if data_list:
