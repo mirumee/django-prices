@@ -119,11 +119,11 @@ Updated code:
     price_net = models.DecimalField("net", default="5", max_digits=9, decimal_places=2)
 ```
 
-2. Replace all occurrences of `MoneyField` by `DecimalField` in your **migration** files (and remove `currency` argument from them); change
+2. Replace all occurrences of the `MoneyField` with `DecimalField` in your **migration** files and remove `currency` argument from them:
 ```python
     field=django_prices.models.MoneyField(currency='BTC', decimal_places=2, default='5', max_digits=9, verbose_name='net')
 ```
-to the
+Updated code:
 ```python
     field=models.DecimalField(decimal_places=2, default='5', max_digits=9, verbose_name='net')
 ```
