@@ -62,7 +62,7 @@ class MoneyField(forms.MultiValueField):
 
     def compress(self, data_list):
         if data_list:
-            # Raise a validation error if one of the values are empty
+            # Raise a validation error if any of the values is empty
             # (it is possible if field has required=False)
             if data_list[0] in self.empty_values:
                 raise ValidationError("Enter a valid amount of money")

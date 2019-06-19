@@ -104,17 +104,17 @@ It will be rendered as a following structure (for example with English locale):
 
 ## How to migrate to django-prices 2.0
 
-Version 2.0 provides major changes in the models. It allows to store prices in many currencies in one table.
+Version 2.0 introduces major changes to how prices data is stored in models, enabling setting price's currency per model instance.
 
 Steps to migrate:
 
-1. Replace all occurrences of `MoneyField` by `DecimalField` in your **models** and remove `currency` argument from them, e.g. change
+1. Replace all occurrences of the `MoneyField` with `DecimalField` in your **models** and remove the `currency` argument from them:
 ```python
     price_net = MoneyField(
         "net", currency="BTC", default="5", max_digits=9, decimal_places=2
     )
 ```
-to the
+Updated code:
 ```python
     price_net = models.DecimalField("net", default="5", max_digits=9, decimal_places=2)
 ```
@@ -143,7 +143,7 @@ to the
 
 7. Run `python manage.py makemigrations` and `python manage.py migrate`.
 
-8. If you use forms, remove `currency` argument and add list of choices `available_currencies`. Moreover, remove `MoneyField` from `ModelForm`'s fields list; you should declare it explicitly:
+8. In your forms, remove the `currency` argument and add `available_currencies` with available choices. If the form specified `MoneyFields` in `fields` option, replace those with explicit declarations instead:
 ```python
 AVAILABLE_CURRENCIES = [("BTC", "bitcoins"), ("USD", "US dollar")]
 
