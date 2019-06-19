@@ -6,8 +6,7 @@ from decimal import Decimal
 
 import pytest
 from django.core.exceptions import ValidationError
-from django.db import connection
-from django.db.models import CharField, DecimalField
+from django.db.models import DecimalField
 from django.utils import translation
 from django_prices import forms, widgets
 from django_prices.models import MoneyField, TaxedMoneyField
@@ -33,21 +32,6 @@ from .models import Model
 @pytest.fixture(scope="module")
 def money_fixture():
     return Money("10", "USD")
-
-
-@pytest.fixture(scope="module")
-def money_with_decimals():
-    return Money("10.20", "USD")
-
-
-@pytest.fixture(scope="module")
-def price_fixture():
-    return TaxedMoney(net=Money("10", "USD"), gross=Money("15", "USD"))
-
-
-@pytest.fixture(scope="module")
-def price_with_decimals():
-    return TaxedMoney(net=Money("10.20", "USD"), gross=Money("15", "USD"))
 
 
 def test_money_field_init():
