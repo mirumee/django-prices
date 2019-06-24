@@ -100,14 +100,27 @@ def test_money_field_set_instance_values():
 
 
 def test_taxed_money_field_init():
-    field = TaxedMoneyField(net_field="price_net", gross_field="price_gross")
-    assert field.net_field == "price_net"
-    assert field.gross_field == "price_gross"
+    field = TaxedMoneyField(
+        net_amount_field="price_net",
+        gross_amount_field="price_gross",
+        currency="currency",
+    )
+    assert field.net_amount_field == "price_net"
+    assert field.gross_amount_field == "price_gross"
+    assert field.currency == "currency"
 
 
 def test_compare_taxed_money_field_with_same_type_field():
-    field_1 = TaxedMoneyField(net_field="price_net", gross_field="price_gross")
-    field_2 = TaxedMoneyField(net_field="price_net", gross_field="price_gross")
+    field_1 = TaxedMoneyField(
+        net_amount_field="price_net",
+        gross_amount_field="price_gross",
+        currency="currency",
+    )
+    field_2 = TaxedMoneyField(
+        net_amount_field="price_net",
+        gross_amount_field="price_gross",
+        currency="currency",
+    )
 
     # Comparision is based on creation_counter attribute
     assert field_1 < field_2
@@ -116,7 +129,11 @@ def test_compare_taxed_money_field_with_same_type_field():
 
 
 def test_compare_taxed_money_field_with_django_field():
-    field_1 = TaxedMoneyField(net_field="price_net", gross_field="price_gross")
+    field_1 = TaxedMoneyField(
+        net_amount_field="price_net",
+        gross_amount_field="price_gross",
+        currency="currency",
+    )
     field_2 = DecimalField(default="5", max_digits=9, decimal_places=2)
 
     # Comparision is based on creation_counter attribute
@@ -126,7 +143,11 @@ def test_compare_taxed_money_field_with_django_field():
 
 
 def test_compare_taxed_money_field_with_money_field():
-    field_1 = TaxedMoneyField(net_field="price_net", gross_field="price_gross")
+    field_1 = TaxedMoneyField(
+        net_amount_field="price_net",
+        gross_amount_field="price_gross",
+        currency="currency",
+    )
     field_2 = MoneyField(amount_field="money_net_amount", currency_field="currency")
 
     # Comparision is based on creation_counter attribute

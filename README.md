@@ -20,7 +20,11 @@ class Model(models.Model):
     price_gross = MoneyField(
         amount_field="price_gross_amount", currency_field="currency"
     )
-    price = TaxedMoneyField(net_field="price_net", gross_field="price_gross")
+    price = TaxedMoneyField(
+        net_amount_field="price_net_amount",
+        gross_amount_field="price_gross_amount",
+        currency="currency",
+    )
 ```
 
 And forms:
@@ -143,7 +147,16 @@ Updated code:
 
 7. Run `python manage.py makemigrations` and `python manage.py migrate`.
 
-8. In your forms, remove the `currency` argument and add `available_currencies` with available choices. If the form specified `MoneyFields` in `fields` option, replace those with explicit declarations instead:
+8. Change `TaxedMoneyField` declaration:
+```python
+    price = TaxedMoneyField(
+        net_amount_field="price_net_amount",
+        gross_amount_field="price_gross_amount",
+        currency="currency",
+    )
+```
+
+9. In your forms, remove the `currency` argument and add `available_currencies` with available choices. If the form specified `MoneyFields` in `fields` option, replace those with explicit declarations instead:
 ```python
 AVAILABLE_CURRENCIES = [("BTC", "bitcoins"), ("USD", "US dollar")]
 

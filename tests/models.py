@@ -16,4 +16,8 @@ class Model(models.Model):
     price_gross = MoneyField(
         amount_field="price_gross_amount", currency_field="currency"
     )
-    price = TaxedMoneyField(net_field="price_net", gross_field="price_gross")
+    price = TaxedMoneyField(
+        net_amount_field="price_net_amount",
+        gross_amount_field="price_gross_amount",
+        currency="currency",
+    )

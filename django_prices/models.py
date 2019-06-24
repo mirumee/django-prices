@@ -123,33 +123,39 @@ class TaxedMoneyField(NonDatabaseFieldBase):
 
     def __init__(
         self,
-        net_field="price_net",
-        gross_field="price_gross",
+        net_amount_field="price_amount_net",
+        gross_amount_field="price_amount_gross",
+        currency="currency",
         verbose_name=None,
         **kwargs
     ):
         super(TaxedMoneyField, self).__init__()
-        self.net_field = net_field
-        self.gross_field = gross_field
+        self.net_amount_field = net_amount_field
+        self.gross_amount_field = gross_amount_field
+        self.currency = currency
 
     def __str__(self):
-        return "TaxedMoneyField(net_field=%s, gross_field=%s)" % (
-            self.net_field,
-            self.gross_field,
+        return (
+            "TaxedMoneyField(net_amount_field=%s, gross_amount_field=%s, currency=%s)"
+            % (self.net_amount_field, self.gross_amount_field, self.currency)
         )
 
     def __get__(self, instance, cls=None):
         if instance is None:
             return self
-        net_val = getattr(instance, self.net_field)
-        gross_val = getattr(instance, self.gross_field)
-        return TaxedMoney(net_val, gross_val)
+        net_amount = getattr(instance, self.net_amount_field)
+        gross_amount = getattr(instance, self.gross_amount_field)
+        currency = getattr(instance, self.currency)
+        return TaxedMoney(Money(net_amount, currency), Money(gross_amount, currency))
 
     def __set__(self, instance, value):
-        net = None
-        gross = None
+        net_amount = None
+        gross_amount = None
+        currency = None
         if value is not None:
-            net = value.net
-            gross = value.gross
-        setattr(instance, self.net_field, net)
-        setattr(instance, self.gross_field, gross)
+            net_amount = value.net.amount
+            gross_amount = value.gross.amount
+            currency = value.gross.currency
+        setattr(instance, self.net_amount_field, net_amount)
+        setattr(instance, self.gross_amount_field, gross_amount)
+        setattr(instance, self.currency, currency)
