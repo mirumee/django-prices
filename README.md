@@ -7,18 +7,24 @@ Provides support for models:
 
 ```python
 from django.db import models
-
 from django_prices.models import MoneyField, TaxedMoneyField
 
-class Product(models.Model):
-    name = models.CharField('Name')
-    price_net = MoneyField(
-        'net', currency='BTC', default='5', max_digits=9,
-        decimal_places=2)
+
+class Model(models.Model):
+    currency = models.CharField(max_length=3, default="BTC")
+    price_net_amount = models.DecimalField(max_digits=9, decimal_places=2, default="5")
+    price_net = MoneyField(amount_field="price_net_amount", currency_field="currency")
+    price_gross_amount = models.DecimalField(
+        max_digits=9, decimal_places=2, default="5"
+    )
     price_gross = MoneyField(
-        'gross', currency='BTC', default='5', max_digits=9,
-        decimal_places=2)
-    price = TaxedMoneyField(net_field='price_net', gross_field='price_gross')
+        amount_field="price_gross_amount", currency_field="currency"
+    )
+    price = TaxedMoneyField(
+        net_amount_field="price_net_amount",
+        gross_amount_field="price_gross_amount",
+        currency="currency",
+    )
 ```
 
 And forms:
@@ -28,9 +34,12 @@ from django import forms
 
 from django_prices.forms import MoneyField
 
+AVAILABLE_CURRENCIES = [("BTC", "bitcoins"), ("USD", "US dollar")]
+
+
 class ProductForm(forms.Form):
-    name = forms.CharField(label='Name')
-    price_net = MoneyField(label='net', currency='BTC')
+    name = forms.CharField(label="Name")
+    price_net = MoneyField(label="net", available_currencies=AVAILABLE_CURRENCIES)
 ```
 
 And validators:
@@ -40,19 +49,26 @@ from django import forms
 from prices.forms import Money
 
 from django_prices.forms import MoneyField
-from django_prices.Validators import (
+from django_prices.validators import (
     MaxMoneyValidator, MinMoneyValidator, MoneyPrecisionValidator)
 
+
 class DonateForm(forms.Form):
-    donator_name = forms.CharField(label='Your name')
+    donator_name = forms.CharField(label="Your name")
     donation = MoneyField(
-        label='net', currency='EUR', max_digits=9, decimal_places=2,
-        validators=[MoneyPrecisionValidator('EUR'),
-                    MinMoneyValidator(Money(5, 'EUR')),
-                    MaxMoneyValidator(Money(500, 'EUR'))])
+        label="net",
+        available_currencies=[("BTC", "bitcoins"), ("USD", "US dollar")],
+        max_digits=9,
+        decimal_places=2,
+        validators=[
+            MoneyPrecisionValidator(),
+            MinMoneyValidator(Money(5, "USD")),
+            MaxMoneyValidator(Money(500, "USD")),
+        ],
+    )
 ```
 
-And templates:
+It also provides support for templates:
 
 ```html+django
 {% load prices %}
@@ -88,4 +104,66 @@ It will be rendered as a following structure (for example with English locale):
 
 ```html
 <span class="currency">$</span>15.00
+```
+
+## How to migrate to django-prices 2.0
+
+Version 2.0 introduces major changes to how prices data is stored in models, enabling setting price's currency per model instance.
+
+Steps to migrate:
+
+1. Replace all occurrences of the `MoneyField` with `DecimalField` in your **models** and remove the `currency` argument from them:
+```python
+    price_net = MoneyField(
+        "net", currency="BTC", default="5", max_digits=9, decimal_places=2
+    )
+```
+Updated code:
+```python
+    price_net = models.DecimalField("net", default="5", max_digits=9, decimal_places=2)
+```
+
+2. Replace all occurrences of the `MoneyField` with `DecimalField` in your **migration** files and remove `currency` argument from them:
+```python
+    field=django_prices.models.MoneyField(currency='BTC', decimal_places=2, default='5', max_digits=9, verbose_name='net')
+```
+Updated code:
+```python
+    field=models.DecimalField(decimal_places=2, default='5', max_digits=9, verbose_name='net')
+```
+
+3. Rename fields in models and run `python manage.py makemigrations`. Your old field will store amount of money, so probably the best choice would be `price_net_amount` instead `price_net`.
+
+4. Run `python manage.py migrate`.
+
+5. Update `django-package`.
+
+6. Add `models.CharField` for currency and `MoneyField` to your models:
+```python
+    currency = models.CharField(max_length=3, default="BTC")
+    price_net_amount = models.DecimalField("net", default="5", max_digits=9, decimal_places=2)
+    price_net = MoneyField(amount_field="price_net_amount", currency_field="currency")
+```
+
+7. Run `python manage.py makemigrations` and `python manage.py migrate`.
+
+8. Change `TaxedMoneyField` declaration:
+```python
+    price = TaxedMoneyField(
+        net_amount_field="price_net_amount",
+        gross_amount_field="price_gross_amount",
+        currency="currency",
+    )
+```
+
+9. In your forms, remove the `currency` argument and add `available_currencies` with available choices. If the form specified `MoneyFields` in `fields` option, replace those with explicit declarations instead:
+```python
+AVAILABLE_CURRENCIES = [("BTC", "bitcoins"), ("USD", "US dollar")]
+
+class ModelForm(forms.ModelForm):
+    class Meta:
+        model = models.Model
+        fields = []
+
+    price_net = MoneyField(available_currencies=AVAILABLE_CURRENCIES)
 ```

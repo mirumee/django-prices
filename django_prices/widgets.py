@@ -2,24 +2,42 @@ from django import forms
 from django.template.loader import render_to_string
 from prices import Money
 
-__all__ = ["MoneyInput"]
+__all__ = ["MoneyInput", "FixedCurrencyMoneyInput"]
 
 
-class MoneyInput(forms.TextInput):
+class MoneyInput(forms.MultiWidget):
+    def __init__(self, choices, attrs=None):
+        widgets = [
+            forms.TextInput(attrs={"type": "number", "step": "any"}),
+            forms.Select(choices=choices),
+        ]
+        super(MoneyInput, self).__init__(widgets, attrs)
+
+    def decompress(self, value):
+        if value and isinstance(value, Money):
+            return [value.amount, value.currency]
+        if value and isinstance(value, (list, tuple)) and len(value) == 2:
+            return value
+        return [None, None]
+
+
+class FixedCurrencyMoneyInput(forms.MultiWidget):
     template = "prices/widget.html"
-    input_type = "number"
 
-    def __init__(self, currency, *args, **kwargs):
+    def __init__(self, currency, attrs=None):
         self.currency = currency
-        super(MoneyInput, self).__init__(*args, **kwargs)
+        widgets = [forms.TextInput(attrs={"type": "number", "step": "any"})]
+        super(FixedCurrencyMoneyInput, self).__init__(widgets, attrs)
 
-    def format_value(self, value):
-        if isinstance(value, Money):
-            return value.amount
-        return value
+    def decompress(self, value):
+        if value and isinstance(value, Money):
+            return [value.amount, self.currency]
+        if value and isinstance(value, (list, tuple)) and len(value) == 2:
+            return [value[0], self.currency]
+        return [None, None]
 
     def render(self, name, value, attrs=None, renderer=None):
-        widget = super(MoneyInput, self).render(
+        widget = super(FixedCurrencyMoneyInput, self).render(
             name, value, attrs=attrs, renderer=renderer
         )
         return render_to_string(

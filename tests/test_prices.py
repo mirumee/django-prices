@@ -6,7 +6,7 @@ from decimal import Decimal
 
 import pytest
 from django.core.exceptions import ValidationError
-from django.db import connection
+from django.db.models import DecimalField
 from django.utils import translation
 from django_prices import forms, widgets
 from django_prices.models import MoneyField, TaxedMoneyField
@@ -18,7 +18,14 @@ from django_prices.validators import (
 )
 from prices import Money, TaxedMoney, percentage_discount
 
-from .forms import ModelForm, OptionalPriceForm, RequiredPriceForm, ValidatedPriceForm
+from .forms import (
+    AVAILABLE_CURRENCIES,
+    MaxMinPriceForm,
+    ModelForm,
+    OptionalPriceForm,
+    RequiredPriceForm,
+    ValidatedPriceForm,
+)
 from .models import Model
 
 
@@ -27,97 +34,49 @@ def money_fixture():
     return Money("10", "USD")
 
 
-@pytest.fixture(scope="module")
-def money_with_decimals():
-    return Money("10.20", "USD")
-
-
-@pytest.fixture(scope="module")
-def price_fixture():
-    return TaxedMoney(net=Money("10", "USD"), gross=Money("15", "USD"))
-
-
-@pytest.fixture(scope="module")
-def price_with_decimals():
-    return TaxedMoney(net=Money("10.20", "USD"), gross=Money("15", "USD"))
-
-
 def test_money_field_init():
-    field = MoneyField(currency="BTC", default="5", max_digits=9, decimal_places=2)
-    assert field.get_default() == Money(5, "BTC")
+    field = MoneyField(amount_field="amount", currency_field="currency")
+    assert field.get_default() == Money(0, None)
+    assert field.amount_field == "amount"
+    assert field.currency_field == "currency"
 
 
-def test_money_field_get_prep_value():
-    field = MoneyField(
-        "price", currency="BTC", default="5", max_digits=9, decimal_places=2
-    )
-    assert field.get_prep_value(Money(5, "BTC")) == Decimal(5)
-
-
-def test_money_field_get_db_prep_save():
-    field = MoneyField(
-        "price", currency="BTC", default="5", max_digits=9, decimal_places=2
-    )
-    value = field.get_db_prep_save(Money(5, "BTC"), connection)
-    assert value == "5.00"
-
-
-def test_money_field_value_to_string():
-    instance = Model(price_net=30)
-    field = instance._meta.get_field("price_net")
-    assert field.value_to_string(instance) == Decimal("30")
-
-
-def test_money_field_from_db_value():
-    field = MoneyField(
-        "price", currency="BTC", default="5", max_digits=9, decimal_places=2
-    )
-    assert field.from_db_value(7, None, None, None) == Money(7, "BTC")
-
-
-def test_money_field_from_db_value_handles_none():
-    field = MoneyField(
-        "price", currency="BTC", default="5", max_digits=9, decimal_places=2
-    )
-    assert field.from_db_value(None, None, None, None) is None
-
-
-def test_money_field_from_db_value_checks_currency():
-    field = MoneyField(
-        "price", currency="BTC", default="5", max_digits=9, decimal_places=2
-    )
-    invalid = Money(1, "USD")
-    with pytest.raises(ValueError):
-        field.from_db_value(invalid, None, None, None)
-
-
-def test_money_field_from_db_value_checks_min_value():
-    field = MoneyField(
-        "price", currency="BTC", default="5", max_digits=9, decimal_places=2
-    )
-    invalid = Money(1, "USD")
-    with pytest.raises(ValueError):
-        field.from_db_value(invalid, None, None, None)
-
-
-def test_money_field_formfield():
-    field = MoneyField(
-        "price", currency="BTC", default="5", max_digits=9, decimal_places=2
-    )
+def test_money_field_formfield_returns_form_with_fixed_currency_input_if_no_model_attached():
+    field = MoneyField(amount_field="amount", currency_field="currency")
     form_field = field.formfield()
     assert isinstance(form_field, forms.MoneyField)
-    assert form_field.currency == "BTC"
+    assert isinstance(form_field.widget, widgets.FixedCurrencyMoneyInput)
+
+
+def test_money_field_formfield_returns_form_with_select_input_if_choices_are_defined_for_currency_field():
+    field = Model.price_net
+    form_field = field.formfield()
+    assert isinstance(form_field, forms.MoneyField)
     assert isinstance(form_field.widget, widgets.MoneyInput)
 
 
-def test_price_field_init():
-    field = TaxedMoneyField(net_field="price_net", gross_field="price_gross")
-    assert field.net_field == "price_net"
-    assert field.gross_field == "price_gross"
+def test_compare_money_field_with_same_type_field():
+    field_1 = MoneyField(amount_field="money_net_amount", currency_field="currency")
+    field_2 = MoneyField(amount_field="money_net_amount", currency_field="currency")
+
+    # Comparision is based on creation_counter attribute
+    assert field_1 < field_2
+    field_2.creation_counter -= 1
+    assert field_1 == field_2
 
 
-def test_compare_taxed_money_field_with_same_type_field():
-    field_1 = TaxedMoneyField(net_field="price_net", gross_field="price_gross")
+def test_compare_money_field_with_django_field():
+    field_1 = MoneyField(amount_field="money_net_amount", currency_field="currency")
+    field_2 = DecimalField(default="5", max_digits=9, decimal_places=2)
+
+    # Comparision is based on creation_counter attribute
+    assert field_1 < field_2
+    field_2.creation_counter -= 1
+    assert field_1 == field_2
+
+
+def test_compare_money_field_with_taxed_money_field():
+    field_1 = MoneyField(amount_field="money_net_amount", currency_field="currency")
     field_2 = TaxedMoneyField(net_field="price_net", gross_field="price_gross")
 
     # Comparision is based on creation_counter attribute
@@ -126,9 +85,70 @@ def test_compare_taxed_money_field_with_same_type_field():
     assert field_1 == field_2
 
 
+def test_money_field_instance_amount_and_currency_are_set_separately():
+    instance = Model(price_net_amount=Decimal("10"), currency="USD")
+    assert instance.price_net.amount == Decimal("10")
+    assert instance.price_net.currency == "USD"
+    assert instance.price_net == Money("10", "USD")
+
+
+def test_money_field_set_instance_values():
+    instance = Model()
+    instance.price_net = Money(25, "USD")
+    assert instance.price_net_amount == 25
+    assert instance.currency == "USD"
+
+
+def test_taxed_money_field_init():
+    field = TaxedMoneyField(
+        net_amount_field="price_net",
+        gross_amount_field="price_gross",
+        currency="currency",
+    )
+    assert field.net_amount_field == "price_net"
+    assert field.gross_amount_field == "price_gross"
+    assert field.currency == "currency"
+
+
+def test_compare_taxed_money_field_with_same_type_field():
+    field_1 = TaxedMoneyField(
+        net_amount_field="price_net",
+        gross_amount_field="price_gross",
+        currency="currency",
+    )
+    field_2 = TaxedMoneyField(
+        net_amount_field="price_net",
+        gross_amount_field="price_gross",
+        currency="currency",
+    )
+
+    # Comparision is based on creation_counter attribute
+    assert field_1 < field_2
+    field_2.creation_counter -= 1
+    assert field_1 == field_2
+
+
 def test_compare_taxed_money_field_with_django_field():
-    field_1 = TaxedMoneyField(net_field="price_net", gross_field="price_gross")
-    field_2 = MoneyField(currency="BTC", default="5", max_digits=9, decimal_places=2)
+    field_1 = TaxedMoneyField(
+        net_amount_field="price_net",
+        gross_amount_field="price_gross",
+        currency="currency",
+    )
+    field_2 = DecimalField(default="5", max_digits=9, decimal_places=2)
+
+    # Comparision is based on creation_counter attribute
+    assert field_1 < field_2
+    field_2.creation_counter -= 1
+    assert field_1 == field_2
+
+
+def test_compare_taxed_money_field_with_money_field():
+    field_1 = TaxedMoneyField(
+        net_amount_field="price_net",
+        gross_amount_field="price_gross",
+        currency="currency",
+    )
+    field_2 = MoneyField(amount_field="money_net_amount", currency_field="currency")
 
     # Comparision is based on creation_counter attribute
     assert field_1 < field_2
@@ -139,139 +159,177 @@ def test_compare_taxed_money_field_with_django_field():
 @pytest.mark.parametrize(
     "data,initial,expected_result",
     [
-        ("5", Money(5, "BTC"), False),
-        ("5", Money(10, "BTC"), True),
-        ("5", "5", False),
-        ("5", "10", True),
-        ("5", None, True),
-        (None, Money(5, "BTC"), True),
-        (None, "5", True),
-        (None, None, False),
+        (["5", "BTC"], Money(5, "BTC"), False),
+        (["5", "BTC"], Money(10, "BTC"), True),
+        (["5", "BTC"], ["5", "BTC"], False),
+        (["5", "BTC"], ["5", "USD"], True),
+        (["5", "BTC"], None, True),
+        ([None, None], Money(5, "BTC"), True),
+        ([None, None], ["5", "BTC"], True),
+        ([None, None], None, False),
     ],
 )
 def test_form_changed_data(data, initial, expected_result):
-    form = RequiredPriceForm(data={"price_net": data}, initial={"price_net": initial})
+    form = RequiredPriceForm(
+        data={"price_net_0": data[0], "price_net_1": data[1]},
+        initial={"price_net": initial},
+    )
     assert bool(form.changed_data) == expected_result
 
 
-def test_render():
-    widget = widgets.MoneyInput("BTC", attrs={"type": "number"})
-    result = widget.render("price", 5, attrs={"foo": "bar"})
-    attrs = ['foo="bar"', 'name="price"', 'type="number"', 'value="5"', "BTC"]
+def test_form_changed_when_only_one_value_is_changed():
+    form = RequiredPriceForm(
+        data={"price_net_0": "5"}, initial={"price_net": Money(10, "BTC")}
+    )
+    assert bool(form.changed_data) == True
+    form = RequiredPriceForm(
+        data={"price_net_1": "USD"}, initial={"price_net": Money(10, "BTC")}
+    )
+    assert bool(form.changed_data) == True
+
+
+def test_render_money_input():
+    widget = widgets.MoneyInput(choices=[("USD", "US dollar")], attrs={"key": "value"})
+    result = widget.render("price", Money(5, "USD"), attrs={"foo": "bar"})
+    assert 'foo="bar"' in result
+    assert 'name="price_0"' in result
+    assert 'name="price_1"' in result
+    assert 'key="value"' in result
+    assert 'value="5"' in result
+    assert "USD" in result
+
+
+def test_render_fixed_currency_money_input():
+    widget = widgets.FixedCurrencyMoneyInput(currency="BTC", attrs={"key": "value"})
+    result = widget.render("price", Money(5, "BTC"), attrs={"foo": "bar"})
+    attrs = ['foo="bar"', 'key="value"', 'value="5"', "price_0", "BTC"]
     for attr in attrs:
         assert attr in result
 
 
-def test_instance_values():
-    instance = Model(price_net=Money(25, "BTC"))
+def test_money_field_instance_init_by_money_object():
+    instance = Model(price_net=Money(25, "USD"))
     assert instance.price.net.amount == 25
 
 
-def test_instance_values_both_amounts():
+def test_taxed_money_field_instance_gross_and_net_are_set_separately():
     instance = Model(price_net=Money(25, "BTC"), price_gross=Money(30, "BTC"))
     assert instance.price == TaxedMoney(net=Money(25, "BTC"), gross=Money(30, "BTC"))
 
 
-def test_instance_values_different_currencies():
-    model = Model(price_net=Money(25, "BTC"), price_gross=Money(30, "USD"))
-    with pytest.raises(ValueError):
-        assert model.price
-
-
-def test_instance_save_values_different_currency(db):
-    model = Model()
-    model.price_gross = Money(10, "USD")
-    with pytest.raises(ValueError):
-        model.save()
-
-
-def test_instance_full_lean_values_different_currency(db):
-    model = Model(price_gross=Money(10, "USD"))
-    with pytest.raises(ValueError):
-        model.full_clean()
-
-
-def test_instance_full_clean_values_invalid_amount(db):
+def test_money_field_instance_full_clean_raises_error_for_invalid_amount(db):
     model = Model(price_gross=Money("10.999", "BTC"))
     with pytest.raises(ValidationError):
         model.full_clean()
 
 
-def test_set_instance_values():
+def test_taxed_money_field_set_instance_value():
     instance = Model()
     instance.price = TaxedMoney(Money(25, "BTC"), Money(30, "BTC"))
     assert instance.price_net == Money(25, "BTC")
     assert instance.price_gross == Money(30, "BTC")
 
 
-def test_init_taxedmoney_model_field():
+def test_taxed_money_field_instance_init_by_taxed_money_object():
     instance = Model(price=TaxedMoney(Money(25, "BTC"), Money(30, "BTC")))
     assert instance.price_net == Money(25, "BTC")
     assert instance.price_gross == Money(30, "BTC")
 
 
-def test_init_taxedmoney_model_field_validation():
-    instance = Model(price=TaxedMoney(Money(25, "USD"), Money(30, "USD")))
-    with pytest.raises(ValueError):
-        instance.full_clean()
-
-
-def test_combined_field_validation():
-    instance = Model()
-    instance.price = TaxedMoney(Money(25, "USD"), Money(30, "USD"))
-    with pytest.raises(ValueError):
-        instance.full_clean()
-
-
-def test_field_passes_all_validations():
-    form = RequiredPriceForm(data={"price_net": "20"})
+def test_form_field_passes_all_validations_for_correct_money_value():
+    form = RequiredPriceForm(data={"price_net_0": "20", "price_net_1": "BTC"})
     form.full_clean()
     assert form.errors == {}
 
 
-def test_model_field_passes_all_validations():
-    form = ModelForm(data={"price_net": "20", "price_gross": "25"})
+def test_form_field_passes_all_validations_for_correct_taxed_money_value():
+    form = ModelForm(
+        data={
+            "price_net_0": "20",
+            "price_net_1": "BTC",
+            "price_gross_0": "25",
+            "price_gross_1": "BTC",
+        }
+    )
     form.full_clean()
     assert form.errors == {}
 
 
-def test_field_passes_none_validation():
-    form = OptionalPriceForm(data={"price": None})
+def test_form_field_validation_passes_if_both_values_are_none():
+    form = OptionalPriceForm(data={"price_net_0": None, "price_net_1": None})
     form.full_clean()
     assert form.errors == {}
 
 
-def test_validate_max_money():
+def test_form_field_validation_fails_if_only_currency_is_given():
+    form = OptionalPriceForm(data={"price_net_0": None, "price_net_1": "USD"})
+    form.full_clean()
+    assert form.errors == {"price_net": ["Enter a valid amount of money"]}
+
+
+def test_form_field_validation_fails_if_too_many_max_digits():
+    form = ValidatedPriceForm(data={"price_0": 15000000000, "price_1": "USD"})
+    form.full_clean()
+    assert form.errors == {
+        "price": ["Ensure that there are no more than 9 digits in total."]
+    }
+
+
+def test_form_field_validation_fails_if_too_many_decimal_places():
+    form = ValidatedPriceForm(data={"price_0": "5.005", "price_1": "USD"})
+    form.full_clean()
+    assert form.errors == {
+        "price": ["Ensure that there are no more than 2 decimal places."]
+    }
+
+
+def test_form_field_validation_fails_if_nonavailable_currency():
+    assert "EUR" not in AVAILABLE_CURRENCIES
+    form = RequiredPriceForm(data={"price_net_0": "20", "price_net_1": "EUR"})
+    assert form.errors == {
+        "price_net": ["Select a valid choice. EUR is not one of the available choices."]
+    }
+
+
+def test_max_money_validation_raises_error_if_greater_money():
     validator = MaxMoneyValidator(Money(5, "BTC"))
     validator(Money("5.00", "BTC"))
     with pytest.raises(ValidationError):
         validator(Money("5.01", "BTC"))
-    with pytest.raises(ValueError):
-        validator(Money("5.00", "USD"))
 
 
-def test_validate_min_money():
+def test_min_money_validation_raises_error_if_less_money():
     validator = MinMoneyValidator(Money(5, "BTC"))
     validator(Money("5.00", "BTC"))
     with pytest.raises(ValidationError):
         validator(Money("4.99", "BTC"))
-    with pytest.raises(ValueError):
-        validator(Money("5.00", "USD"))
+
+
+def test_max_money_validation_passes_if_greater_amount_is_in_different_currency():
+    """It's incomparable, so it should be accepted."""
+    validator = MaxMoneyValidator(Money(5, "BTC"))
+    validator(Money("5.00", "USD"))
+    validator(Money("5.01", "USD"))
+
+
+def test_min_money_validation_passes_if_less_amount_is_in_different_currency():
+    """It's incomparable, so it should be accepted."""
+    validator = MinMoneyValidator(Money(5, "BTC"))
+    validator(Money("5.00", "USD"))
+    validator(Money("4.99", "USD"))
 
 
 def test_validate_money_precision():
-    validator = MoneyPrecisionValidator("USD", 9, 2)
+    validator = MoneyPrecisionValidator(9, 2)
     validator(Money("5.00", "USD"))
     validator(Money("5.1", "USD"))
     with pytest.raises(ValidationError):
         validator(Money("5.001", "USD"))
-    with pytest.raises(ValueError):
-        validator(Money("5.00", "BTC"))
 
 
 def test_validate_money_precision_by_currency():
     # Validator tests if precision is valid for given currency
-    validator = MoneyPrecisionValidator("USD", 9, 3)
+    validator = MoneyPrecisionValidator(9, 3)
     validator(Money("5.00", "USD"))
     validator(Money("5.1", "USD"))
     with pytest.raises(ValidationError):
@@ -279,17 +337,43 @@ def test_validate_money_precision_by_currency():
 
 
 def test_validate_money_precision_fictional_currency():
-    validator = MoneyPrecisionValidator("BTC", 16, 10)
+    validator = MoneyPrecisionValidator(16, 10)
     validator(Money("5.1234567890", "BTC"))
     with pytest.raises(ValidationError):
         validator(Money("5.12345678901", "BTC"))
 
 
 def test_validators_work_with_formfields():
-    form = ValidatedPriceForm(data={"price": "25"})
+    form = ValidatedPriceForm(data={"price_0": "25", "price_1": "USD"})
     form.full_clean()
     assert form.errors == {
         "price": ["Ensure this value is less than or equal to $15.00."]
+    }
+
+
+def test_define_max_money_validators_for_many_currencies():
+    form = MaxMinPriceForm(data={"price_0": "1", "price_1": "USD"})
+    form.full_clean()
+    assert form.errors == {
+        "price": ["Ensure this value is greater than or equal to $5.00."]
+    }
+    form = MaxMinPriceForm(data={"price_0": "1", "price_1": "BTC"})
+    form.full_clean()
+    assert form.errors == {
+        "price": ["Ensure this value is greater than or equal to BTC6.00."]
+    }
+
+
+def test_define_min_money_validators_for_many_currencies():
+    form = MaxMinPriceForm(data={"price_0": "15.01", "price_1": "USD"})
+    form.full_clean()
+    assert form.errors == {
+        "price": ["Ensure this value is less than or equal to $15.00."]
+    }
+    form = MaxMinPriceForm(data={"price_0": "16.01", "price_1": "BTC"})
+    form.full_clean()
+    assert form.errors == {
+        "price": ["Ensure this value is less than or equal to BTC16.00."]
     }
 
 
