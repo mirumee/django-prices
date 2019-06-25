@@ -155,7 +155,7 @@ class TaxedMoneyField(NonDatabaseFieldBase):
         if value is not None:
             net_amount = value.net.amount
             gross_amount = value.gross.amount
-            currency = value.gross.currency
+            currency = value.currency
         setattr(instance, self.net_amount_field, net_amount)
         setattr(instance, self.gross_amount_field, gross_amount)
         setattr(instance, self.currency, currency)
