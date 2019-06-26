@@ -136,7 +136,7 @@ Updated code:
 
 4. Run `python manage.py migrate`.
 
-5. Update `django-package`.
+5. Update `django-prices`.
 
 6. Add `models.CharField` for currency and `MoneyField` to your models:
 ```python
