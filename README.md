@@ -108,7 +108,7 @@ It will be rendered as a following structure (for example with English locale):
 
 ## How to migrate to django-prices 2.0
 
-Version 2.0 introduces major changes to how prices data is stored in models, enabling setting price's currency per model instance. 
+Version 2.0 introduces major changes to how prices data is stored in models, enabling setting price's currency per model instance.
 
 Steps to migrate:
 
