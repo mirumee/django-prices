@@ -39,6 +39,11 @@ class NonDatabaseFieldBase:
             return self.creation_counter < other.creation_counter
         return NotImplemented
 
+    def __gt__(self, other):
+        if isinstance(other, (Field, NonDatabaseFieldBase)):
+            return self.creation_counter > other.creation_counter
+        return NotImplemented
+
     def __hash__(self):
         return hash(self.creation_counter)
 
