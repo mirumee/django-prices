@@ -6,8 +6,10 @@ from django.db.models import Field
 from prices import Money, TaxedMoney
 
 from . import forms
+from functools import total_ordering
 
 
+@total_ordering
 class NonDatabaseFieldBase:
     """Base class for all fields that are not stored in the database."""
 
@@ -37,11 +39,6 @@ class NonDatabaseFieldBase:
     def __lt__(self, other):
         if isinstance(other, (Field, NonDatabaseFieldBase)):
             return self.creation_counter < other.creation_counter
-        return NotImplemented
-
-    def __gt__(self, other):
-        if isinstance(other, (Field, NonDatabaseFieldBase)):
-            return self.creation_counter > other.creation_counter
         return NotImplemented
 
     def __hash__(self):
