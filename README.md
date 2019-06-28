@@ -158,7 +158,11 @@ Steps to migrate:
             field=models.DecimalField(decimal_places=2, default='5', max_digits=9, verbose_name='net')
         ```
 
-1. Rename fields in **models**. Your old field will still store amount of money, so probably the best choice would be `price_net_amount` instead `price_net`. Run `python manage.py makemigrations`. Make sure to do this step before adding new `MoneyFields` to model! If not, django will generate `delete/create` migrations instead of `rename`.
+1. Rename fields in **models**. Your old field will still store amount of money, so probably the best choice would be `price_net_amount` instead `price_net`. 
+
+1. All places which use Models and it's fields can prevent django app from even starting the code. Possible issues: code tries to access non existing fields. Exclude those fields for now from your ModelForms, Graphene types etc. 
+
+1. Run `python manage.py makemigrations`. Make sure to do this step before adding new `MoneyFields` to model! If not, django will generate `delete/create` migrations instead of `rename`.
 
 1. Run `python manage.py migrate`.
 
@@ -184,3 +188,4 @@ Steps to migrate:
         )
     ```
 
+1. Remember to address changes in previously edited ModelForms
