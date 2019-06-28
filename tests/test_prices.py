@@ -71,6 +71,7 @@ def test_compare_money_field_with_django_field():
 
     # Comparision is based on creation_counter attribute
     assert field_1 < field_2
+    assert not field_1 > field_2
     field_2.creation_counter -= 1
     assert field_1 == field_2
 
@@ -81,6 +82,7 @@ def test_compare_money_field_with_taxed_money_field():
 
     # Comparision is based on creation_counter attribute
     assert field_1 < field_2
+    assert not field_1 > field_2
     field_2.creation_counter -= 1
     assert field_1 == field_2
 
@@ -138,6 +140,7 @@ def test_compare_taxed_money_field_with_django_field():
 
     # Comparision is based on creation_counter attribute
     assert field_1 < field_2
+    assert not field_1 > field_2
     field_2.creation_counter -= 1
     assert field_1 == field_2
 
@@ -152,6 +155,7 @@ def test_compare_taxed_money_field_with_money_field():
 
     # Comparision is based on creation_counter attribute
     assert field_1 < field_2
+    assert not field_1 > field_2
     field_2.creation_counter -= 1
     assert field_1 == field_2
 

@@ -6,8 +6,10 @@ from django.db.models import Field
 from prices import Money, TaxedMoney
 
 from . import forms
+from functools import total_ordering
 
 
+@total_ordering
 class NonDatabaseFieldBase:
     """Base class for all fields that are not stored in the database."""
 
