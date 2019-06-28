@@ -471,4 +471,4 @@ def test_get_default_values_wth_nulls():
     gross = None
     assert object_with_defaults.price_net is None
     assert object_with_defaults.price_net is None
-    assert object_with_defaults.price == None
+    assert object_with_defaults.price is None
