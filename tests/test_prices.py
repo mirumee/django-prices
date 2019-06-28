@@ -26,7 +26,7 @@ from .forms import (
     RequiredPriceForm,
     ValidatedPriceForm,
 )
-from .models import Model
+from .models import Model, NullModel
 
 
 @pytest.fixture(scope="module")
@@ -454,3 +454,21 @@ def test_get_currency_fraction_unknown_currency():
 def test_format_price_invalid_value():
     result = prices_i18n.format_price("invalid", "USD")
     assert result == ""
+
+
+def test_get_default_values():
+    object_with_defaults = Model()
+    net = Money(Model.DEFAULT_NET, currency=Model.DEFAULT_CURRENCY)
+    gross = Money(Model.DEFAULT_GROSS, currency=Model.DEFAULT_CURRENCY)
+    assert object_with_defaults.price_net == net
+    assert object_with_defaults.price_net == gross
+    assert object_with_defaults.price == TaxedMoney(net, gross)
+
+
+def test_get_default_values_wth_nulls():
+    object_with_defaults = NullModel()
+    net = None
+    gross = None
+    assert object_with_defaults.price_net == None
+    assert object_with_defaults.price_net == None
+    assert object_with_defaults.price == None

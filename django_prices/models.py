@@ -114,6 +114,8 @@ class MoneyField(NonDatabaseFieldBase):
             ).get_default()
             default_amount = self.model._meta.get_field(self.amount_field).get_default()
 
+        if default_amount is None:
+            return None
         return Money(default_amount, default_currency)
 
 
@@ -146,6 +148,8 @@ class TaxedMoneyField(NonDatabaseFieldBase):
         net_amount = getattr(instance, self.net_amount_field)
         gross_amount = getattr(instance, self.gross_amount_field)
         currency = getattr(instance, self.currency)
+        if net_amount is None or gross_amount is None:
+            return None
         return TaxedMoney(Money(net_amount, currency), Money(gross_amount, currency))
 
     def __set__(self, instance, value):
