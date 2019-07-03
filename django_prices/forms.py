@@ -1,3 +1,4 @@
+from decimal import Decimal
 import itertools
 from typing import List, Optional, Tuple
 
@@ -80,7 +81,7 @@ class MoneyField(forms.MultiValueField):
                 [MinMoneyValidator(limit_value) for limit_value in min_values]
             )
 
-    def compress(self, data_list):
+    def compress(self, data_list: Optional[Tuple[Decimal, str]]) -> Optional[Money]:
         """If field is optional, return None when there is no amount provided."""
         if not data_list:
             return None
@@ -94,4 +95,4 @@ class MoneyField(forms.MultiValueField):
         if amount is None:
             return None
 
-        return Money(data_list[0], data_list[1])
+        return Money(amount, currency)
