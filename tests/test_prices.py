@@ -476,3 +476,8 @@ def test_get_default_values_wth_nulls():
     assert object_with_defaults.price_net is None
     assert object_with_defaults.price_net is None
     assert object_with_defaults.price is None
+
+
+def test_get_money_field_zero_amount():
+    instance = Model(price_net_amount=Decimal("0"), currency="USD")
+    assert instance.price_net == Money(amount=Decimal("0"), currency="USD")

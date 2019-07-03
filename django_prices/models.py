@@ -86,7 +86,7 @@ class MoneyField(NonDatabaseFieldBase):
 
         amount = getattr(instance, self.amount_field)
         currency = getattr(instance, self.currency_field)
-        if amount and currency:
+        if amount is not None and currency is not None:
             return Money(amount, currency)
         return self.get_default()
 
