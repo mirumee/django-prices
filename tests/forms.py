@@ -26,6 +26,14 @@ class OptionalPriceForm(forms.Form):
     price_net = MoneyField(available_currencies=AVAILABLE_CURRENCIES, required=False)
 
 
+class FixedCurrencyRequiredPriceForm(forms.Form):
+    price = MoneyField(available_currencies=[("BTC", "Bitcoin"),])
+
+
+class FixedCurrencyOptionalPriceForm(forms.Form):
+    price = MoneyField(available_currencies=[("BTC", "Bitcoin"),], required=False)
+
+
 class ValidatedPriceForm(forms.Form):
     price = MoneyField(
         available_currencies=AVAILABLE_CURRENCIES,

@@ -38,7 +38,7 @@ class MoneyField(forms.MultiValueField):
                 and len(available_currencies) <= 1
             ):
                 widget_instance = FixedCurrencyMoneyInput(
-                    currency=available_currencies[0]
+                    currency=available_currencies[0][0]
                     if len(available_currencies) == 1
                     else "",
                     attrs={"type": "number", "step": "any"},
