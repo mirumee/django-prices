@@ -25,6 +25,8 @@ from .forms import (
     OptionalPriceForm,
     RequiredPriceForm,
     ValidatedPriceForm,
+    FixedCurrencyOptionalPriceForm,
+    FixedCurrencyRequiredPriceForm,
 )
 from .models import Model, NullModel
 
@@ -244,6 +246,21 @@ def test_form_field_passes_all_validations_for_correct_money_value():
     form = RequiredPriceForm(data={"price_net_0": "20", "price_net_1": "BTC"})
     form.full_clean()
     assert form.errors == {}
+
+def test_form_field_passes_all_validations_for_correct_money_value_fixed():
+    form = FixedCurrencyRequiredPriceForm(data={"price_0": "20", "price_1": "BTC"})
+    form.full_clean()
+    assert form.errors == {}
+
+
+def test_form_field_passes_all_validations_for_correct_money_value_fixed_2():
+    form = FixedCurrencyOptionalPriceForm(data={})
+    form.full_clean()
+    assert form.errors == {}
+    form = FixedCurrencyOptionalPriceForm(data={"price_0": "20", "price_1": "BTC"})
+    form.full_clean()
+    assert form.errors == {}
+    assert form.cleaned_data['price'] == Money(20, currency='BTC')
 
 
 def test_form_field_passes_all_validations_for_correct_taxed_money_value():
