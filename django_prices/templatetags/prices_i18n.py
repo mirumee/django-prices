@@ -2,8 +2,8 @@ import warnings
 
 from django import template
 
-from .prices import (
-    amount as new_amount,
+from .prices import amount as new_amount
+from ..utils.formatting import (
     format_price as new_format_price,
     get_currency_fraction as new_get_currency_fraction,
 )

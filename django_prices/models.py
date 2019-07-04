@@ -1,7 +1,6 @@
 from decimal import Decimal
 
 from django.core import validators
-from django.db import models
 from django.db.models import Field
 from prices import Money, TaxedMoney
 

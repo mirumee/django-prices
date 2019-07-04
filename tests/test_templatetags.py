@@ -4,6 +4,8 @@ import functools
 import pytest
 from django.utils import translation
 from django_prices.templatetags import prices
+from django_prices.utils.formatting import get_currency_fraction
+
 
 from prices import Money, TaxedMoney, percentage_discount
 
@@ -73,12 +75,12 @@ def test_templatetag_amount_wrong_param(money_fixture):
 
 
 def test_get_currency_fraction_USD():
-    result = prices.get_currency_fraction("USD")
+    result = get_currency_fraction("USD")
     assert result == 2
 
 
 def test_get_currency_fraction_unknown_currency():
-    result = prices.get_currency_fraction(("test"))
+    result = get_currency_fraction(("test"))
     assert result == 2
 
 
