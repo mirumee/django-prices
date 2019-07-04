@@ -2,7 +2,11 @@ import warnings
 
 from django import template
 
-from .prices import get_currency_fraction, format_price, amount
+from .prices import (
+    amount as new_amount,
+    format_price as new_format_price,
+    get_currency_fraction as new_get_currency_fraction,
+)
 
 register = template.Library()
 
@@ -15,15 +19,15 @@ def deprecation_warning():
 
 def get_currency_fraction(currency):
     deprecation_warning()
-    return get_currency_fraction(currency)
+    return new_get_currency_fraction(currency)
 
 
 def format_price(value, currency, html=False):
     deprecation_warning()
-    return format_price(value, currency, html)
+    return new_format_price(value, currency, html)
 
 
 @register.filter
 def amount(obj, format="text"):
     deprecation_warning()
-    return amount(obj, format)
+    return new_amount(obj, format)
