@@ -63,7 +63,7 @@ def test_compare_money_field_with_taxed_money_field():
     assert field_1 == field_2
 
 
-def test_render_money_input():
+def test_money_input_widget_renders():
     widget = widgets.MoneyInput(choices=[("USD", "US dollar")], attrs={"key": "value"})
     result = widget.render("price", Money(5, "USD"), attrs={"foo": "bar"})
     assert 'foo="bar"' in result
