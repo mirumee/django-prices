@@ -172,7 +172,7 @@ def test_validators_work_with_formfields():
     }
 
 
-def test_define_max_money_validators_for_many_currencies():
+def test_max_money_is_validated_for_many_currencies():
     form = MaxMinPriceForm(data={"price_0": "1", "price_1": "USD"})
     form.full_clean()
     assert form.errors == {
@@ -185,7 +185,7 @@ def test_define_max_money_validators_for_many_currencies():
     }
 
 
-def test_define_min_money_validators_for_many_currencies():
+def test_min_money_is_validated_for_many_currencies():
     form = MaxMinPriceForm(data={"price_0": "15.01", "price_1": "USD"})
     form.full_clean()
     assert form.errors == {
@@ -198,6 +198,6 @@ def test_define_min_money_validators_for_many_currencies():
     }
 
 
-def test_raise_value_error_when_no_currencies():
+def test_value_error_is_raised_when_no_currencies_are_configured():
     with pytest.raises(ValueError):
         forms.MoneyField(available_currencies=[])

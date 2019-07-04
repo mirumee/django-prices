@@ -13,7 +13,7 @@ register = template.Library()
 
 def deprecation_warning():
     warnings.warn(
-        "Use tags from module `prices`. Module `prices_i18n` is going to be deprecated."
+        "Module `prices_i18n` is deprecated and will be removed in future version. Use `prices` instead."
     )
 
 
