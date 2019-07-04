@@ -14,12 +14,16 @@ from .widgets import FixedCurrencyMoneyInput, MoneyInput
 __all__ = ("MoneyField", "MoneyInput")
 
 
+def _get_symbol(currency_code: str) -> str:
+    _, locale_code = get_locale_data()
+    return get_currency_symbol(currency_code, locale_code)
+
+
 def _get_currency_choices(currencies: List[str]) -> List[Tuple[str, str]]:
     """Generate choices for SelectField.
     As a label we are presenting currency symbol."""
-    _, locale_code = get_locale_data()
     currency_choices = [
-        (code, get_currency_symbol(code, locale_code)) for code in currencies
+        (code, _get_symbol(code)) for code in currencies
     ]
     return currency_choices
 
@@ -55,11 +59,11 @@ class MoneyField(forms.MultiValueField):
         if widget is not None:
             raise NotImplementedError("Custom widgets are not supported by MoneyField.")
 
-        if len(available_currencies) <= 1:
+        if len(available_currencies) == 0:
+            raise ValueError("At least one currency needed.")
+        elif len(available_currencies) == 1:
             widget_instance = FixedCurrencyMoneyInput(
-                currency=available_currencies[0]
-                if len(available_currencies) == 1
-                else ""
+                currency=_get_symbol(available_currencies[0])
             )
         else:
             widget_instance = MoneyInput(
