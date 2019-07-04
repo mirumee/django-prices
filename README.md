@@ -78,13 +78,7 @@ It also provides support for templates:
 
 **Note:** for template tags to work, you need to add `django_prices` to your `INSTALLED_APPS`.
 
-You can also install the wonderful [`babel`](http://babel.pocoo.org/) library and get proper currency symbols with `prices_i18n`. First install BabelDjango:
-
-```
-$ pip install BabelDjango
-```
-
-Then follow the instruction to add it to your `INSTALLED_APPS` and `MIDDLEWARE_CLASSES`. Finally load the localized template tags:
+You can also get proper currency symbols with `prices_i18n`. First follow `django-babel` [instructions](https://github.com/python-babel/django-babel/#using-the-middleware) and update your `INSTALLED_APPS` and `MIDDLEWARE_CLASSES`. Finally load the localized template tags:
 
 ```html+django
 {% load prices_i18n %}
@@ -132,7 +126,7 @@ Steps to migrate:
 1. In your **models** using `MoneyField`:
     * Replace all occurrences of the `MoneyField` class with `DecimalField`
     * Remove the `currency` argument from them
-    * Change `default` from Money instance to value acceptable by Decimal field 
+    * Change `default` from Money instance to value acceptable by Decimal field
 
         Example of code:
         ```python
@@ -148,7 +142,7 @@ Steps to migrate:
 1. In your **migration** files:
     * Replace all occurrences of the `MoneyField` class with `DecimalField`
     * Remove the `currency` argument from them
-    * Change `default` from Money instance to value acceptable by Decimal field 
+    * Change `default` from Money instance to value acceptable by Decimal field
 
         ```python
             field=django_prices.models.MoneyField(currency='BTC', decimal_places=2, default='5', max_digits=9, verbose_name='net')
@@ -158,9 +152,9 @@ Steps to migrate:
             field=models.DecimalField(decimal_places=2, default='5', max_digits=9, verbose_name='net')
         ```
 
-1. Rename fields in **models**. Your old field will still store amount of money, so probably the best choice would be `price_net_amount` instead `price_net`. 
+1. Rename fields in **models**. Your old field will still store amount of money, so probably the best choice would be `price_net_amount` instead `price_net`.
 
-1. All places which use Models and it's fields can prevent django app from even starting the code. Possible issues: code tries to access non existing fields. Exclude those fields for now from your ModelForms, Graphene types etc. 
+1. All places which use Models and it's fields can prevent django app from even starting the code. Possible issues: code tries to access non existing fields. Exclude those fields for now from your ModelForms, Graphene types etc.
 
 1. Run `python manage.py makemigrations`. Make sure to do this step before adding new `MoneyFields` to model! If not, django will generate `delete/create` migrations instead of `rename`.
 
