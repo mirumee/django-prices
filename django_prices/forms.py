@@ -1,6 +1,6 @@
+import itertools
 from decimal import Decimal
 from typing import List, Optional, Tuple
-import itertools
 
 from babel.numbers import get_currency_symbol
 from django import forms
