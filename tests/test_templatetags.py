@@ -27,10 +27,10 @@ def test_non_existing_locale(money_fixture):
     #     Babel 1.0+ doesn't support `zh_CN`
     #     https://github.com/python-babel/babel/issues/37
     # Though to make this test more reliable we mock the language with totally
-    # made up code 'oO_Oo' as the 'zh_CN' "alias" might work in the future, see:
+    # made up code 'zz' as the 'zh_CN' "alias" might work in the future, see:
     #     Babel needs to support Fuzzy Locales
     #     https://github.com/python-babel/babel/issues/30
-    translation.activate("oO_Oo")
+    translation.activate("zz")
     amount = prices_i18n.amount(money_fixture, format="html")
     assert amount  # No exception, success!
 
