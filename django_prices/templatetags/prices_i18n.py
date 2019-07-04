@@ -1,14 +1,14 @@
 import re
 from decimal import Decimal, InvalidOperation
 
-from babel.core import Locale, UnknownLocaleError, get_global
+from babel.core import get_global
 from babel.numbers import format_currency
 from django import template
-from django.conf import settings
 from django.utils.safestring import mark_safe
-from django.utils.translation import get_language, to_locale
 
 from django_babel.templatetags.babel import currencyfmt
+
+from ..locale_utils import get_locale_data
 
 register = template.Library()
 
@@ -39,23 +39,6 @@ def format_price(value, currency, html=False):
 
     result = format_currency(value, currency, format=pattern, locale=locale_code)
     return mark_safe(result)
-
-
-def get_locale_data():
-    language = get_language()
-    if not language:
-        language = settings.LANGUAGE_CODE
-    locale_code = to_locale(language)
-    locale = None
-    try:
-        locale = Locale.parse(locale_code)
-    except (ValueError, UnknownLocaleError):
-        # Invalid format or unknown locale
-        # Fallback to the default language
-        language = settings.LANGUAGE_CODE
-        locale_code = to_locale(language)
-        locale = Locale.parse(locale_code)
-    return locale, locale_code
 
 
 @register.filter
