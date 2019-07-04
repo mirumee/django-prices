@@ -1,15 +1,15 @@
 from decimal import Decimal
-import itertools
 from typing import List, Optional, Tuple
+import itertools
 
 from babel.numbers import get_currency_symbol
 from django import forms
 from django.core.validators import ValidationError
 from prices import Money
 
+from .locale_utils import get_locale_data
 from .validators import MaxMoneyValidator, MinMoneyValidator, MoneyPrecisionValidator
 from .widgets import FixedCurrencyMoneyInput, MoneyInput
-from .locale_utils import get_locale_data
 
 __all__ = ("MoneyField", "MoneyInput")
 
