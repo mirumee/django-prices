@@ -1,8 +1,6 @@
 # coding: utf-8
 import pytest
-from django.db.models import DecimalField
 from django_prices import forms, widgets
-from django_prices.models import MoneyField, TaxedMoneyField
 from prices import Money
 
 from .forms import (
@@ -16,51 +14,6 @@ from .forms import (
     FixedCurrencyOptionalPriceForm,
 )
 
-
-def test_money_field_init():
-    field = MoneyField(amount_field="amount", currency_field="currency")
-    assert field.get_default() == Money(0, None)
-    assert field.amount_field == "amount"
-    assert field.currency_field == "currency"
-
-
-def test_money_field_formfield_returns_form_with_fixed_currency_input_if_no_model_attached():
-    field = MoneyField(amount_field="amount", currency_field="currency")
-    form_field = field.formfield()
-    assert isinstance(form_field, forms.MoneyField)
-    assert isinstance(form_field.widget, widgets.FixedCurrencyMoneyInput)
-
-
-def test_compare_money_field_with_same_type_field():
-    field_1 = MoneyField(amount_field="money_net_amount", currency_field="currency")
-    field_2 = MoneyField(amount_field="money_net_amount", currency_field="currency")
-
-    # Comparision is based on creation_counter attribute
-    assert field_1 < field_2
-    field_2.creation_counter -= 1
-    assert field_1 == field_2
-
-
-def test_compare_money_field_with_django_field():
-    field_1 = MoneyField(amount_field="money_net_amount", currency_field="currency")
-    field_2 = DecimalField(default="5", max_digits=9, decimal_places=2)
-
-    # Comparision is based on creation_counter attribute
-    assert field_1 < field_2
-    assert not field_1 > field_2
-    field_2.creation_counter -= 1
-    assert field_1 == field_2
-
-
-def test_compare_money_field_with_taxed_money_field():
-    field_1 = MoneyField(amount_field="money_net_amount", currency_field="currency")
-    field_2 = TaxedMoneyField(net_field="price_net", gross_field="price_gross")
-
-    # Comparision is based on creation_counter attribute
-    assert field_1 < field_2
-    assert not field_1 > field_2
-    field_2.creation_counter -= 1
-    assert field_1 == field_2
 
 
 def test_money_input_widget_renders():
@@ -82,63 +35,7 @@ def test_render_fixed_currency_money_input():
         assert attr in result
 
 
-def test_taxed_money_field_init():
-    field = TaxedMoneyField(
-        net_amount_field="price_net",
-        gross_amount_field="price_gross",
-        currency="currency",
-    )
-    assert field.net_amount_field == "price_net"
-    assert field.gross_amount_field == "price_gross"
-    assert field.currency == "currency"
 
-
-def test_compare_taxed_money_field_with_same_type_field():
-    field_1 = TaxedMoneyField(
-        net_amount_field="price_net",
-        gross_amount_field="price_gross",
-        currency="currency",
-    )
-    field_2 = TaxedMoneyField(
-        net_amount_field="price_net",
-        gross_amount_field="price_gross",
-        currency="currency",
-    )
-
-    # Comparision is based on creation_counter attribute
-    assert field_1 < field_2
-    field_2.creation_counter -= 1
-    assert field_1 == field_2
-
-
-def test_compare_taxed_money_field_with_django_field():
-    field_1 = TaxedMoneyField(
-        net_amount_field="price_net",
-        gross_amount_field="price_gross",
-        currency="currency",
-    )
-    field_2 = DecimalField(default="5", max_digits=9, decimal_places=2)
-
-    # Comparision is based on creation_counter attribute
-    assert field_1 < field_2
-    assert not field_1 > field_2
-    field_2.creation_counter -= 1
-    assert field_1 == field_2
-
-
-def test_compare_taxed_money_field_with_money_field():
-    field_1 = TaxedMoneyField(
-        net_amount_field="price_net",
-        gross_amount_field="price_gross",
-        currency="currency",
-    )
-    field_2 = MoneyField(amount_field="money_net_amount", currency_field="currency")
-
-    # Comparision is based on creation_counter attribute
-    assert field_1 < field_2
-    assert not field_1 > field_2
-    field_2.creation_counter -= 1
-    assert field_1 == field_2
 
 
 @pytest.mark.parametrize(
@@ -303,3 +200,8 @@ def test_define_min_money_validators_for_many_currencies():
     assert form.errors == {
         "price": ["Ensure this value is less than or equal to BTC16.00."]
     }
+
+
+def test_raise_value_error_when_no_currencies():
+    with pytest.raises(ValueError):
+        forms.MoneyField(available_currencies=[])
