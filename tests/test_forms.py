@@ -15,7 +15,6 @@ from .forms import (
 )
 
 
-
 def test_money_input_widget_renders():
     widget = widgets.MoneyInput(choices=[("USD", "US dollar")], attrs={"key": "value"})
     result = widget.render("price", Money(5, "USD"), attrs={"foo": "bar"})
@@ -33,9 +32,6 @@ def test_render_fixed_currency_money_input():
     attrs = ['foo="bar"', 'key="value"', 'value="5"', "price_0", "BTC"]
     for attr in attrs:
         assert attr in result
-
-
-
 
 
 @pytest.mark.parametrize(

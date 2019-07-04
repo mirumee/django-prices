@@ -22,9 +22,7 @@ def _get_symbol(currency_code: str) -> str:
 def _get_currency_choices(currencies: List[str]) -> List[Tuple[str, str]]:
     """Generate choices for SelectField.
     As a label we are presenting currency symbol."""
-    currency_choices = [
-        (code, _get_symbol(code)) for code in currencies
-    ]
+    currency_choices = [(code, _get_symbol(code)) for code in currencies]
     return currency_choices
 
 

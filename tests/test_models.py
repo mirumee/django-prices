@@ -84,8 +84,12 @@ def test_money_field_init():
 
 
 def test_compare_money_field_with_same_type_field():
-    field_1 = models.MoneyField(amount_field="money_net_amount", currency_field="currency")
-    field_2 = models.MoneyField(amount_field="money_net_amount", currency_field="currency")
+    field_1 = models.MoneyField(
+        amount_field="money_net_amount", currency_field="currency"
+    )
+    field_2 = models.MoneyField(
+        amount_field="money_net_amount", currency_field="currency"
+    )
 
     # Comparision is based on creation_counter attribute
     assert field_1 < field_2
@@ -94,7 +98,9 @@ def test_compare_money_field_with_same_type_field():
 
 
 def test_compare_money_field_with_django_field():
-    field_1 = models.MoneyField(amount_field="money_net_amount", currency_field="currency")
+    field_1 = models.MoneyField(
+        amount_field="money_net_amount", currency_field="currency"
+    )
     field_2 = DecimalField(default="5", max_digits=9, decimal_places=2)
 
     # Comparision is based on creation_counter attribute
@@ -105,7 +111,9 @@ def test_compare_money_field_with_django_field():
 
 
 def test_compare_money_field_with_taxed_money_field():
-    field_1 = models.MoneyField(amount_field="money_net_amount", currency_field="currency")
+    field_1 = models.MoneyField(
+        amount_field="money_net_amount", currency_field="currency"
+    )
     field_2 = models.TaxedMoneyField(net_field="price_net", gross_field="price_gross")
 
     # Comparision is based on creation_counter attribute
@@ -165,7 +173,9 @@ def test_compare_taxed_money_field_with_money_field():
         gross_amount_field="price_gross",
         currency="currency",
     )
-    field_2 = models.MoneyField(amount_field="money_net_amount", currency_field="currency")
+    field_2 = models.MoneyField(
+        amount_field="money_net_amount", currency_field="currency"
+    )
 
     # Comparision is based on creation_counter attribute
     assert field_1 < field_2
