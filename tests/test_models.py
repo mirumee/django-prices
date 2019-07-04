@@ -40,8 +40,8 @@ def test_taxed_money_field_instance_init_by_taxed_money_object():
 
 def test_get_default_values():
     object_with_defaults = Model()
-    net = Money(Model.DEFAULT_NET, currency=Model.DEFAULT_CURRENCY)
-    gross = Money(Model.DEFAULT_GROSS, currency=Model.DEFAULT_CURRENCY)
+    net = Money(Model.DEFAULT_NET, Model.DEFAULT_CURRENCY)
+    gross = Money(Model.DEFAULT_GROSS, Model.DEFAULT_CURRENCY)
     assert object_with_defaults.price_net == net
     assert object_with_defaults.price_net == gross
     assert object_with_defaults.price == TaxedMoney(net, gross)

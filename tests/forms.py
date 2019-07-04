@@ -40,8 +40,8 @@ class ValidatedPriceForm(forms.Form):
         max_digits=9,
         decimal_places=2,
         validators=[
-            MinMoneyValidator(Money(5, currency="USD")),
-            MaxMoneyValidator(Money(15, currency="USD")),
+            MinMoneyValidator(Money(5, "USD")),
+            MaxMoneyValidator(Money(15, "USD")),
         ],
     )
 
@@ -49,6 +49,6 @@ class ValidatedPriceForm(forms.Form):
 class MaxMinPriceForm(forms.Form):
     price = MoneyField(
         available_currencies=AVAILABLE_CURRENCIES,
-        min_values=[Money(5, currency="USD"), Money(6, currency="BTC")],
-        max_values=[Money(15, currency="USD"), Money(16, currency="BTC")],
+        min_values=[Money(5, "USD"), Money(6, "BTC")],
+        max_values=[Money(15, "USD"), Money(16, "BTC")],
     )

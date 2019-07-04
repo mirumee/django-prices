@@ -183,7 +183,7 @@ def test_form_field_fixed_currency_andrequired_pass_on_valid_data():
     form = FixedCurrencyRequiredPriceForm(data={"price_0": "20", "price_1": "BTC"})
     form.full_clean()
     assert form.errors == {}
-    assert form.cleaned_data["price"] == Money(20, currency="BTC")
+    assert form.cleaned_data["price"] == Money(20, "BTC")
 
 
 def test_form_field_fixed_currency_and_required_error_on_wrong_currency():
@@ -204,7 +204,7 @@ def test_form_field_fixed_currency_and_optional_pass_on_valid_data():
     form = FixedCurrencyOptionalPriceForm(data={"price_0": "20", "price_1": "BTC"})
     form.full_clean()
     assert form.errors == {}
-    assert form.cleaned_data["price"] == Money(20, currency="BTC")
+    assert form.cleaned_data["price"] == Money(20, "BTC")
 
 
 def test_form_field_fixed_currency_and_optional_error_on_wrong_currency():
@@ -219,7 +219,7 @@ def test_form_field_fixed_currency_and_optional_none_on_no_amount():
     form = FixedCurrencyOptionalPriceForm(data={"price_0": "", "price_1": "BTC"})
     form.full_clean()
     assert form.errors == {}
-    assert form.cleaned_data["price"] == None
+    assert form.cleaned_data["price"] is None
 
 
 def test_form_field_passes_all_validations_for_correct_taxed_money_value():
