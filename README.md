@@ -3,6 +3,14 @@ django-prices: Django fields for the `prices` module
 
 [![Build Status](https://secure.travis-ci.org/mirumee/django-prices.png)](https://travis-ci.org/mirumee/django-prices) [![codecov.io](https://img.shields.io/codecov/c/github/mirumee/django-prices/master.svg)](http://codecov.io/github/mirumee/django-prices?branch=master)
 
+# Installation
+
+* `pip install django-prices`
+* Add `django_prices` to your `INSTALLED_APPS` at `settings.py`
+* Follow `django-babel` [instructions](https://github.com/python-babel/django-babel/#using-the-middleware) and update both your `INSTALLED_APPS` and `MIDDLEWARE_CLASSES`.
+
+# Features
+
 Provides support for models:
 
 ```python
@@ -76,13 +84,6 @@ It also provides support for templates:
 <p>Price: {{ foo.price.gross|amount }} ({{ foo.price.net|amount }} + {{ foo.price.tax|amount }} tax)</p>
 ```
 
-**Note:** for template tags to work, you need to add `django_prices` to your `INSTALLED_APPS` and follow `django-babel` [instructions](https://github.com/python-babel/django-babel/#using-the-middleware) and update both your `INSTALLED_APPS` and `MIDDLEWARE_CLASSES`. Finally load the localized template tags:
-
-```html+django
-{% load prices %}
-
-<p>Price: {{ foo.price.gross|amount }} ({{ foo.price.net|amount }} + {{ foo.price.tax|amount }} tax)</p>
-```
 
 You can also use HTML output from `prices` template tags, they will wrap currency symbol in a `<span>` element:
 
