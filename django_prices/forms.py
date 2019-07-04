@@ -9,7 +9,7 @@ from prices import Money
 
 from .validators import MaxMoneyValidator, MinMoneyValidator, MoneyPrecisionValidator
 from .widgets import FixedCurrencyMoneyInput, MoneyInput
-from .templatetags.prices_i18n import get_locale_data
+from .locale_utils import get_locale_data
 
 __all__ = ("MoneyField", "MoneyInput")
 

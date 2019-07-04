@@ -6,7 +6,7 @@ from django.core.validators import (
     ValidationError,
 )
 
-from .templatetags.prices_i18n import format_price
+from .templatetags.prices import format_price
 
 
 class MoneyPrecisionValidator(DecimalValidator):

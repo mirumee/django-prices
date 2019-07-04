@@ -1,50 +1,29 @@
-import re
-from decimal import Decimal, InvalidOperation
+import warnings
 
-from babel.core import get_global
-from babel.numbers import format_currency
 from django import template
-from django.utils.safestring import mark_safe
 
-from django_babel.templatetags.babel import currencyfmt
-
-from ..locale_utils import get_locale_data
+from .prices import get_currency_fraction, format_price, amount
 
 register = template.Library()
 
 
+def deprecation_warning():
+    warnings.warn(
+        "Use tags from module `prices`. Module `prices_i18n` is going to be deprecated."
+    )
+
+
 def get_currency_fraction(currency):
-    fractions = get_global("currency_fractions")
-    try:
-        fraction = fractions[currency]
-    except KeyError:
-        fraction = fractions["DEFAULT"]
-    return fraction[0]
+    deprecation_warning()
+    return get_currency_fraction(currency)
 
 
 def format_price(value, currency, html=False):
-    """
-    Format decimal value as currency
-    """
-    try:
-        value = Decimal(value)
-    except (TypeError, InvalidOperation):
-        return ""
-
-    locale, locale_code = get_locale_data()
-    pattern = locale.currency_formats.get("standard").pattern
-
-    if html:
-        pattern = re.sub("(\xa4+)", '<span class="currency">\\1</span>', pattern)
-
-    result = format_currency(value, currency, format=pattern, locale=locale_code)
-    return mark_safe(result)
+    deprecation_warning()
+    return format_price(value, currency, html)
 
 
 @register.filter
 def amount(obj, format="text"):
-    if format == "text":
-        return format_price(obj.amount, obj.currency, html=False)
-    if format == "html":
-        return format_price(obj.amount, obj.currency, html=True)
-    return currencyfmt(obj.amount, obj.currency)
+    deprecation_warning()
+    return amount(obj, format)

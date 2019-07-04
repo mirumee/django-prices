@@ -76,20 +76,18 @@ It also provides support for templates:
 <p>Price: {{ foo.price.gross|amount }} ({{ foo.price.net|amount }} + {{ foo.price.tax|amount }} tax)</p>
 ```
 
-**Note:** for template tags to work, you need to add `django_prices` to your `INSTALLED_APPS`.
-
-You can also get proper currency symbols with `prices_i18n`. First follow `django-babel` [instructions](https://github.com/python-babel/django-babel/#using-the-middleware) and update your `INSTALLED_APPS` and `MIDDLEWARE_CLASSES`. Finally load the localized template tags:
+**Note:** for template tags to work, you need to add `django_prices` to your `INSTALLED_APPS` and follow `django-babel` [instructions](https://github.com/python-babel/django-babel/#using-the-middleware) and update both your `INSTALLED_APPS` and `MIDDLEWARE_CLASSES`. Finally load the localized template tags:
 
 ```html+django
-{% load prices_i18n %}
+{% load prices %}
 
 <p>Price: {{ foo.price.gross|amount }} ({{ foo.price.net|amount }} + {{ foo.price.tax|amount }} tax)</p>
 ```
 
-You can also use HTML output from `prices_i18n` template tags, they will wrap currency symbol in a `<span>` element:
+You can also use HTML output from `prices` template tags, they will wrap currency symbol in a `<span>` element:
 
 ```html+django
-{% load prices_i18n %}
+{% load prices %}
 
 <p>Price: {{ foo.price.gross|amount:'html' }} ({{ foo.price.net|amount:'html' }} + {{ foo.price.tax|amount:'html' }} tax)</p>
 ```
