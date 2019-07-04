@@ -53,7 +53,7 @@ class MoneyField(forms.MultiValueField):
         fields = (decimal_field, forms.ChoiceField(choices=choices))
 
         if widget is not None:
-            raise NotImplementedError()
+            raise NotImplementedError("Custom widgets are not supported by MoneyField.")
 
         if len(available_currencies) <= 1:
             widget_instance = FixedCurrencyMoneyInput(
