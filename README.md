@@ -3,6 +3,14 @@ django-prices: Django fields for the `prices` module
 
 [![Build Status](https://secure.travis-ci.org/mirumee/django-prices.png)](https://travis-ci.org/mirumee/django-prices) [![codecov.io](https://img.shields.io/codecov/c/github/mirumee/django-prices/master.svg)](http://codecov.io/github/mirumee/django-prices?branch=master)
 
+# Installation
+
+* `pip install django-prices`
+* Add `django_prices` to your `INSTALLED_APPS` at `settings.py`
+* Follow `django-babel` [instructions](https://github.com/python-babel/django-babel/#using-the-middleware) and update both your `INSTALLED_APPS` and `MIDDLEWARE_CLASSES`.
+
+# Features
+
 Provides support for models:
 
 ```python
@@ -76,26 +84,11 @@ It also provides support for templates:
 <p>Price: {{ foo.price.gross|amount }} ({{ foo.price.net|amount }} + {{ foo.price.tax|amount }} tax)</p>
 ```
 
-**Note:** for template tags to work, you need to add `django_prices` to your `INSTALLED_APPS`.
 
-You can also install the wonderful [`babel`](http://babel.pocoo.org/) library and get proper currency symbols with `prices_i18n`. First install BabelDjango:
-
-```
-$ pip install BabelDjango
-```
-
-Then follow the instruction to add it to your `INSTALLED_APPS` and `MIDDLEWARE_CLASSES`. Finally load the localized template tags:
+You can also use HTML output from `prices` template tags, they will wrap currency symbol in a `<span>` element:
 
 ```html+django
-{% load prices_i18n %}
-
-<p>Price: {{ foo.price.gross|amount }} ({{ foo.price.net|amount }} + {{ foo.price.tax|amount }} tax)</p>
-```
-
-You can also use HTML output from `prices_i18n` template tags, they will wrap currency symbol in a `<span>` element:
-
-```html+django
-{% load prices_i18n %}
+{% load prices %}
 
 <p>Price: {{ foo.price.gross|amount:'html' }} ({{ foo.price.net|amount:'html' }} + {{ foo.price.tax|amount:'html' }} tax)</p>
 ```
@@ -132,7 +125,7 @@ Steps to migrate:
 1. In your **models** using `MoneyField`:
     * Replace all occurrences of the `MoneyField` class with `DecimalField`
     * Remove the `currency` argument from them
-    * Change `default` from Money instance to value acceptable by Decimal field 
+    * Change `default` from Money instance to value acceptable by Decimal field
 
         Example of code:
         ```python
@@ -148,7 +141,7 @@ Steps to migrate:
 1. In your **migration** files:
     * Replace all occurrences of the `MoneyField` class with `DecimalField`
     * Remove the `currency` argument from them
-    * Change `default` from Money instance to value acceptable by Decimal field 
+    * Change `default` from Money instance to value acceptable by Decimal field
 
         ```python
             field=django_prices.models.MoneyField(currency='BTC', decimal_places=2, default='5', max_digits=9, verbose_name='net')
@@ -158,9 +151,9 @@ Steps to migrate:
             field=models.DecimalField(decimal_places=2, default='5', max_digits=9, verbose_name='net')
         ```
 
-1. Rename fields in **models**. Your old field will still store amount of money, so probably the best choice would be `price_net_amount` instead `price_net`. 
+1. Rename fields in **models**. Your old field will still store amount of money, so probably the best choice would be `price_net_amount` instead `price_net`.
 
-1. All places which use Models and it's fields can prevent django app from even starting the code. Possible issues: code tries to access non existing fields. Exclude those fields for now from your ModelForms, Graphene types etc. 
+1. All places which use Models and it's fields can prevent django app from even starting the code. Possible issues: code tries to access non existing fields. Exclude those fields for now from your ModelForms, Graphene types etc.
 
 1. Run `python manage.py makemigrations`. Make sure to do this step before adding new `MoneyFields` to model! If not, django will generate `delete/create` migrations instead of `rename`.
 
