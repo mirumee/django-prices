@@ -6,7 +6,6 @@ from django.utils import translation
 from django_prices.templatetags import prices
 from django_prices.utils.formatting import get_currency_fraction
 
-
 from prices import Money, TaxedMoney, percentage_discount
 
 
