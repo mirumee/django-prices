@@ -61,7 +61,7 @@ class MoneyField(forms.MultiValueField):
             raise ValueError("At least one currency needed.")
         elif len(available_currencies) == 1:
             widget_instance = FixedCurrencyMoneyInput(
-                currency=_get_symbol(available_currencies[0])
+                currency=available_currencies[0]
             )
         else:
             widget_instance = MoneyInput(
