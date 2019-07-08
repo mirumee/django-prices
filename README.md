@@ -42,7 +42,7 @@ from django import forms
 
 from django_prices.forms import MoneyField
 
-AVAILABLE_CURRENCIES = [("BTC", "bitcoins"), ("USD", "US dollar")]
+AVAILABLE_CURRENCIES = ["BTC", "USD"]
 
 
 class ProductForm(forms.Form):
@@ -65,7 +65,7 @@ class DonateForm(forms.Form):
     donator_name = forms.CharField(label="Your name")
     donation = MoneyField(
         label="net",
-        available_currencies=[("BTC", "bitcoins"), ("USD", "US dollar")],
+        available_currencies=["BTC", "USD"],
         max_digits=9,
         decimal_places=2,
         validators=[
