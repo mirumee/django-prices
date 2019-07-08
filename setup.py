@@ -24,7 +24,7 @@ setup(
     license="BSD",
     version="2.1.0a1",
     url="https://github.com/mirumee/django-prices",
-    packages=["django_prices", "django_prices.templatetags"],
+    packages=["django_prices", "django_prices.templatetags", "django_prices.utils"],
     include_package_data=True,
     classifiers=CLASSIFIERS,
     install_requires=["Babel>=2.2", "Django>=1.11,<3", "django-babel", "prices>=1.0.0"],
