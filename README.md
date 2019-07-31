@@ -111,16 +111,16 @@ Steps to migrate:
 
     If the form specified `MoneyFields` in `fields` option, replace those with explicit declarations instead:
 
-            ```python
-            AVAILABLE_CURRENCIES = [("BTC", "bitcoins"), ("USD", "US dollar")]
+    ```python
+    AVAILABLE_CURRENCIES = [("BTC", "bitcoins"), ("USD", "US dollar")]
 
-            class ModelForm(forms.ModelForm):
-                class Meta:
-                    model = models.Model
-                    fields = []
+    class ModelForm(forms.ModelForm):
+        class Meta:
+            model = models.Model
+            fields = []
 
-                price_net = MoneyField(available_currencies=AVAILABLE_CURRENCIES)
-            ```
+        price_net = MoneyField(available_currencies=AVAILABLE_CURRENCIES)
+    ```
 
 1. In your **models** using `MoneyField`:
     * Replace all occurrences of the `MoneyField` class with `DecimalField`
@@ -129,13 +129,13 @@ Steps to migrate:
 
         Example of code:
         ```python
-            price_net = MoneyField(
-                "net", currency="BTC", default=Money("0", "BTC"), max_digits=9, decimal_places=2
-            )
+        price_net = MoneyField(
+            "net", currency="BTC", default=Money("0", "BTC"), max_digits=9, decimal_places=2
+        )
         ```
         Updated code:
         ```python
-            price_net = models.DecimalField("net", default="5", max_digits=9, decimal_places=2)
+        price_net = models.DecimalField("net", default="5", max_digits=9, decimal_places=2)
         ```
 
 1. In your **migration** files:
@@ -144,11 +144,11 @@ Steps to migrate:
     * Change `default` from Money instance to value acceptable by Decimal field
 
         ```python
-            field=django_prices.models.MoneyField(currency='BTC', decimal_places=2, default='5', max_digits=9, verbose_name='net')
+        field = django_prices.models.MoneyField(currency='BTC', decimal_places=2, default='5', max_digits=9, verbose_name='net')
         ```
         Updated code:
         ```python
-            field=models.DecimalField(decimal_places=2, default='5', max_digits=9, verbose_name='net')
+        field = models.DecimalField(decimal_places=2, default='5', max_digits=9, verbose_name='net')
         ```
 
 1. Rename fields in **models**. Your old field will still store amount of money, so probably the best choice would be `price_net_amount` instead `price_net`.
@@ -164,9 +164,9 @@ Steps to migrate:
 1. Add `models.CharField` for currency and `MoneyField` to your models:
 
     ```python
-        currency = models.CharField(max_length=3, default="BTC")
-        price_net_amount = models.DecimalField("net", default="5", max_digits=9, decimal_places=2)
-        price_net = MoneyField(amount_field="price_net_amount", currency_field="currency")
+    currency = models.CharField(max_length=3, default="BTC")
+    price_net_amount = models.DecimalField("net", default="5", max_digits=9, decimal_places=2)
+    price_net = MoneyField(amount_field="price_net_amount", currency_field="currency")
     ```
 
 1. Run `python manage.py makemigrations` and `python manage.py migrate`.
@@ -174,11 +174,11 @@ Steps to migrate:
 1. Change `TaxedMoneyField` declaration:
 
     ```python
-        price = TaxedMoneyField(
-            net_amount_field="price_net_amount",
-            gross_amount_field="price_gross_amount",
-            currency="currency",
-        )
+    price = TaxedMoneyField(
+        net_amount_field="price_net_amount",
+        gross_amount_field="price_gross_amount",
+        currency="currency",
+    )
     ```
 
 1. Remember to address changes in previously edited ModelForms
