@@ -130,7 +130,7 @@ Steps to migrate:
         Example of code:
         ```python
         price_net = MoneyField(
-            "net", currency="BTC", default=Money("0", "BTC"), max_digits=9, decimal_places=2
+            "net", currency="BTC", default=Money("5", "BTC"), max_digits=9, decimal_places=2
         )
         ```
         Updated code:
