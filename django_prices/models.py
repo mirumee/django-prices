@@ -23,6 +23,11 @@ class NonDatabaseFieldBase:
     is_relation = False
     remote_field = None
 
+    many_to_many = None
+    many_to_one = None
+    one_to_many = None
+    one_to_one = None
+
     def __init__(self):
         self.column = None
         self.primary_key = False
@@ -72,6 +77,7 @@ class MoneyField(NonDatabaseFieldBase):
         super(MoneyField, self).__init__()
         self.amount_field = amount_field
         self.currency_field = currency_field
+        self.verbose_name = verbose_name
 
     def __str__(self):
         return "MoneyField(amount_field=%s, currency_field=%s)" % (
