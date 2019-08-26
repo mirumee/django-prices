@@ -72,7 +72,7 @@ def test_form_field_passes_all_validations_for_correct_money_value():
     assert form.errors == {}
 
 
-def test_form_field_fixed_currency_andrequired_pass_on_valid_data():
+def test_form_field_fixed_currency_and_required_pass_on_valid_data():
     form = FixedCurrencyRequiredPriceForm(data={"price_0": "20", "price_1": "BTC"})
     form.full_clean()
     assert form.errors == {}
@@ -106,6 +106,12 @@ def test_form_field_fixed_currency_and_optional_error_on_wrong_currency():
     assert form.errors == {
         "price": ["Select a valid choice. LOL is not one of the available choices."]
     }
+
+
+def test_form_field_fixed_currency_and_optional_error_on_empty_currency():
+    form = FixedCurrencyOptionalPriceForm(data={"price_0": "20", "price_1": ""})
+    form.full_clean()
+    assert form.cleaned_data["price"] is None
 
 
 def test_form_field_fixed_currency_and_optional_none_on_no_amount():

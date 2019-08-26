@@ -95,4 +95,7 @@ class MoneyField(forms.MultiValueField):
         if amount is None:
             return None
 
+        if not currency:
+            return None
+
         return Money(amount, currency)
