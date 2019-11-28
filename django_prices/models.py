@@ -143,6 +143,7 @@ class TaxedMoneyField(NonDatabaseFieldBase):
         self.net_amount_field = net_amount_field
         self.gross_amount_field = gross_amount_field
         self.currency = currency
+        self.verbose_name = verbose_name
 
     def __str__(self):
         return (
