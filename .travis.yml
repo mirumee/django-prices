@@ -4,6 +4,7 @@ sudo: false
 python:
   - "3.6"
   - "3.7"
+  - "3.8"
 cache:
   pip: true
 install:
@@ -13,16 +14,16 @@ script:
   - tox
 env:
   matrix:
-    - DJANGO="1.11"
-    - DJANGO="2.0"
-    - DJANGO="2.1"
+    - DJANGO="2.2"
+    - DJANGO="3.0"
     - DJANGO="master"
 matrix:
   allow_failures:
     - python: "3.6"
       env: DJANGO="master"
-  exclude:
     - python: "3.7"
-      env: DJANGO="1.11"
+      env: DJANGO="master"
+    - python: "3.8"
+      env: DJANGO="master"
 after_success:
   - codecov

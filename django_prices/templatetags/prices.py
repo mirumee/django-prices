@@ -1,6 +1,6 @@
 from django import template
 
-from django_babel.templatetags.babel import currencyfmt
+from enmerkar.templatetags.babel import currencyfmt
 
 from ..utils.formatting import format_price
 
