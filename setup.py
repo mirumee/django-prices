@@ -22,7 +22,7 @@ setup(
     author_email="hello@mirumee.com",
     description="Django fields for the prices module",
     license="BSD",
-    version="2.1.0",
+    version="2.1.1",
     url="https://github.com/mirumee/django-prices",
     packages=["django_prices", "django_prices.templatetags", "django_prices.utils"],
     include_package_data=True,
