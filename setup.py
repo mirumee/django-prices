@@ -16,6 +16,9 @@ CLASSIFIERS = [
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 
+with open("README.md", "r", encoding="utf8") as fh:
+    long_description = fh.read()
+
 setup(
     name="django-prices",
     author="Mirumee Software",
@@ -23,6 +26,8 @@ setup(
     description="Django fields for the prices module",
     license="BSD",
     version="2.2.0",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     url="https://github.com/mirumee/django-prices",
     packages=["django_prices", "django_prices.templatetags", "django_prices.utils"],
     include_package_data=True,
