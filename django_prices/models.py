@@ -131,6 +131,8 @@ class MoneyField(NonDatabaseFieldBase):
 
 
 class TaxedMoneyField(NonDatabaseFieldBase):
+    
+    serialize = True
 
     description = "A field that combines net and gross fields values into TaxedMoney."
 
