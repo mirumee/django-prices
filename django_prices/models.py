@@ -62,6 +62,7 @@ class NonDatabaseFieldBase:
 
 
 class MoneyField(NonDatabaseFieldBase):
+    serialize = True
 
     description = (
         "A field that combines an amount of money and currency code into Money"
