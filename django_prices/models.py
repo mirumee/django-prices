@@ -64,7 +64,6 @@ class NonDatabaseFieldBase:
 
 
 class MoneyField(NonDatabaseFieldBase):
-    serialize = True
 
     description = (
         "A field that combines an amount of money and currency code into Money"
@@ -132,8 +131,6 @@ class MoneyField(NonDatabaseFieldBase):
 
 class TaxedMoneyField(NonDatabaseFieldBase):
     
-    serialize = True
-
     description = "A field that combines net and gross fields values into TaxedMoney."
 
     def __init__(
