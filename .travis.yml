@@ -5,6 +5,7 @@ python:
   - "3.6"
   - "3.7"
   - "3.8"
+  - "3.9"
 cache:
   pip: true
 install:
@@ -24,6 +25,8 @@ matrix:
     - python: "3.7"
       env: DJANGO="master"
     - python: "3.8"
+      env: DJANGO="master"
+    - python: "3.9"
       env: DJANGO="master"
 after_success:
   - codecov
