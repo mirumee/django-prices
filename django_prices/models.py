@@ -12,6 +12,8 @@ from functools import total_ordering
 class NonDatabaseFieldBase:
     """Base class for all fields that are not stored in the database."""
 
+    serialize = True
+
     empty_values = list(validators.EMPTY_VALUES)
 
     # Field flags
