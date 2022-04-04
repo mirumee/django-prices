@@ -31,6 +31,10 @@ class NonDatabaseFieldBase:
     one_to_many = None
     one_to_one = None
 
+    unique_for_date = None
+    unique_for_month = None
+    unique_for_year = None
+
     def __init__(self):
         self.column = None
         self.primary_key = False
