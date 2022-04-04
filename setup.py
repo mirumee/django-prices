@@ -34,7 +34,7 @@ setup(
     classifiers=CLASSIFIERS,
     install_requires=[
         "Babel>=2.2",
-        "Django>=2.2,<4",
+        "Django>=2.2",
         "enmerkar>=0.7.1",
         "prices>=1.0.0",
     ],
