@@ -11,6 +11,8 @@ from functools import total_ordering
 @total_ordering
 class NonDatabaseFieldBase:
     """Base class for all fields that are not stored in the database."""
+    
+    serialize = True
 
     empty_values = list(validators.EMPTY_VALUES)
 
@@ -128,7 +130,7 @@ class MoneyField(NonDatabaseFieldBase):
 
 
 class TaxedMoneyField(NonDatabaseFieldBase):
-
+    
     description = "A field that combines net and gross fields values into TaxedMoney."
 
     def __init__(
