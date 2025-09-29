@@ -2,8 +2,6 @@ dist: xenial
 language: python
 sudo: false
 python:
-  - "3.8"
-  - "3.9"
   - "3.10"
   - "3.11"
   - "3.12"
@@ -23,16 +21,6 @@ env:
     - DJANGO="master"
 matrix:
   allow_failures:
-    - python: "3.8"
-      env: DJANGO="5.0"
-    - python: "3.8"
-      env: DJANGO="master"
-
-    - python: "3.9"
-      env: DJANGO="5.0"
-    - python: "3.9"
-      env: DJANGO="master"
-
     - python: "3.10"
       env: DJANGO="3.0"
 
