@@ -7,8 +7,6 @@ CLASSIFIERS = [
     "License :: OSI Approved :: BSD License",
     "Operating System :: OS Independent",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -35,6 +33,7 @@ setup(
     packages=["django_prices", "django_prices.templatetags", "django_prices.utils"],
     include_package_data=True,
     classifiers=CLASSIFIERS,
+    python_requires=">=3.10",
     install_requires=[
         "Babel>=2.2",
         "Django>=3.0,<6",
