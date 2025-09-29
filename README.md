@@ -7,7 +7,6 @@ django-prices: Django fields for the `prices` module
 
 * `pip install django-prices`
 * Add `django_prices` to your `INSTALLED_APPS` at `settings.py`
-* Follow `enmerkar` [instructions](https://github.com/Zegocover/enmerkar#using-the-middleware) and update both your `INSTALLED_APPS` and `MIDDLEWARE_CLASSES`.
 
 # Features
 

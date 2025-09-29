@@ -23,6 +23,7 @@ class NonDatabaseFieldBase:
 
     is_relation = False
     remote_field = None
+    generated = False
 
     many_to_many = None
     many_to_one = None
