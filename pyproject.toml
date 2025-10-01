@@ -24,6 +24,7 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Application Frameworks",
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
+requires-python = ">=3.10"
 dependencies = ["Babel>=2.2", "Django>=3.0", "prices>=1.0.0"]
 
 [project.urls]
