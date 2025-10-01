@@ -1,17 +1,17 @@
-# coding: utf-8
 import pytest
-from django_prices import forms, widgets
 from prices import Money
+
+from django_prices import forms, widgets
 
 from .forms import (
     AVAILABLE_CURRENCIES,
+    FixedCurrencyOptionalPriceForm,
+    FixedCurrencyRequiredPriceForm,
     MaxMinPriceForm,
     ModelForm,
     OptionalPriceForm,
     RequiredPriceForm,
     ValidatedPriceForm,
-    FixedCurrencyRequiredPriceForm,
-    FixedCurrencyOptionalPriceForm,
 )
 
 
@@ -59,11 +59,11 @@ def test_form_changed_when_only_one_value_is_changed():
     form = RequiredPriceForm(
         data={"price_net_0": "5"}, initial={"price_net": Money(10, "BTC")}
     )
-    assert bool(form.changed_data) == True
+    assert bool(form.changed_data)
     form = RequiredPriceForm(
         data={"price_net_1": "USD"}, initial={"price_net": Money(10, "BTC")}
     )
-    assert bool(form.changed_data) == True
+    assert bool(form.changed_data)
 
 
 def test_form_field_passes_all_validations_for_correct_money_value():

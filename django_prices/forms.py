@@ -7,9 +7,13 @@ from django import forms
 from django.core.validators import ValidationError
 from prices import Money
 
-from .utils.locale import get_locale_data
-from .validators import MaxMoneyValidator, MinMoneyValidator, MoneyPrecisionValidator
-from .widgets import FixedCurrencyMoneyInput, MoneyInput
+from django_prices.utils.locale import get_locale_data
+from django_prices.validators import (
+    MaxMoneyValidator,
+    MinMoneyValidator,
+    MoneyPrecisionValidator,
+)
+from django_prices.widgets import FixedCurrencyMoneyInput, MoneyInput
 
 __all__ = ("MoneyField", "MoneyInput")
 
@@ -45,7 +49,7 @@ class MoneyField(forms.MultiValueField):
         decimal_places: int = None,
         validators=(),
         *args,
-        **kwargs
+        **kwargs,
     ):
         decimal_field = forms.DecimalField(
             max_digits=max_digits, decimal_places=decimal_places
@@ -66,9 +70,7 @@ class MoneyField(forms.MultiValueField):
                 choices=_get_currency_choices(available_currencies)
             )
 
-        super(MoneyField, self).__init__(
-            fields, widget=widget_instance, *args, **kwargs
-        )
+        super().__init__(fields, widget=widget_instance, *args, **kwargs)
 
         self.validators = list(itertools.chain(self.default_validators, validators))
         self.validators.append(MoneyPrecisionValidator(max_digits, decimal_places))

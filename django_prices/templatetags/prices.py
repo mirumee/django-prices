@@ -1,15 +1,15 @@
-from babel import support as babel_support
 from babel import core as babel_core
+from babel import support as babel_support
 from django import template
 from django.conf import settings
-from django.utils.translation import to_locale, get_language
+from django.utils.translation import get_language, to_locale
+
 try:
     from pytz import timezone
 except ImportError:
     timezone = None
 
-from ..utils.formatting import format_price
-
+from django_prices.utils.formatting import format_price
 
 register = template.Library()
 

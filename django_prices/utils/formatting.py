@@ -5,7 +5,7 @@ from babel.core import get_global
 from babel.numbers import format_currency
 from django.utils.safestring import mark_safe
 
-from .locale import get_locale_data
+from django_prices.utils.locale import get_locale_data
 
 
 def get_currency_fraction(currency):

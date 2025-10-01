@@ -2,9 +2,11 @@ import warnings
 
 from django import template
 
-from .prices import amount as new_amount
-from ..utils.formatting import (
+from django_prices.templatetags.prices import amount as new_amount
+from django_prices.utils.formatting import (
     format_price as new_format_price,
+)
+from django_prices.utils.formatting import (
     get_currency_fraction as new_get_currency_fraction,
 )
 
@@ -13,7 +15,7 @@ register = template.Library()
 
 def deprecation_warning():
     warnings.warn(
-        "Module `prices_i18n` is deprecated and will be removed in future version. Use `prices` instead."
+        "Module `prices_i18n` is deprecated and will be removed in future version. Use `prices` instead."  # noqa: E501
     )
 
 

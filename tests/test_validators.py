@@ -1,12 +1,12 @@
-# coding: utf-8
 import pytest
 from django.core.exceptions import ValidationError
+from prices import Money
+
 from django_prices.validators import (
     MaxMoneyValidator,
     MinMoneyValidator,
     MoneyPrecisionValidator,
 )
-from prices import Money
 
 
 def test_max_money_validation_raises_error_if_greater_money():

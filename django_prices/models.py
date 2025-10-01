@@ -1,11 +1,11 @@
 from decimal import Decimal
+from functools import total_ordering
 
 from django.core import validators
 from django.db.models import Field
 from prices import Money, TaxedMoney
 
-from . import forms
-from functools import total_ordering
+from django_prices import forms
 
 
 @total_ordering
@@ -63,7 +63,6 @@ class NonDatabaseFieldBase:
 
 
 class MoneyField(NonDatabaseFieldBase):
-
     description = (
         "A field that combines an amount of money and currency code into Money"
         "It allows to store prices with different currencies in one database."
@@ -74,18 +73,15 @@ class MoneyField(NonDatabaseFieldBase):
         amount_field="price_amount",
         currency_field="price_currency",
         verbose_name=None,
-        **kwargs
+        **kwargs,
     ):
-        super(MoneyField, self).__init__()
+        super().__init__()
         self.amount_field = amount_field
         self.currency_field = currency_field
         self.verbose_name = verbose_name
 
     def __str__(self):
-        return "MoneyField(amount_field=%s, currency_field=%s)" % (
-            self.amount_field,
-            self.currency_field,
-        )
+        return f"MoneyField(amount_field={self.amount_field}, currency_field={self.currency_field})"  # noqa: E501
 
     def __get__(self, instance, cls=None):
         if instance is None:
@@ -129,7 +125,6 @@ class MoneyField(NonDatabaseFieldBase):
 
 
 class TaxedMoneyField(NonDatabaseFieldBase):
-
     description = "A field that combines net and gross fields values into TaxedMoney."
 
     def __init__(
@@ -138,19 +133,16 @@ class TaxedMoneyField(NonDatabaseFieldBase):
         gross_amount_field="price_amount_gross",
         currency="currency",
         verbose_name=None,
-        **kwargs
+        **kwargs,
     ):
-        super(TaxedMoneyField, self).__init__()
+        super().__init__()
         self.net_amount_field = net_amount_field
         self.gross_amount_field = gross_amount_field
         self.currency = currency
         self.verbose_name = verbose_name
 
     def __str__(self):
-        return (
-            "TaxedMoneyField(net_amount_field=%s, gross_amount_field=%s, currency=%s)"
-            % (self.net_amount_field, self.gross_amount_field, self.currency)
-        )
+        return f"TaxedMoneyField(net_amount_field={self.net_amount_field}, gross_amount_field={self.gross_amount_field}, currency={self.currency})"  # noqa: E501
 
     def __get__(self, instance, cls=None):
         if instance is None:

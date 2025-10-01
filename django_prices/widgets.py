@@ -11,7 +11,7 @@ class MoneyInput(forms.MultiWidget):
             forms.TextInput(attrs={"type": "number", "step": "any"}),
             forms.Select(choices=choices),
         ]
-        super(MoneyInput, self).__init__(widgets, attrs)
+        super().__init__(widgets, attrs)
 
     def decompress(self, value):
         if value and isinstance(value, Money):
@@ -28,7 +28,7 @@ class FixedCurrencyMoneyInput(forms.MultiWidget):
             forms.TextInput(attrs={"type": "number", "step": "any"}),
             forms.HiddenInput(),
         ]
-        super(FixedCurrencyMoneyInput, self).__init__(widgets, attrs)
+        super().__init__(widgets, attrs)
 
     def decompress(self, value):
         if value and isinstance(value, Money):
@@ -36,9 +36,7 @@ class FixedCurrencyMoneyInput(forms.MultiWidget):
         return [None, None]
 
     def render(self, name, value, attrs=None, renderer=None):
-        widget = super(FixedCurrencyMoneyInput, self).render(
-            name, value, attrs=attrs, renderer=renderer
-        )
+        widget = super().render(name, value, attrs=attrs, renderer=renderer)
         return render_to_string(
             self.template, {"widget": widget, "value": value, "currency": self.currency}
         )
