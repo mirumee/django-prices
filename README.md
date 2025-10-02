@@ -1,7 +1,7 @@
 django-prices: Django fields for the `prices` module
 ====================================================
 
-[![codecov.io](https://img.shields.io/codecov/c/github/mirumee/django-prices/master.svg)](http://codecov.io/github/mirumee/django-prices?branch=master)
+[![codecov](https://codecov.io/github/mirumee/django-prices/graph/badge.svg?token=UQzoumLsct)](https://codecov.io/github/mirumee/django-prices)
 
 # Installation
 
