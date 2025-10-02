@@ -4,11 +4,12 @@ build-backend = "hatchling.build"
 
 [project]
 name = "django-prices"
-version = "2.3.0"
+dynamic = ["version"]
 readme = "README.md"
 description = "Django fields for the prices module"
 authors = [{ name = "Mirumee Software", email = "hello@mirumee.com" }]
-license = { file = "LICENSE" }
+license = "BSD-3-Clause"
+license-files = ["LICENSE"]
 classifiers = [
     "Environment :: Web Environment",
     "Intended Audience :: Developers",
@@ -27,28 +28,21 @@ classifiers = [
 requires-python = ">=3.10"
 dependencies = ["Babel>=2.2", "Django>=3.0", "prices>=1.0.0"]
 
+[project.optional-dependencies]
+dev = ["ipdb"]
+test = ["pytest", "pytest-cov", "pytest-django", "coverage[toml]"]
+
 [project.urls]
 "Homepage" = "https://github.com/mirumee/django-prices"
 "Repository" = "https://github.com/mirumee/django-prices"
 "Bug Tracker" = "https://github.com/mirumee/django-prices/issues"
 
-[project.optional-dependencies]
-dev = ["ipdb"]
-test = ["pytest-cov", "pytest-django", "coverage[toml]"]
-
 [tool.hatch.build]
-include = [
-    "django_prices/**/*.py",
-    "django_prices/**/*.json",
-]
+include = ["django_prices/**/*.py", "django_prices/**/*.json"]
+exclude = ["tests"]
 
-[tool.hatch.build.targets.wheel]
-exclude = ["/.github"]
-packages = ["django_prices"]
-
-[tool.hatch.build.targets.sdist]
-packages = ["django_prices"]
-
+[tool.hatch.version]
+path = "django_prices/__about__.py"
 
 [tool.hatch.envs.default]
 features = ["dev", "test"]
@@ -58,11 +52,7 @@ check = ["hatch fmt", "hatch test -a", "hatch test --cover"]
 
 
 [tool.hatch.envs.hatch-test]
-dependencies = [
-    "pytest-cov",
-    "coverage[toml]",
-    "pytest-django",
-]
+dependencies = ["pytest", "pytest-cov", "coverage[toml]", "pytest-django"]
 
 #[tool.hatch.envs.hatch-test.env-vars]
 #DJANGO_SETTINGS_MODULE = "tests.settings"
@@ -70,59 +60,60 @@ dependencies = [
 [[tool.hatch.envs.hatch-test.matrix]]
 python = ["3.10", "3.11", "3.12", "3.13"]
 
+# Tool configuration
+
+## Pytest configuration
+
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "tests.settings"
 pythonpath = "."
+testpaths = ["tests"]
 
-# Coverage - `hatch test --cover` options
+## Coverage configuration
 
 [tool.coverage.run]
-source_pkgs = ["django_prices"]
-branch = true
-parallel = true
-
-[tool.coverage.paths]
-django_prices = ["django_prices"]
-tests = ["tests"]
+source = ["django_prices", "tests"]
 
 [tool.coverage.report]
-exclude_lines = [
-    "no cov",
+exclude_also = [
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
     "if __name__ == .__main__.:",
     "if TYPE_CHECKING:",
-    "@abstract",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
 ]
+omit = ["*/__about__.py"]
 fail_under = 90
 
 [tool.hatch.envs.coverage]
 detached = true
-dependencies = [
-  "coverage[toml]",
-]
 
 [tool.hatch.envs.coverage.scripts]
 combine = "coverage combine {args}"
 html = "coverage html --skip-covered --skip-empty"
 xml = "coverage xml --skip-empty"
 
-# Ruff - `hatch fmt` options
+## Ruff configuration
 
 [tool.ruff]
 line-length = 88
-target-version = "py38"
+target-version = "py310"
 
 [tool.ruff.format]
 docstring-code-format = true
-docstring-code-line-length = 80
+docstring-code-line-length = 99
 
 [tool.ruff.lint]
 select = ["E", "F", "G", "I", "N", "Q", "UP", "C90", "T20", "TID"]
-
-[tool.ruff.lint.flake8-tidy-imports]
-ban-relative-imports = "all"
+ignore = ["UP038"]
 
 [tool.ruff.lint.mccabe]
-max-complexity = 30
+max-complexity = 15
 
 [tool.ruff.lint.isort]
 known-first-party = ["django_prices"]
