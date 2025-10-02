@@ -50,7 +50,6 @@ features = ["dev", "test"]
 [tool.hatch.envs.default.scripts]
 check = ["hatch fmt", "hatch test -a", "hatch test --cover"]
 
-
 [tool.hatch.envs.hatch-test]
 dependencies = ["pytest", "pytest-cov", "coverage[toml]", "pytest-django"]
 
@@ -92,6 +91,7 @@ fail_under = 90
 
 [tool.hatch.envs.coverage]
 detached = true
+dependencies = ["coverage[toml]"]
 
 [tool.hatch.envs.coverage.scripts]
 combine = "coverage combine {args}"
