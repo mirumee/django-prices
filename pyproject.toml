@@ -53,9 +53,6 @@ check = ["hatch fmt", "hatch test -a", "hatch test --cover"]
 [tool.hatch.envs.hatch-test]
 dependencies = ["pytest", "pytest-cov", "coverage[toml]", "pytest-django"]
 
-#[tool.hatch.envs.hatch-test.env-vars]
-#DJANGO_SETTINGS_MODULE = "tests.settings"
-
 [[tool.hatch.envs.hatch-test.matrix]]
 python = ["3.10", "3.11", "3.12", "3.13"]
 
