@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/p/ariadne
+      url: https://pypi.org/p/django-prices
     permissions:
       # IMPORTANT: this permission is mandatory for trusted publishing
       id-token: write
