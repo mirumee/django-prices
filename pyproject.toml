@@ -38,7 +38,7 @@ test = ["pytest", "pytest-cov", "pytest-django", "coverage[toml]"]
 "Bug Tracker" = "https://github.com/mirumee/django-prices/issues"
 
 [tool.hatch.build]
-include = ["django_prices/**/*.py", "django_prices/**/*.json"]
+include = ["django_prices/**/*.py", "django_prices/**/*.html"]
 exclude = ["tests"]
 
 [tool.hatch.version]
