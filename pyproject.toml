@@ -26,7 +26,7 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 requires-python = ">=3.10"
-dependencies = ["Babel>=2.2", "Django>=3.0", "prices>=1.0.0"]
+dependencies = ["Babel>=2.2", "Django>=3.2", "prices>=1.0.0"]
 
 [project.optional-dependencies]
 dev = ["ipdb"]
@@ -53,8 +53,27 @@ check = ["hatch fmt", "hatch test -a", "hatch test --cover"]
 [tool.hatch.envs.hatch-test]
 dependencies = ["pytest", "pytest-cov", "coverage[toml]", "pytest-django"]
 
+# Django 3.2
+[[tool.hatch.envs.hatch-test.matrix]]
+python = ["3.10"]
+django = ["3.2"]
+
+# Django 4.2
+[[tool.hatch.envs.hatch-test.matrix]]
+python = ["3.10", "3.11", "3.12"]
+django = ["4.2"]
+
+# Django 5.2
 [[tool.hatch.envs.hatch-test.matrix]]
 python = ["3.10", "3.11", "3.12", "3.13"]
+django = ["5.2"]
+
+[tool.hatch.envs.hatch-test.overrides]
+matrix.django.dependencies = [
+    { value = "Django==3.2.*", if = ["3.2"]},
+    { value = "Django==4.2.*", if = ["4.2"]},
+    { value = "Django==5.2.*", if = ["5.2"]},
+]
 
 # Tool configuration
 
