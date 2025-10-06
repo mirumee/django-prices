@@ -18,20 +18,16 @@ env:
 
 jobs:
   test:
+    name: Test for Python and Django versions
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ["3.10", "3.11", "3.12", "3.13"]
-
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: pyproject.toml
 
       - name: Install Hatch
         uses: pypa/hatch@a3c83ab3d481fbc2dc91dd0088628817488dd1d5
@@ -40,7 +36,7 @@ jobs:
         run: hatch fmt --check
 
       - name: Run tests
-        run: hatch test -c -py ${{ matrix.python-version }}
+        run: hatch test --all
 
   cov-report:
     name: Generate and publish coverage report
