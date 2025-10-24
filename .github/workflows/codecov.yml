@@ -1,20 +1,18 @@
-name: Tests
+name: Codecov Report Upload
 
 on:
   push:
     branches:
       - master
   pull_request:
-  workflow_call:
-  workflow_dispatch:
 
 env:
   PYTHONUNBUFFERED: "1"
   FORCE_COLOR: "1"
 
 jobs:
-  test:
-    name: Test for Python and Django versions
+  cov-report:
+    name: Generate and publish coverage report
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source code
@@ -28,8 +26,14 @@ jobs:
       - name: Install Hatch
         uses: pypa/hatch@a3c83ab3d481fbc2dc91dd0088628817488dd1d5
 
-      - name: Run static analysis
-        run: hatch fmt --check
+      - name: Run coverage
+        run: hatch test --cover -i python=3.13
 
-      - name: Run tests
-        run: hatch test --all
+      - name: Generate coverage report
+        run: hatch run coverage:xml
+
+      - name: Publish coverage report to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: coverage.xml
