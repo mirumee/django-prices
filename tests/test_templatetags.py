@@ -1,12 +1,11 @@
-# coding: utf-8
 import functools
 
 import pytest
 from django.utils import translation
+from prices import Money, TaxedMoney, percentage_discount
+
 from django_prices.templatetags import prices
 from django_prices.utils.formatting import get_currency_fraction
-
-from prices import Money, TaxedMoney, percentage_discount
 
 
 @pytest.fixture(scope="module")
@@ -36,7 +35,7 @@ def test_non_existing_locale(money_fixture):
     assert amount  # No exception, success!
 
 
-def test_non_cannonical_locale_zh_CN(money_fixture, settings):
+def test_non_cannonical_locale_zh_cn(money_fixture, settings):
     # Test detecting an error that occur for language 'zh_CN' for which
     # the canonical code is 'zh_Hans_CN', see:
     #     Babel 1.0+ doesn't support `zh_CN`
@@ -73,13 +72,13 @@ def test_templatetag_amount_wrong_param(money_fixture):
     assert amount == "$10.00"
 
 
-def test_get_currency_fraction_USD():
+def test_get_currency_fraction_usd():
     result = get_currency_fraction("USD")
     assert result == 2
 
 
 def test_get_currency_fraction_unknown_currency():
-    result = get_currency_fraction(("test"))
+    result = get_currency_fraction("test")
     assert result == 2
 
 

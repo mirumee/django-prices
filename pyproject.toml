@@ -1,26 +1,139 @@
-[tool.black]
-target_version = ['py310', 'py311', 'py312', 'py313']
-include = '\.pyi?$'
-exclude = '''
-/(\.git/
-  |\.eggs
-  |\.hg
-  |__pycache__
-  |\.cache
-  |\.ipynb_checkpoints
-  |\.mypy_cache
-  |\.pytest_cache
-  |\.tox
-  |\.venv
-  |node_modules
-  |_build
-  |buck-out
-  |build
-  |dist
-  |media
-  |infrastructure
-  |templates
-  |locale
-  |docs
-)/
-'''
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "django-prices"
+dynamic = ["version"]
+readme = "README.md"
+description = "Django fields for the prices module"
+authors = [{ name = "Mirumee Software", email = "hello@mirumee.com" }]
+license = "BSD-3-Clause"
+license-files = ["LICENSE"]
+classifiers = [
+    "Environment :: Web Environment",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
+    "Topic :: Software Development :: Libraries :: Application Frameworks",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+requires-python = ">=3.10"
+dependencies = ["Babel>=2.2", "Django>=3.2", "prices>=1.0.0"]
+
+[project.optional-dependencies]
+dev = ["ipdb"]
+test = ["pytest", "pytest-cov", "pytest-django", "coverage[toml]"]
+
+[project.urls]
+"Homepage" = "https://github.com/mirumee/django-prices"
+"Repository" = "https://github.com/mirumee/django-prices"
+"Bug Tracker" = "https://github.com/mirumee/django-prices/issues"
+
+[tool.hatch.build]
+include = ["django_prices/**/*.py", "django_prices/**/*.html"]
+exclude = ["tests"]
+
+[tool.hatch.version]
+path = "django_prices/__about__.py"
+
+[tool.hatch.envs.default]
+features = ["dev", "test"]
+
+[tool.hatch.envs.default.scripts]
+check = ["hatch fmt", "hatch test -a", "hatch test --cover"]
+
+[tool.hatch.envs.hatch-test]
+dependencies = ["pytest", "pytest-cov", "coverage[toml]", "pytest-django"]
+
+# Django 3.2
+[[tool.hatch.envs.hatch-test.matrix]]
+python = ["3.10"]
+django = ["3.2"]
+
+# Django 4.2
+[[tool.hatch.envs.hatch-test.matrix]]
+python = ["3.10", "3.11", "3.12"]
+django = ["4.2"]
+
+# Django 5.2
+[[tool.hatch.envs.hatch-test.matrix]]
+python = ["3.10", "3.11", "3.12", "3.13"]
+django = ["5.2"]
+
+[tool.hatch.envs.hatch-test.overrides]
+matrix.django.dependencies = [
+    { value = "Django==3.2.*", if = ["3.2"]},
+    { value = "Django==4.2.*", if = ["4.2"]},
+    { value = "Django==5.2.*", if = ["5.2"]},
+]
+
+# Tool configuration
+
+## Pytest configuration
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "tests.settings"
+pythonpath = "."
+testpaths = ["tests"]
+
+## Coverage configuration
+
+[tool.coverage.run]
+source = ["django_prices", "tests"]
+
+[tool.coverage.report]
+exclude_also = [
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+omit = ["*/__about__.py"]
+fail_under = 90
+
+[tool.hatch.envs.coverage]
+detached = true
+dependencies = ["coverage[toml]"]
+
+[tool.hatch.envs.coverage.scripts]
+combine = "coverage combine {args}"
+html = "coverage html --skip-covered --skip-empty"
+xml = "coverage xml --skip-empty"
+
+## Ruff configuration
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+
+[tool.ruff.format]
+docstring-code-format = true
+docstring-code-line-length = 99
+
+[tool.ruff.lint]
+select = ["E", "F", "G", "I", "N", "Q", "UP", "C90", "T20", "TID"]
+ignore = ["UP038"]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 15
+
+[tool.ruff.lint.isort]
+known-first-party = ["django_prices"]
+
+[tool.ruff.lint.flake8-pytest-style]
+fixture-parentheses = false
+mark-parentheses = false

@@ -6,17 +6,17 @@ from django.core.validators import (
     ValidationError,
 )
 
-from .utils.formatting import format_price
+from django_prices.utils.formatting import format_price
 
 
 class MoneyPrecisionValidator(DecimalValidator):
     def __init__(self, *args):
-        super(MoneyPrecisionValidator, self).__init__(*args)
+        super().__init__(*args)
 
     def __call__(self, other):
         value = other.amount
         currency = other.currency
-        super(MoneyPrecisionValidator, self).__call__(value)
+        super().__call__(value)
 
         if is_currency(currency):
             currency_precision = get_currency_precision(currency)

@@ -1,4 +1,5 @@
 from django.db import models
+
 from django_prices.models import MoneyField, TaxedMoneyField
 
 AVAILABLE_CURRENCIES = [("BTC", "bitcoins"), ("USD", "US dollar")]

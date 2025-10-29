@@ -1,11 +1,11 @@
-# coding: utf-8
 from decimal import Decimal
 
 import pytest
 from django.core.exceptions import ValidationError
 from django.db.models.fields import DecimalField
-from django_prices import forms, widgets, models
 from prices import Money, TaxedMoney
+
+from django_prices import forms, models, widgets
 
 from .models import Model, NullModel
 
@@ -69,7 +69,7 @@ def test_money_field_set_instance_values():
     assert instance.currency == "USD"
 
 
-def test_money_field_formfield_returns_form_with_select_input_if_choices_are_defined_for_currency_field():
+def test_money_field_formfield_returns_form_with_select_input_if_choices_are_defined_for_currency_field():  # noqa: E501
     field = Model.price_net
     form_field = field.formfield()
     assert isinstance(form_field, forms.MoneyField)

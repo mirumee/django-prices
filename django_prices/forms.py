@@ -1,15 +1,18 @@
 import itertools
 from decimal import Decimal
-from typing import List, Optional, Tuple
 
 from babel.numbers import get_currency_symbol
 from django import forms
 from django.core.validators import ValidationError
 from prices import Money
 
-from .utils.locale import get_locale_data
-from .validators import MaxMoneyValidator, MinMoneyValidator, MoneyPrecisionValidator
-from .widgets import FixedCurrencyMoneyInput, MoneyInput
+from django_prices.utils.locale import get_locale_data
+from django_prices.validators import (
+    MaxMoneyValidator,
+    MinMoneyValidator,
+    MoneyPrecisionValidator,
+)
+from django_prices.widgets import FixedCurrencyMoneyInput, MoneyInput
 
 __all__ = ("MoneyField", "MoneyInput")
 
@@ -19,7 +22,7 @@ def _get_symbol(currency_code: str) -> str:
     return get_currency_symbol(currency_code, locale_code)
 
 
-def _get_currency_choices(currencies: List[str]) -> List[Tuple[str, str]]:
+def _get_currency_choices(currencies: list[str]) -> list[tuple[str, str]]:
     """Generate choices for SelectField.
     As a label we are presenting currency symbol."""
     currency_choices = [(code, _get_symbol(code)) for code in currencies]
@@ -37,15 +40,15 @@ class MoneyField(forms.MultiValueField):
 
     def __init__(
         self,
-        available_currencies: List[str],
+        available_currencies: list[str],
         widget=None,
-        max_values: Optional[List] = None,
-        min_values: Optional[List] = None,
+        max_values: list | None = None,
+        min_values: list | None = None,
         max_digits: int = None,
         decimal_places: int = None,
         validators=(),
         *args,
-        **kwargs
+        **kwargs,
     ):
         decimal_field = forms.DecimalField(
             max_digits=max_digits, decimal_places=decimal_places
@@ -66,9 +69,7 @@ class MoneyField(forms.MultiValueField):
                 choices=_get_currency_choices(available_currencies)
             )
 
-        super(MoneyField, self).__init__(
-            fields, widget=widget_instance, *args, **kwargs
-        )
+        super().__init__(fields, widget=widget_instance, *args, **kwargs)
 
         self.validators = list(itertools.chain(self.default_validators, validators))
         self.validators.append(MoneyPrecisionValidator(max_digits, decimal_places))
@@ -81,7 +82,7 @@ class MoneyField(forms.MultiValueField):
                 [MinMoneyValidator(limit_value) for limit_value in min_values]
             )
 
-    def compress(self, data_list: Optional[Tuple[Decimal, str]]) -> Optional[Money]:
+    def compress(self, data_list: tuple[Decimal, str] | None) -> Money | None:
         """If field is optional, return None when there is no amount provided."""
         if not data_list:
             return None

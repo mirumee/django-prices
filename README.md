@@ -1,7 +1,10 @@
 django-prices: Django fields for the `prices` module
 ====================================================
 
-[![Build Status](https://secure.travis-ci.org/mirumee/django-prices.png)](https://travis-ci.org/mirumee/django-prices) [![codecov.io](https://img.shields.io/codecov/c/github/mirumee/django-prices/master.svg)](http://codecov.io/github/mirumee/django-prices?branch=master)
+[![codecov](https://codecov.io/github/mirumee/django-prices/graph/badge.svg?token=UQzoumLsct)](https://codecov.io/github/mirumee/django-prices)
+![PyPI - Version](https://img.shields.io/pypi/v/django-prices)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/django-prices)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/django-prices)
 
 # Installation
 
@@ -181,3 +184,9 @@ Steps to migrate:
     ```
 
 1. Remember to address changes in previously edited ModelForms
+
+---
+
+**Crafted with ❤️ by [Mirumee Software](http://mirumee.com)**
+
+hello@mirumee.com
