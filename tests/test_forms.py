@@ -34,6 +34,20 @@ def test_render_fixed_currency_money_input():
         assert attr in result
 
 
+def test_fixed_currency_money_input_decompress_with_none():
+    """Test that decompress returns currency even when value is None."""
+    widget = widgets.FixedCurrencyMoneyInput(currency="USD")
+    result = widget.decompress(None)
+    assert result == [None, "USD"], "Currency should be set even when value is None"
+
+
+def test_fixed_currency_money_input_decompress_with_value():
+    """Test that decompress returns correct values when Money object is provided."""
+    widget = widgets.FixedCurrencyMoneyInput(currency="USD")
+    result = widget.decompress(Money(10, "USD"))
+    assert result == [10, "USD"], "Should return amount and currency from Money object"
+
+
 @pytest.mark.parametrize(
     "data,initial,expected_result",
     [
