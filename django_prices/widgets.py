@@ -33,7 +33,7 @@ class FixedCurrencyMoneyInput(forms.MultiWidget):
     def decompress(self, value):
         if value and isinstance(value, Money):
             return [value.amount, self.currency]
-        return [None, None]
+        return [None, self.currency]
 
     def render(self, name, value, attrs=None, renderer=None):
         widget = super().render(name, value, attrs=attrs, renderer=renderer)
